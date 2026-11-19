@@ -120,20 +120,20 @@ export default function Hero() {
       <TopBar />
       <Navbar />
 
-      <div className="relative z-10 mx-auto w-full max-w-7xl xl:max-w-[90rem] 2xl:max-w-[100rem] px-5 pb-16 pt-28 sm:px-8 md:pt-[9.5rem] lg:px-12 lg:pb-16 lg:pt-[9.5rem]">
+      <div className="relative z-10 mx-auto w-full max-w-7xl xl:max-w-[90rem] 2xl:max-w-[100rem] px-5 pb-14 pt-24 sm:px-8 sm:pb-16 md:pt-[9.5rem] lg:px-12 lg:pb-16 lg:pt-[9.5rem]">
         <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-6">
           {/* Left: hero content */}
-          <div className="max-w-[34rem]">
+          <div className="mx-auto w-full max-w-[34rem] text-center lg:mx-0 lg:text-left">
             <p
-              className="mz-up flex items-center gap-3 text-[13px] font-medium tracking-wide text-on-dark/80 sm:text-sm"
+              className="mz-up flex items-center justify-center gap-3 text-[13px] font-medium tracking-wide text-on-dark/80 sm:text-sm lg:justify-start"
               style={{ animationDelay: "0ms" }}
             >
               <span>Smart Repair. Better Life.</span>
-              <span className="h-px w-14 bg-on-dark/40" aria-hidden="true" />
+              <span className="hidden h-px w-14 bg-on-dark/40 lg:block" aria-hidden="true" />
             </p>
 
             <h1
-              className="mz-up mt-5 font-display text-[clamp(2.6rem,4.8vw,4.4rem)] leading-[1.04] tracking-tight text-on-dark"
+              className="mz-up mt-4 font-display text-[clamp(2rem,9.5vw,2.6rem)] leading-[1.05] tracking-tight text-on-dark sm:mt-5 sm:text-[clamp(2.6rem,4.8vw,4.4rem)] sm:leading-[1.04]"
               style={{ animationDelay: "100ms" }}
             >
               <span className="block dark:hidden">
@@ -148,7 +148,7 @@ export default function Hero() {
             </h1>
 
             <p
-              className="mz-up mt-6 max-w-[28rem] text-[15px] leading-7 text-on-dark/75 sm:text-[17px] sm:leading-8"
+              className="mz-up mx-auto mt-4 max-w-[28rem] text-[15px] leading-7 text-on-dark/75 sm:mt-6 sm:text-[17px] sm:leading-8 lg:mx-0 lg:mt-6"
               style={{ animationDelay: "200ms" }}
             >
               <span className="dark:hidden">
@@ -163,12 +163,12 @@ export default function Hero() {
             </p>
 
             <div
-              className="mz-up mt-9 flex flex-wrap items-center gap-x-5 gap-y-4"
+              className="mz-up mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-3 sm:mt-9 sm:gap-x-5 sm:gap-y-4 lg:justify-start"
               style={{ animationDelay: "300ms" }}
             >
               <a
                 href="#services"
-                className="inline-flex items-center justify-center gap-2.5 rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-[0_18px_40px_-16px_rgba(0,124,199,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[color-mix(in_oklab,var(--color-primary),black_12%)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky"
+                className="inline-flex items-center justify-center gap-2.5 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[0_18px_40px_-16px_rgba(0,124,199,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[color-mix(in_oklab,var(--color-primary),black_12%)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky sm:py-3.5 xl:px-7"
               >
                 Explore Services
                 <ArrowRightIcon className="h-4 w-4" />
@@ -176,7 +176,7 @@ export default function Hero() {
 
               <a
                 href="#how-it-works"
-                className="group inline-flex items-center gap-3 rounded-full border-2 border-primary py-1 pl-1 pr-6 text-sm font-semibold text-on-dark transition-colors duration-300 hover:bg-primary/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky"
+                className="group inline-flex items-center gap-3 rounded-full border-2 border-primary py-1 pl-1 pr-5 text-sm font-semibold text-on-dark transition-colors duration-300 hover:bg-primary/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky xl:pr-6"
               >
                 <span className="grid h-10 w-10 place-items-center rounded-full bg-primary/20 text-on-dark transition-colors duration-300 group-hover:bg-primary">
                   <PlayIcon />
@@ -186,7 +186,7 @@ export default function Hero() {
             </div>
 
             <ul
-              className="mz-up mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-[13px] font-medium text-on-dark/75"
+              className="mz-up mt-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[clamp(0.75rem,3.4vw,0.8125rem)] font-medium text-on-dark/75 sm:mt-8 sm:gap-x-6 sm:text-[13px] lg:justify-start"
               style={{ animationDelay: "400ms" }}
             >
               {[
@@ -200,6 +200,18 @@ export default function Hero() {
                 </li>
               ))}
             </ul>
+
+            {/* Image stays visible below lg: a single centered column (text first, then hero visual) */}
+            <div
+              className="mz-up mx-auto mt-6 w-full max-w-[21rem] sm:mt-10 sm:max-w-[26rem] md:mt-12 md:max-w-[30rem] lg:hidden"
+              style={{ animationDelay: "500ms" }}
+            >
+              <HeroStage
+                activeImage={activeImage}
+                frameClassName="aspect-[16/11] sm:aspect-[4/3]"
+                sizes="(min-width: 768px) 30rem, (min-width: 640px) 26rem, 21rem"
+              />
+            </div>
           </div>
 
           {/* Spacer column for desktop visuals */}
@@ -217,11 +229,11 @@ export default function Hero() {
 
       {/*
         Right: image slideshow (transparent PNGs)
-        - left: just right of the navy curve (lg: 56%, xl: 50%, 2xl: 43%). If CURVE_TIERS change, update this too.
+        - left: just right of the navy curve (lg: 52%, xl: 50%, 2xl: 43%). If CURVE_TIERS change, update this too.
         - right: stops 12px before the cards' left edge. --maxw and --gap match the Navbar container.
       */}
       <div
-        className="pointer-events-none absolute inset-y-0 left-[56%] z-[5] hidden items-center justify-center [--gap:1.25rem] [--maxw:80rem] sm:[--gap:2rem] lg:flex xl:left-[50%] xl:[--maxw:90rem] 2xl:left-[43%] 2xl:[--maxw:100rem]"
+        className="pointer-events-none absolute inset-y-0 left-[52%] z-[5] hidden items-center justify-center [--gap:1.25rem] [--maxw:80rem] sm:[--gap:2rem] lg:flex xl:left-[50%] xl:[--maxw:90rem] 2xl:left-[43%] 2xl:[--maxw:100rem]"
         style={
           {
             "--card-w": CARD_W,
@@ -230,51 +242,11 @@ export default function Hero() {
           } as CSSProperties
         }
       >
-        <div className="mz-img-in relative aspect-[4/3] w-full max-w-[1100px]">
-          {/*
-            Stage: large circle behind the images, so they look like they stand on it
-            and the images' bottom edge no longer needs to line up with anything.
-            Change h-[120%] to resize it; adjust the -translate-y value to align it vertically with the images.
-          */}
-          <div
-            aria-hidden="true"
-            className="absolute left-1/2 top-1/2 aspect-square h-[120%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/70 bg-[radial-gradient(circle_at_50%_35%,rgba(255,255,255,0.95),rgba(255,255,255,0.45)_55%,rgba(0,124,199,0.10)_100%)] shadow-[0_40px_80px_-30px_rgba(0,124,199,0.35),inset_0_2px_0_rgba(255,255,255,0.9)] dark:border-sky/25 dark:bg-[radial-gradient(circle_at_50%_35%,rgba(77,168,218,0.35),rgba(18,70,127,0.25)_60%,rgba(11,42,70,0.15)_100%)] dark:shadow-[0_40px_80px_-30px_rgba(0,0,0,0.7)]"
-          />
-          {/* Small shadow under the stage so it looks grounded */}
-          <div
-            aria-hidden="true"
-            className="absolute left-1/2 top-[calc(50%+57%)] h-[6%] w-[60%] -translate-x-1/2 -translate-y-1/2 rounded-[50%] bg-navy/15 blur-2xl dark:bg-black/50"
-          />
-
-          {HERO_IMAGES.map((image, index) => (
-            <div
-              key={image.src}
-              aria-hidden={activeImage !== index}
-              className={`mz-slide-layer absolute inset-0 ${
-                activeImage === index ? "opacity-100" : "opacity-0"
-              }`}
-              style={{
-                transform: `translateX(${image.tx}px) scale(${image.sx * IMG_SCALE}, ${image.sy * IMG_SCALE})`,
-                // Fade-out first, then fade-in, so two images are never visible at once (no ghosting).
-                transitionProperty: "opacity",
-                transitionDuration: "450ms",
-                transitionTimingFunction: "ease-in-out",
-                transitionDelay: activeImage === index ? "450ms" : "0ms",
-              }}
-            >
-              <Image
-                src={image.src}
-                alt={image.alt}
-                fill
-                priority={index === 0}
-                sizes="(min-width: 1024px) 55vw, 0px"
-                className="object-contain object-center drop-shadow-[0_14px_18px_rgba(11,34,64,0.18)] dark:drop-shadow-[0_14px_18px_rgba(0,0,0,0.4)]"
-              />
-            </div>
-          ))}
-
-         
-        </div>
+        <HeroStage
+          activeImage={activeImage}
+          className="mz-img-in mx-auto max-w-[1100px]"
+          sizes="(min-width: 1024px) 55vw, 0px"
+        />
       </div>
 
       {/*
@@ -327,6 +299,73 @@ export default function Hero() {
         </div>
       </div>
     </section>
+  );
+}
+
+type HeroStageProps = {
+  /** Index of the slide currently shown. Owned by Hero so every stage stays in sync. */
+  activeImage: number;
+  /** Responsive sizes hint for next/image. */
+  sizes: string;
+  className?: string;
+  /** Frame aspect ratio. Slightly wider on small phones so the visual sits higher. */
+  frameClassName?: string;
+};
+
+/**
+ * Stage + slideshow shared by the desktop (absolute positioned) layout and the
+ * mobile/tablet (in-flow, centered) layout. Only the wrapper sizing differs.
+ */
+function HeroStage({
+  activeImage,
+  sizes,
+  className = "",
+  frameClassName = "aspect-[4/3]",
+}: HeroStageProps) {
+  return (
+    <div className={`relative w-full ${frameClassName} ${className}`}>
+      {/*
+        Stage: large circle behind the images, so they look like they stand on it
+        and the images' bottom edge no longer needs to line up with anything.
+        Change h-[120%] to resize it; adjust the -translate-y value to align it vertically with the images.
+      */}
+      <div
+        aria-hidden="true"
+        className="absolute left-1/2 top-1/2 aspect-square h-[120%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/70 bg-[radial-gradient(circle_at_50%_35%,rgba(255,255,255,0.95),rgba(255,255,255,0.45)_55%,rgba(0,124,199,0.10)_100%)] shadow-[0_40px_80px_-30px_rgba(0,124,199,0.35),inset_0_2px_0_rgba(255,255,255,0.9)] dark:border-sky/25 dark:bg-[radial-gradient(circle_at_50%_35%,rgba(77,168,218,0.35),rgba(18,70,127,0.25)_60%,rgba(11,42,70,0.15)_100%)] dark:shadow-[0_40px_80px_-30px_rgba(0,0,0,0.7)]"
+      />
+      {/* Small shadow under the stage so it looks grounded */}
+      <div
+        aria-hidden="true"
+        className="absolute left-1/2 top-[calc(50%+57%)] h-[6%] w-[60%] -translate-x-1/2 -translate-y-1/2 rounded-[50%] bg-navy/15 blur-2xl dark:bg-black/50"
+      />
+
+      {HERO_IMAGES.map((image, index) => (
+        <div
+          key={image.src}
+          aria-hidden={activeImage !== index}
+          className={`mz-slide-layer absolute inset-0 ${
+            activeImage === index ? "opacity-100" : "opacity-0"
+          }`}
+          style={{
+            transform: `translateX(${image.tx}px) scale(${image.sx * IMG_SCALE}, ${image.sy * IMG_SCALE})`,
+            // Fade-out first, then fade-in, so two images are never visible at once (no ghosting).
+            transitionProperty: "opacity",
+            transitionDuration: "450ms",
+            transitionTimingFunction: "ease-in-out",
+            transitionDelay: activeImage === index ? "450ms" : "0ms",
+          }}
+        >
+          <Image
+            src={image.src}
+            alt={image.alt}
+            fill
+            priority={index === 0}
+            sizes={sizes}
+            className="object-contain object-center drop-shadow-[0_14px_18px_rgba(11,34,64,0.18)] dark:drop-shadow-[0_14px_18px_rgba(0,0,0,0.4)]"
+          />
+        </div>
+      ))}
+    </div>
   );
 }
 

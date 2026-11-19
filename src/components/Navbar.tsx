@@ -1,32 +1,32 @@
+
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 const NAV_LINKS = [
-  { label: "Home", href: "#home" },
-  { label: "Services", href: "#services" },
-  { label: "How It Works", href: "#how-it-works" },
-  { label: "About", href: "#about" },
+  { label: "Home", href: "/" },
+  { label: "Services", href: "/services" },
+  { label: "How It Works", href: "/about" },
+  { label: "Contact", href: "/contact" },
 ];
 
-/*
- * Colors are plain Tailwind classes, so nothing extra is needed in globals.css:
- *  - default (below lg, and in dark mode): light text, because it sits on navy / blue
- *  - lg and up in LIGHT mode only: navy text, because it sits on the pale panel
- * `lg:[html:not(.dark)_&]:` reads as "lg and up, and <html> has no .dark class".
- * The center links only show from 1360px so they never touch the curve.
- */
 const FOCUS =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky";
 
 const CTRL =
   "text-on-dark border-on-dark/40 hover:bg-on-dark/10 lg:[html:not(.dark)_&]:text-navy lg:[html:not(.dark)_&]:border-navy/40 lg:[html:not(.dark)_&]:hover:bg-navy/5";
+
 const LINK_IDLE =
   "text-on-dark hover:text-sky lg:[html:not(.dark)_&]:text-navy lg:[html:not(.dark)_&]:hover:text-primary";
-const LINK_ACTIVE = "text-on-dark lg:[html:not(.dark)_&]:text-primary";
+
+const LINK_ACTIVE =
+  "text-sky lg:[html:not(.dark)_&]:text-primary";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   function toggleTheme() {
     const root = document.documentElement;
@@ -35,76 +35,81 @@ export default function Navbar() {
     root.classList.toggle("dark", nextIsDark);
     root.style.colorScheme = nextIsDark ? "dark" : "light";
     root.dataset.theme = nextIsDark ? "dark" : "light";
+
     try {
-      localStorage.setItem("mendizo-theme", nextIsDark ? "dark" : "light");
+      localStorage.setItem(
+        "mendizo-theme",
+        nextIsDark ? "dark" : "light"
+      );
     } catch {
       /* storage unavailable */
     }
   }
 
   return (
-    // md:top-10 = sits right below the 40px TopBar (the TopBar is hidden below md, so top-0 there)
     <header className="absolute inset-x-0 top-0 z-40 md:top-10">
       <nav className="mx-auto flex h-20 max-w-7xl xl:max-w-[90rem] 2xl:max-w-[100rem] items-center justify-between gap-6 px-5 sm:px-8 min-[1360px]:grid min-[1360px]:grid-cols-[1fr_auto_1fr]">
-        {/* Logo: always on the navy side */}
-        <a
-          href="#home"
+        {/* Logo */}
+        <Link
+          href="/"
           aria-label="Mendizo home"
           className="group flex items-center gap-2.5 justify-self-start text-on-dark"
         >
           <LogoMark />
+
           <span className="font-display text-[28px] leading-none tracking-wide">
             Mendizo
           </span>
-        </a>
+        </Link>
 
-        {/* Center: plain links, active one has an underline (1360px+) */}
+        {/* Desktop Navigation */}
         <ul className="hidden items-center gap-9 min-[1360px]:flex">
-          {NAV_LINKS.map((link, index) => {
-            const isActive = index === 0;
+          {NAV_LINKS.map((link) => {
+            const isActive = pathname === link.href;
+
             return (
-              <li key={link.label}>
-                <a
+              <li key={link.href}>
+                <Link
                   href={link.href}
                   aria-current={isActive ? "page" : undefined}
-                  className={`relative block py-2 text-[15px] font-semibold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky ${
-                    isActive ? LINK_ACTIVE : LINK_IDLE
+                  className={`block border-b-2 py-2 text-[15px] font-semibold transition-colors duration-200 ${FOCUS} ${
+                    isActive
+                      ? `${LINK_ACTIVE} border-[#007CC7]`
+                      : `${LINK_IDLE} border-transparent`
                   }`}
                 >
                   {link.label}
-                  {isActive && (
-                    <span
-                      aria-hidden="true"
-                      className="absolute inset-x-0 -bottom-0.5 h-0.5 rounded-full bg-current"
-                    />
-                  )}
-                </a>
+                </Link>
               </li>
             );
           })}
         </ul>
 
-        {/* Right controls */}
+        {/* Right Controls */}
         <div className="flex items-center gap-2.5 justify-self-end">
           <ThemeToggle onToggle={toggleTheme} />
 
-          <a
-            href="#sign-in"
+          <Link
+            href="/sign-in"
             className={`hidden rounded-full border bg-transparent px-5 py-2.5 text-sm font-semibold transition-colors duration-300 lg:inline-block ${CTRL} ${FOCUS}`}
           >
             Sign In
-          </a>
-          <a
-            href="#sign-up"
+          </Link>
+
+          <Link
+            href="/sign-up"
             className={`hidden rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-[0_12px_30px_-12px_rgba(0,124,199,0.85)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[color-mix(in_oklab,var(--color-primary),black_12%)] lg:inline-block ${FOCUS}`}
           >
             Sign Up
-          </a>
+          </Link>
 
+          {/* Mobile Menu Button */}
           <button
             type="button"
             onClick={() => setIsMenuOpen((open) => !open)}
-            aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-label={
+              isMenuOpen ? "Close navigation menu" : "Open navigation menu"
+            }
             aria-expanded={isMenuOpen}
             aria-controls="mobile-menu"
             className={`grid h-10 w-10 place-items-center rounded-full border bg-transparent transition-colors min-[1360px]:hidden ${CTRL} ${FOCUS}`}
@@ -114,45 +119,52 @@ export default function Navbar() {
         </div>
       </nav>
 
+      {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div id="mobile-menu" className="absolute inset-x-4 top-20 z-40 min-[1360px]:hidden">
+        <div
+          id="mobile-menu"
+          className="absolute inset-x-4 top-20 z-40 min-[1360px]:hidden"
+        >
           <div className="overflow-hidden rounded-3xl border border-on-dark/10 bg-navy p-3 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)]">
             <ul className="flex flex-col">
-              {NAV_LINKS.map((link, index) => {
-                const isActive = index === 0;
+              {NAV_LINKS.map((link) => {
+                const isActive = pathname === link.href;
+
                 return (
-                  <li key={link.label}>
-                    <a
+                  <li key={link.href}>
+                    <Link
                       href={link.href}
-                      onClick={() => setIsMenuOpen(false)}
                       aria-current={isActive ? "page" : undefined}
-                      className={`block rounded-2xl px-4 py-3 text-sm font-semibold transition-colors ${
+                      onClick={() => setIsMenuOpen(false)}
+                      className={`block rounded-xl px-4 py-3 text-sm font-semibold transition-colors duration-200 ${
                         isActive
                           ? "bg-on-dark/10 text-sky"
-                          : "text-on-dark/85 hover:bg-on-dark/10 hover:text-on-dark"
+                          : "text-on-dark hover:bg-on-dark/5 hover:text-sky"
                       }`}
                     >
                       {link.label}
-                    </a>
+                    </Link>
                   </li>
                 );
               })}
             </ul>
+
             <div className="mt-3 grid grid-cols-2 gap-2 border-t border-on-dark/10 pt-3 lg:hidden">
-              <a
+              <Link
                 href="#sign-in"
                 onClick={() => setIsMenuOpen(false)}
                 className="rounded-full border border-on-dark/35 px-4 py-2.5 text-center text-sm font-semibold text-on-dark transition-colors hover:bg-on-dark/10"
               >
                 Sign In
-              </a>
-              <a
+              </Link>
+
+              <Link
                 href="#sign-up"
                 onClick={() => setIsMenuOpen(false)}
                 className="rounded-full bg-primary px-4 py-2.5 text-center text-sm font-semibold text-primary-foreground transition-colors hover:bg-[color-mix(in_oklab,var(--color-primary),black_12%)]"
               >
                 Sign Up
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -170,10 +182,10 @@ function ThemeToggle({ onToggle }: { onToggle: () => void }) {
       title="Toggle color theme"
       className={`grid h-10 w-10 place-items-center rounded-full bg-transparent transition-colors duration-300 ${CTRL} ${FOCUS}`}
     >
-      {/* Shows the CURRENT mode, like the reference: sun in light, moon in dark */}
       <span className="dark:hidden">
         <SunIcon />
       </span>
+
       <span className="hidden dark:block">
         <MoonIcon />
       </span>
@@ -181,7 +193,7 @@ function ThemeToggle({ onToggle }: { onToggle: () => void }) {
   );
 }
 
-/* Crossed wrench + screwdriver, drawn as filled shapes (no tile behind it). */
+/* Crossed wrench + screwdriver logo */
 function LogoMark() {
   return (
     <svg
@@ -196,13 +208,17 @@ function LogoMark() {
         </mask>
       </defs>
 
-      {/* Wrench: open-end head at the top-left */}
-      <g transform="rotate(-45 24 24)" mask="url(#mz-wrench-slot)" fill="currentColor">
+      {/* Wrench */}
+      <g
+        transform="rotate(-45 24 24)"
+        mask="url(#mz-wrench-slot)"
+        fill="currentColor"
+      >
         <circle cx="24" cy="11" r="9.5" />
         <rect x="20.5" y="16" width="7" height="29" rx="3.5" />
       </g>
 
-      {/* Screwdriver crossing over it, with a navy outline to separate the two */}
+      {/* Screwdriver */}
       <g
         transform="rotate(45 24 24)"
         fill="currentColor"
