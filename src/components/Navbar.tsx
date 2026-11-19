@@ -27,6 +27,21 @@ const LINK_IDLE =
 const LINK_ACTIVE =
   "text-sky lg:[html:not(.dark)_&]:text-primary";
 
+type UserRole = "customer" | "technician" | "admin";
+
+type UserMenuProps = {
+  user: {
+    name: string;
+    email: string;
+    image?: string | null;
+    role?: UserRole;
+  };
+  router: ReturnType<typeof useRouter>;
+  scrolled: boolean;
+  isOpen: boolean;
+  onOpenChange: (next: boolean) => void;
+};
+
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -38,7 +53,6 @@ export default function Navbar() {
   const { data: session, isPending } = useSession();
   const user = session?.user ?? null;
 
-  // Colors change depending on whether the Navbar is scrolled.
   const controlClass = scrolled
     ? "text-on-dark border-on-dark/40 hover:bg-on-dark/10"
     : CTRL;
@@ -51,7 +65,6 @@ export default function Navbar() {
     ? "text-sky"
     : LINK_ACTIVE;
 
-  // Switch between absolute and fixed Navbar on scroll.
   useEffect(() => {
     function onScroll() {
       setScrolled(window.scrollY > 10);
@@ -130,13 +143,11 @@ export default function Navbar() {
 
         {/* Right Controls */}
         <div className="flex items-center gap-2.5 justify-self-end">
-
           <ThemeToggle
             onToggle={toggleTheme}
             scrolled={scrolled}
           />
 
-          {/* Show auth buttons only after session loading */}
           {!isPending && !user && (
             <>
               <Link
@@ -155,10 +166,14 @@ export default function Navbar() {
             </>
           )}
 
-          {/* Avatar + dropdown */}
+          {/* User name + avatar + dropdown */}
           {!isPending && user && (
             <UserMenu
-              user={user}
+              user={
+                user as typeof user & {
+                  role?: UserRole;
+                }
+              }
               router={router}
               scrolled={scrolled}
               isOpen={isUserMenuOpen}
@@ -250,14 +265,6 @@ export default function Navbar() {
 
 // ─── UserMenu ─────────────────────────────────────────────
 
-type UserMenuProps = {
-  user: { name: string; email: string; image?: string | null };
-  router: ReturnType<typeof useRouter>;
-  scrolled: boolean;
-  isOpen: boolean;
-  onOpenChange: (next: boolean) => void;
-};
-
 function UserMenu({
   user,
   router,
@@ -268,7 +275,6 @@ function UserMenu({
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
-  // Close dropdown when clicking outside.
   useEffect(() => {
     if (!isOpen) return;
 
@@ -287,7 +293,6 @@ function UserMenu({
       document.removeEventListener("mousedown", handleOutsideClick);
   }, [isOpen, onOpenChange]);
 
-  // Close dropdown with Escape key.
   useEffect(() => {
     if (!isOpen) return;
 
@@ -333,7 +338,7 @@ function UserMenu({
     ? user.name.charAt(0).toUpperCase()
     : "U";
 
-  const avatarCircle = user.image ? null : (
+  const avatarCircle = (
     <span className="flex h-full w-full items-center justify-center bg-primary text-sm font-bold text-primary-foreground">
       {initials}
     </span>
@@ -342,7 +347,7 @@ function UserMenu({
   return (
     <div ref={containerRef} className="relative">
 
-      {/* Avatar trigger */}
+      {/* User name + avatar trigger */}
       <button
         ref={triggerRef}
         type="button"
@@ -350,23 +355,29 @@ function UserMenu({
         aria-label="Open user menu"
         aria-expanded={isOpen}
         aria-haspopup="true"
-        className={`grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full border-2 transition-all duration-200 hover:border-sky focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky ${
+        className={`flex h-11 max-w-[190px] items-center gap-2 rounded-full border py-1 pl-3 pr-1.5 transition-all duration-200 hover:border-sky hover:bg-on-dark/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky ${
           scrolled
-            ? "border-on-dark/40"
-            : "border-on-dark/40 lg:[html:not(.dark)_&]:border-navy/30 lg:[html:not(.dark)_&]:hover:border-primary"
+            ? "border-on-dark/40 text-on-dark"
+            : "border-on-dark/40 text-on-dark lg:[html:not(.dark)_&]:border-navy/30 lg:[html:not(.dark)_&]:text-navy lg:[html:not(.dark)_&]:hover:border-primary"
         }`}
       >
-        {user.image ? (
-          <Image
-            src={user.image}
-            alt={user.name ?? "User avatar"}
-            width={40}
-            height={40}
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          avatarCircle
-        )}
+        <span className="max-w-[105px] truncate text-sm font-semibold">
+          {user.name}
+        </span>
+
+        <span className="h-9 w-9 shrink-0 overflow-hidden rounded-full border border-sky/30">
+          {user.image ? (
+            <Image
+              src={user.image}
+              alt={user.name ?? "User avatar"}
+              width={36}
+              height={36}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            avatarCircle
+          )}
+        </span>
       </button>
 
       {/* Dropdown panel */}
@@ -409,6 +420,13 @@ function UserMenu({
               <p className="truncate text-[11.5px] font-medium leading-snug text-on-dark/50 lg:[html:not(.dark)_&]:text-navy/50">
                 {user.email}
               </p>
+
+              {/* User role badge */}
+              {user.role && (
+                <span className="mt-1 inline-flex rounded-full bg-sky/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-sky lg:[html:not(.dark)_&]:bg-primary/10 lg:[html:not(.dark)_&]:text-primary">
+                  {user.role}
+                </span>
+              )}
             </div>
           </div>
 

@@ -4,12 +4,9 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { FormEvent, RefObject } from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
-import {
-  PasswordField,
-  SubmitButton,
-  TextField,
-} from "./FormControls";
+import { PasswordField, SubmitButton, TextField } from "./FormControls";
 
 import {
   AlertIcon,
@@ -54,19 +51,12 @@ const ROLE_OPTIONS: {
   },
 ];
 
-// Full name / Email / Password এর label, input লেখা ও placeholder বড় করার জন্য।
-// FormControls.tsx না বদলেই কাজ করে (label ও input এর উপর override)।
-// input এর উচ্চতা বদলাতে h-[54px], লেখার size বদলাতে text-[16px] পাল্টান।
+
 const FIELD_SCALE =
   "[&_label]:text-[15px] [&_label]:font-semibold [&_label]:text-foreground [&_input]:h-[54px] [&_input]:text-[16px] [&_input]:font-medium [&_input]:text-foreground [&_input]:placeholder:text-foreground/55 [&_p]:text-[14px]";
 
-// ─────────────────────────────────────────────────────────────
-// CARD WIDTH (সাময়িক সমাধান)
-// Card এর width parent file এ set করা, যেটা এই file থেকে সরাসরি বদলানো যায় না।
-// তাই এই hook উপরের দিকে খুঁজে প্রথম যে element এর max-width ~300–560px সেটাকে CARD_MAX_WIDTH করে দেয়।
-// parent file (page.tsx / AuthShell) এ `max-w-md` বা `max-w-[28rem]` বদলে `max-w-[34rem]` করলে
-// এই hook আর লাগবে না, তখন USE_WIDER_CARD কে false করে দিন।
-// ─────────────────────────────────────────────────────────────
+
+  
 const USE_WIDER_CARD = true;
 const CARD_MAX_WIDTH = "34rem";
 
@@ -101,6 +91,7 @@ const LINK =
   "font-semibold text-primary underline-offset-4 transition-colors hover:text-[color-mix(in_oklab,var(--color-primary),black_14%)] hover:underline dark:text-sky dark:hover:text-on-dark";
 
 export default function SignUpForm() {
+  const router = useRouter();
   const rootRef = useRef<HTMLDivElement>(null);
   useWiderCard(rootRef);
 
@@ -162,8 +153,7 @@ export default function SignUpForm() {
 
     if (hasErrors(nextErrors)) {
       const firstInvalid = Object.keys(nextErrors)[0];
-      const focusId =
-        firstInvalid === "role" ? "role-customer" : firstInvalid;
+      const focusId = firstInvalid === "role" ? "role-customer" : firstInvalid;
 
       if (focusId) {
         document.getElementById(focusId)?.focus();
@@ -184,18 +174,24 @@ export default function SignUpForm() {
 
       if (error) {
         toast.error(
-          error.message || "Account creation failed. Please try again."
+          error.message || "Account creation failed. Please try again.",
         );
         return;
       }
 
-      toast.success("Your Mendizo account has been created successfully!");
+
+      toast.success(
+        "Account created successfully! Please sign in with your email and password.",
+      );
+      router.push("/sign-in");
+
     } catch {
       toast.error("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   }
+
 
   return (
     <div ref={rootRef}>
@@ -215,41 +211,41 @@ export default function SignUpForm() {
       </header>
 
       <form noValidate onSubmit={handleSubmit} className="mt-5 space-y-4">
-<div className={FIELD_SCALE}>
-        <TextField
-          id="name"
-          name="name"
-          label="Full name"
-          type="text"
-          autoComplete="name"
-          placeholder="Your full name"
-          icon={<UserIcon className="h-[18px] w-[18px]" />}
-          value={name}
-          error={errors.name}
-          onChange={(event) => {
-            setName(event.target.value);
-            clearError("name");
-          }}
-        />
+        <div className={FIELD_SCALE}>
+          <TextField
+            id="name"
+            name="name"
+            label="Full name"
+            type="text"
+            autoComplete="name"
+            placeholder="Your full name"
+            icon={<UserIcon className="h-[18px] w-[18px]" />}
+            value={name}
+            error={errors.name}
+            onChange={(event) => {
+              setName(event.target.value);
+              clearError("name");
+            }}
+          />
         </div>
 
-<div className={FIELD_SCALE}>
-        <TextField
-          id="email"
-          name="email"
-          label="Email address"
-          type="email"
-          inputMode="email"
-          autoComplete="email"
-          placeholder="you@example.com"
-          icon={<MailIcon className="h-[18px] w-[18px]" />}
-          value={email}
-          error={errors.email}
-          onChange={(event) => {
-            setEmail(event.target.value);
-            clearError("email");
-          }}
-        />
+        <div className={FIELD_SCALE}>
+          <TextField
+            id="email"
+            name="email"
+            label="Email address"
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            placeholder="you@example.com"
+            icon={<MailIcon className="h-[18px] w-[18px]" />}
+            value={email}
+            error={errors.email}
+            onChange={(event) => {
+              setEmail(event.target.value);
+              clearError("email");
+            }}
+          />
         </div>
 
         <div className={FIELD_SCALE}>
@@ -279,9 +275,7 @@ export default function SignUpForm() {
                 <li
                   key={rule.id}
                   className={`flex items-center gap-2 text-[13.5px] font-medium transition-colors duration-200 ${
-                    met
-                      ? "text-primary dark:text-sky"
-                      : "text-foreground/55"
+                    met ? "text-primary dark:text-sky" : "text-foreground/55"
                   }`}
                 >
                   <span
