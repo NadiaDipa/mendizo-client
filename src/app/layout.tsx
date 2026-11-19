@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Serif_Display, Manrope } from "next/font/google";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
 const dmSerif = DM_Serif_Display({
@@ -34,7 +35,41 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        {children}
+
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            duration: 4500,
+            style: {
+              background: "#EAF7FF",
+              color: "#12232E",
+              border: "1px solid #9BD5F5",
+              borderRadius: "16px",
+              padding: "17px 20px",
+              fontFamily: "var(--font-manrope)",
+              fontSize: "15px",
+              fontWeight: "600",
+              lineHeight: "1.5",
+              boxShadow: "0 10px 30px rgba(0, 124, 199, 0.22)",
+              maxWidth: "400px",
+            },
+            success: {
+              iconTheme: {
+                primary: "#16834A",
+                secondary: "#D1F5DF",
+              },
+            },
+            error: {
+              iconTheme: {
+                primary: "#DC4545",
+                secondary: "#FEE2E2",
+              },
+            },
+          }}
+        />
+      </body>
     </html>
   );
 }

@@ -1,22 +1,35 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import type { FormEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import type { FormEvent, RefObject } from "react";
 import Link from "next/link";
+import toast from "react-hot-toast";
+
 import {
-  FormNotice,
   PasswordField,
   SubmitButton,
   TextField,
 } from "./FormControls";
-import { AlertIcon, CheckIcon, HomeIcon, LockIcon, MailIcon, UserIcon, WrenchIcon } from "./AuthIcons";
+
+import {
+  AlertIcon,
+  CheckIcon,
+  HomeIcon,
+  LockIcon,
+  MailIcon,
+  UserIcon,
+  WrenchIcon,
+} from "./AuthIcons";
+
 import {
   PASSWORD_RULES,
   hasErrors,
   isValidEmail,
   meetsAllPasswordRules,
 } from "@/lib/validation";
+
 import type { FormErrors } from "@/lib/validation";
+import { authClient } from "@/lib/auth-client";
 
 type Field = "name" | "email" | "password" | "role";
 type Role = "customer" | "technician";
@@ -41,24 +54,63 @@ const ROLE_OPTIONS: {
   },
 ];
 
+// Full name / Email / Password এর label, input লেখা ও placeholder বড় করার জন্য।
+// FormControls.tsx না বদলেই কাজ করে (label ও input এর উপর override)।
+// input এর উচ্চতা বদলাতে h-[54px], লেখার size বদলাতে text-[16px] পাল্টান।
+const FIELD_SCALE =
+  "[&_label]:text-[15px] [&_label]:font-semibold [&_label]:text-foreground [&_input]:h-[54px] [&_input]:text-[16px] [&_input]:font-medium [&_input]:text-foreground [&_input]:placeholder:text-foreground/55 [&_p]:text-[14px]";
+
+// ─────────────────────────────────────────────────────────────
+// CARD WIDTH (সাময়িক সমাধান)
+// Card এর width parent file এ set করা, যেটা এই file থেকে সরাসরি বদলানো যায় না।
+// তাই এই hook উপরের দিকে খুঁজে প্রথম যে element এর max-width ~300–560px সেটাকে CARD_MAX_WIDTH করে দেয়।
+// parent file (page.tsx / AuthShell) এ `max-w-md` বা `max-w-[28rem]` বদলে `max-w-[34rem]` করলে
+// এই hook আর লাগবে না, তখন USE_WIDER_CARD কে false করে দিন।
+// ─────────────────────────────────────────────────────────────
+const USE_WIDER_CARD = true;
+const CARD_MAX_WIDTH = "34rem";
+
+const useIsoLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
+function useWiderCard(ref: RefObject<HTMLElement | null>) {
+  useIsoLayoutEffect(() => {
+    if (!USE_WIDER_CARD) return;
+
+    let node = ref.current?.parentElement ?? null;
+
+    for (let depth = 0; node && depth < 8; depth += 1) {
+      const maxWidth = window.getComputedStyle(node).maxWidth;
+      const px = maxWidth.endsWith("px") ? parseFloat(maxWidth) : NaN;
+
+      if (!Number.isNaN(px) && px >= 300 && px <= 560) {
+        const target = node;
+        const previous = target.style.maxWidth;
+        target.style.maxWidth = CARD_MAX_WIDTH;
+        return () => {
+          target.style.maxWidth = previous;
+        };
+      }
+
+      node = node.parentElement;
+    }
+  }, [ref]);
+}
+
 const LINK =
   "font-semibold text-primary underline-offset-4 transition-colors hover:text-[color-mix(in_oklab,var(--color-primary),black_14%)] hover:underline dark:text-sky dark:hover:text-on-dark";
 
 export default function SignUpForm() {
+  const rootRef = useRef<HTMLDivElement>(null);
+  useWiderCard(rootRef);
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<Role | null>(null);
+
   const [errors, setErrors] = useState<FormErrors<Field>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [notice, setNotice] = useState<string | null>(null);
-  const timerRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (timerRef.current !== null) window.clearTimeout(timerRef.current);
-    };
-  }, []);
 
   function clearError(field: Field) {
     setErrors((previous) => {
@@ -70,19 +122,26 @@ export default function SignUpForm() {
     });
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setNotice(null);
+
+    const formData = new FormData(event.currentTarget);
+    const formDataObj = Object.fromEntries(formData.entries());
+
+    const name = String(formDataObj.name || "").trim();
+    const email = String(formDataObj.email || "").trim();
+    const password = String(formDataObj.password || "");
+    const role = formDataObj.role;
 
     const nextErrors: FormErrors<Field> = {};
 
-    if (!name.trim()) {
+    if (!name) {
       nextErrors.name = "Enter your full name.";
-    } else if (name.trim().length < 2) {
+    } else if (name.length < 2) {
       nextErrors.name = "Your name should be at least 2 characters.";
     }
 
-    if (!email.trim()) {
+    if (!email) {
       nextErrors.email = "Enter your email address.";
     } else if (!isValidEmail(email)) {
       nextErrors.email = "Enter a valid email address, like name@example.com.";
@@ -91,10 +150,11 @@ export default function SignUpForm() {
     if (!password) {
       nextErrors.password = "Create a password.";
     } else if (!meetsAllPasswordRules(password)) {
-      nextErrors.password = "Your password doesn't meet all the requirements yet.";
+      nextErrors.password =
+        "Your password doesn't meet all the requirements yet.";
     }
 
-    if (!role) {
+    if (role !== "customer" && role !== "technician") {
       nextErrors.role = "Choose how you'll use Mendizo.";
     }
 
@@ -102,41 +162,60 @@ export default function SignUpForm() {
 
     if (hasErrors(nextErrors)) {
       const firstInvalid = Object.keys(nextErrors)[0];
-      if (firstInvalid) {
-        const focusId = firstInvalid === "role" ? "role-customer" : firstInvalid;
+      const focusId =
+        firstInvalid === "role" ? "role-customer" : firstInvalid;
+
+      if (focusId) {
         document.getElementById(focusId)?.focus();
       }
+
       return;
     }
 
-    // UI only: no auth provider is wired up yet, so nothing is submitted anywhere.
     setIsSubmitting(true);
-    timerRef.current = window.setTimeout(() => {
+
+    try {
+      const { error } = await authClient.signUp.email({
+        name,
+        email,
+        password,
+        role,
+      } as any);
+
+      if (error) {
+        toast.error(
+          error.message || "Account creation failed. Please try again."
+        );
+        return;
+      }
+
+      toast.success("Your Mendizo account has been created successfully!");
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
       setIsSubmitting(false);
-      setNotice(
-        "Account creation isn't connected yet. This form is UI only, so nothing was saved or sent."
-      );
-    }, 900);
+    }
   }
 
   return (
-    <div>
+    <div ref={rootRef}>
       <header>
-        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary dark:text-sky">
+        <p className="text-[12.5px] font-bold uppercase tracking-[0.2em] text-primary dark:text-sky">
           Get started
         </p>
 
-        <h1 className="mt-3 font-display text-[clamp(2rem,5.4vw,2.6rem)] leading-[1.08] tracking-tight text-foreground">
+        <h1 className="mt-3 font-display text-[clamp(2rem,5.4vw,2.9rem)] leading-[1.08] tracking-tight text-foreground">
           Create Your Account
         </h1>
 
-        <p className="mt-2 max-w-[26rem] text-[14.5px] leading-6 text-foreground/60">
+        <p className="mt-2.5 max-w-[28rem] text-[15.5px] leading-6 text-foreground/65">
           Book verified technicians, follow every repair in real time and pay
           once the job is done.
         </p>
       </header>
 
-      <form noValidate onSubmit={handleSubmit} className="mt-6 space-y-4">
+      <form noValidate onSubmit={handleSubmit} className="mt-5 space-y-4">
+<div className={FIELD_SCALE}>
         <TextField
           id="name"
           name="name"
@@ -149,11 +228,12 @@ export default function SignUpForm() {
           error={errors.name}
           onChange={(event) => {
             setName(event.target.value);
-            setNotice(null);
             clearError("name");
           }}
         />
+        </div>
 
+<div className={FIELD_SCALE}>
         <TextField
           id="email"
           name="email"
@@ -167,12 +247,12 @@ export default function SignUpForm() {
           error={errors.email}
           onChange={(event) => {
             setEmail(event.target.value);
-            setNotice(null);
             clearError("email");
           }}
         />
+        </div>
 
-        <div>
+        <div className={FIELD_SCALE}>
           <PasswordField
             id="password"
             name="password"
@@ -184,30 +264,32 @@ export default function SignUpForm() {
             error={errors.password}
             onChange={(event) => {
               setPassword(event.target.value);
-              setNotice(null);
               clearError("password");
             }}
           />
 
-          <ul aria-live="polite" className="mt-2 grid gap-1.5 sm:grid-cols-2">
+          <ul
+            aria-live="polite"
+            className="mt-2 grid gap-x-3 gap-y-1 sm:grid-cols-2"
+          >
             {PASSWORD_RULES.map((rule) => {
               const met = rule.test(password);
 
               return (
                 <li
                   key={rule.id}
-                  className={`flex items-center gap-2 text-[12px] font-medium transition-colors duration-200 ${
+                  className={`flex items-center gap-2 text-[13.5px] font-medium transition-colors duration-200 ${
                     met
                       ? "text-primary dark:text-sky"
-                      : "text-foreground/45"
+                      : "text-foreground/55"
                   }`}
                 >
                   <span
                     aria-hidden="true"
-                    className={`grid h-4 w-4 place-items-center rounded-full border transition-colors duration-200 ${
+                    className={`grid h-4 w-4 shrink-0 place-items-center rounded-full border transition-colors duration-200 ${
                       met
                         ? "border-primary bg-primary text-primary-foreground dark:border-sky dark:bg-sky dark:text-navy"
-                        : "border-foreground/25 text-transparent"
+                        : "border-foreground/30 text-transparent"
                     }`}
                   >
                     <CheckIcon className="h-2.5 w-2.5" />
@@ -220,7 +302,7 @@ export default function SignUpForm() {
         </div>
 
         <fieldset>
-          <legend className="text-[12.5px] font-semibold tracking-[0.01em] text-foreground/80">
+          <legend className="text-[15px] font-semibold tracking-[0.01em] text-foreground">
             I&apos;m joining as
           </legend>
 
@@ -232,7 +314,7 @@ export default function SignUpForm() {
               return (
                 <label
                   key={option.value}
-                  className={`relative flex cursor-pointer items-start gap-3 rounded-2xl border p-3.5 pr-9 transition-all duration-200 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-sky ${
+                  className={`relative flex cursor-pointer items-center gap-3 rounded-2xl border p-3.5 pr-10 transition-all duration-200 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-sky ${
                     selected
                       ? "border-primary bg-primary/[0.07] ring-1 ring-primary/30 dark:border-sky dark:bg-sky/10 dark:ring-sky/30"
                       : "border-foreground/15 bg-white hover:border-primary/40 hover:bg-primary/[0.03] dark:border-white/15 dark:bg-white/[0.04] dark:hover:border-sky/40"
@@ -247,7 +329,6 @@ export default function SignUpForm() {
                     aria-describedby={errors.role ? "role-error" : undefined}
                     onChange={() => {
                       setRole(option.value);
-                      setNotice(null);
                       clearError("role");
                     }}
                     className="sr-only"
@@ -264,22 +345,22 @@ export default function SignUpForm() {
                     <Icon className="h-[18px] w-[18px]" />
                   </span>
 
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-[13.5px] font-semibold text-foreground">
+                  <span className="min-w-0">
+                    <span className="block text-[15px] font-semibold leading-tight text-foreground">
                       {option.label}
                     </span>
 
-                    <span className="mt-1 block text-[12px] leading-5 text-foreground/55">
+                    <span className="mt-0.5 block text-[13px] leading-5 text-foreground/60">
                       {option.description}
                     </span>
                   </span>
 
                   <span
                     aria-hidden="true"
-                    className={`absolute right-3 top-3 grid h-5 w-5 place-items-center rounded-full border transition-colors duration-200 ${
+                    className={`absolute right-3 top-1/2 grid h-5 w-5 -translate-y-1/2 place-items-center rounded-full border transition-colors duration-200 ${
                       selected
                         ? "border-primary bg-primary text-primary-foreground dark:border-sky dark:bg-sky dark:text-navy"
-                        : "border-foreground/20 text-transparent"
+                        : "border-foreground/25 text-transparent"
                     }`}
                   >
                     <CheckIcon className="h-3 w-3" />
@@ -293,7 +374,7 @@ export default function SignUpForm() {
             <p
               id="role-error"
               role="alert"
-              className="mt-2 flex items-start gap-1.5 text-[12.5px] font-medium leading-5 text-red-600 dark:text-red-400"
+              className="mt-2 flex items-start gap-1.5 text-[13.5px] font-medium leading-5 text-red-600 dark:text-red-400"
             >
               <AlertIcon className="mt-px h-4 w-4 shrink-0" />
               <span>{errors.role}</span>
@@ -306,11 +387,9 @@ export default function SignUpForm() {
             Create Account
           </SubmitButton>
         </div>
-
-        {notice ? <FormNotice>{notice}</FormNotice> : null}
       </form>
 
-      <p className="mt-5 border-t border-foreground/10 pt-4 text-center text-[13.5px] text-foreground/60">
+      <p className="mt-4 border-t border-foreground/10 pt-4 text-center text-[15px] text-foreground/65">
         Already have an account?{" "}
         <Link href="/sign-in" className={LINK}>
           Sign in

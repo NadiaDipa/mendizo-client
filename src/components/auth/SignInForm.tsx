@@ -1,18 +1,23 @@
+
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import type { FormEvent } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+
 import {
   AUTH_FOCUS,
-  FormNotice,
   PasswordField,
   SubmitButton,
   TextField,
 } from "./FormControls";
+
 import { CheckIcon, LockIcon, MailIcon } from "./AuthIcons";
 import { hasErrors, isValidEmail } from "@/lib/validation";
 import type { FormErrors } from "@/lib/validation";
+import { authClient } from "@/lib/auth-client";
 
 type Field = "email" | "password";
 
@@ -20,19 +25,13 @@ const LINK =
   "font-semibold text-primary underline-offset-4 transition-colors hover:text-[color-mix(in_oklab,var(--color-primary),black_14%)] hover:underline dark:text-sky dark:hover:text-on-dark";
 
 export default function SignInForm() {
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(true);
   const [errors, setErrors] = useState<FormErrors<Field>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [notice, setNotice] = useState<string | null>(null);
-  const timerRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (timerRef.current !== null) window.clearTimeout(timerRef.current);
-    };
-  }, []);
 
   function clearError(field: Field) {
     setErrors((previous) => {
@@ -44,13 +43,21 @@ export default function SignInForm() {
     });
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setNotice(null);
 
+    // Collect form data and convert it into an object
+    const formData = new FormData(event.currentTarget);
+    const formDataObj = Object.fromEntries(formData.entries());
+
+    const email = String(formDataObj.email || "").trim();
+    const password = String(formDataObj.password || "");
+    const rememberMe = formDataObj.remember === "on";
+
+    // Validate form data
     const nextErrors: FormErrors<Field> = {};
 
-    if (!email.trim()) {
+    if (!email) {
       nextErrors.email = "Enter your email address.";
     } else if (!isValidEmail(email)) {
       nextErrors.email = "Enter a valid email address, like name@example.com.";
@@ -64,18 +71,40 @@ export default function SignInForm() {
 
     if (hasErrors(nextErrors)) {
       const firstInvalid = Object.keys(nextErrors)[0];
-      if (firstInvalid) document.getElementById(firstInvalid)?.focus();
+
+      if (firstInvalid) {
+        document.getElementById(firstInvalid)?.focus();
+      }
+
       return;
     }
 
-    // UI only: no auth provider is wired up yet, so nothing is submitted anywhere.
+    // Sign in using Better Auth
     setIsSubmitting(true);
-    timerRef.current = window.setTimeout(() => {
+
+    try {
+      const { error } = await authClient.signIn.email({
+        email,
+        password,
+        rememberMe,
+      });
+
+      if (error) {
+        toast.error(
+          error.message || "Sign in failed. Please check your credentials."
+        );
+        return;
+      }
+
+      toast.success("Welcome back to Mendizo!");
+
+      router.push("/");
+      router.refresh();
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
       setIsSubmitting(false);
-      setNotice(
-        "Authentication isn't connected yet. This form is UI only, so your details were not sent anywhere."
-      );
-    }, 900);
+    }
   }
 
   return (
@@ -109,7 +138,6 @@ export default function SignInForm() {
           error={errors.email}
           onChange={(event) => {
             setEmail(event.target.value);
-            setNotice(null);
             clearError("email");
           }}
         />
@@ -125,7 +153,6 @@ export default function SignInForm() {
           error={errors.password}
           onChange={(event) => {
             setPassword(event.target.value);
-            setNotice(null);
             clearError("password");
           }}
         />
@@ -142,7 +169,7 @@ export default function SignInForm() {
 
             <span
               aria-hidden="true"
-              className={`grid h-[18px] w-[18px] place-items-center rounded-[6px] border border-foreground/25 bg-white text-primary-foreground transition-colors duration-200 peer-checked:border-primary peer-checked:bg-primary peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-sky dark:border-white/25 dark:bg-white/5`}
+              className="grid h-[18px] w-[18px] place-items-center rounded-[6px] border border-foreground/25 bg-white text-primary-foreground transition-colors duration-200 peer-checked:border-primary peer-checked:bg-primary peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-sky dark:border-white/25 dark:bg-white/5"
             >
               {rememberMe ? <CheckIcon className="h-3 w-3" /> : null}
             </span>
@@ -153,10 +180,9 @@ export default function SignInForm() {
           <button
             type="button"
             onClick={() => {
-              setErrors({});
-              setNotice(
-                "Password reset isn't wired up yet. No reset email has been sent."
-              );
+              toast("Password reset isn't available yet.", {
+                icon: "ℹ️",
+              });
             }}
             className={`text-[13px] ${LINK} ${AUTH_FOCUS}`}
           >
@@ -169,8 +195,6 @@ export default function SignInForm() {
             Sign In
           </SubmitButton>
         </div>
-
-        {notice ? <FormNotice>{notice}</FormNotice> : null}
       </form>
 
       <p className="mt-5 border-t border-foreground/10 pt-4 text-center text-[13.5px] text-foreground/60">
