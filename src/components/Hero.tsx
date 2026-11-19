@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import type { CSSProperties, JSX } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import Navbar from "./Navbar";
 import TopBar from "./TopBar";
 import "./hero-motion.css";
 
@@ -118,7 +117,7 @@ export default function Hero() {
     >
       <HeroBackground />
       <TopBar />
-      <Navbar />
+     
 
       <div className="relative z-10 mx-auto w-full max-w-7xl xl:max-w-[90rem] 2xl:max-w-[100rem] px-5 pb-14 pt-24 sm:px-8 sm:pb-16 md:pt-[9.5rem] lg:px-12 lg:pb-16 lg:pt-[9.5rem]">
         <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-6">

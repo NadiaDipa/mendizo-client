@@ -1,9 +1,12 @@
 
 "use client";
 
-import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { useState, useRef, useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
+import toast from "react-hot-toast";
+import { useSession, authClient } from "@/lib/auth-client";
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
@@ -26,7 +29,40 @@ const LINK_ACTIVE =
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
   const pathname = usePathname();
+  const router = useRouter();
+
+  const { data: session, isPending } = useSession();
+  const user = session?.user ?? null;
+
+  // Colors change depending on whether the Navbar is scrolled.
+  const controlClass = scrolled
+    ? "text-on-dark border-on-dark/40 hover:bg-on-dark/10"
+    : CTRL;
+
+  const idleLinkClass = scrolled
+    ? "text-on-dark hover:text-sky"
+    : LINK_IDLE;
+
+  const activeLinkClass = scrolled
+    ? "text-sky"
+    : LINK_ACTIVE;
+
+  // Switch between absolute and fixed Navbar on scroll.
+  useEffect(() => {
+    function onScroll() {
+      setScrolled(window.scrollY > 10);
+    }
+
+    onScroll();
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   function toggleTheme() {
     const root = document.documentElement;
@@ -47,8 +83,15 @@ export default function Navbar() {
   }
 
   return (
-    <header className="absolute inset-x-0 top-0 z-40 md:top-10">
+    <header
+      className={`inset-x-0 top-0 z-40 transition-[background-color,box-shadow] duration-300 ${
+        scrolled
+          ? "fixed bg-navy shadow-[0_2px_20px_-4px_rgba(0,0,0,0.5)]"
+          : "absolute md:top-10"
+      }`}
+    >
       <nav className="mx-auto flex h-20 max-w-7xl xl:max-w-[90rem] 2xl:max-w-[100rem] items-center justify-between gap-6 px-5 sm:px-8 min-[1360px]:grid min-[1360px]:grid-cols-[1fr_auto_1fr]">
+
         {/* Logo */}
         <Link
           href="/"
@@ -74,8 +117,8 @@ export default function Navbar() {
                   aria-current={isActive ? "page" : undefined}
                   className={`block border-b-2 py-2 text-[15px] font-semibold transition-colors duration-200 ${FOCUS} ${
                     isActive
-                      ? `${LINK_ACTIVE} border-[#007CC7]`
-                      : `${LINK_IDLE} border-transparent`
+                      ? `${activeLinkClass} border-[#007CC7]`
+                      : `${idleLinkClass} border-transparent`
                   }`}
                 >
                   {link.label}
@@ -87,32 +130,61 @@ export default function Navbar() {
 
         {/* Right Controls */}
         <div className="flex items-center gap-2.5 justify-self-end">
-          <ThemeToggle onToggle={toggleTheme} />
 
-          <Link
-            href="/sign-in"
-            className={`hidden rounded-full border bg-transparent px-5 py-2.5 text-sm font-semibold transition-colors duration-300 lg:inline-block ${CTRL} ${FOCUS}`}
-          >
-            Sign In
-          </Link>
+          <ThemeToggle
+            onToggle={toggleTheme}
+            scrolled={scrolled}
+          />
 
-          <Link
-            href="/sign-up"
-            className={`hidden rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-[0_12px_30px_-12px_rgba(0,124,199,0.85)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[color-mix(in_oklab,var(--color-primary),black_12%)] lg:inline-block ${FOCUS}`}
-          >
-            Sign Up
-          </Link>
+          {/* Show auth buttons only after session loading */}
+          {!isPending && !user && (
+            <>
+              <Link
+                href="/sign-in"
+                className={`hidden rounded-full border bg-transparent px-5 py-2.5 text-sm font-semibold transition-colors duration-300 lg:inline-block ${controlClass} ${FOCUS}`}
+              >
+                Sign In
+              </Link>
+
+              <Link
+                href="/sign-up"
+                className={`hidden rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-[0_12px_30px_-12px_rgba(0,124,199,0.85)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[color-mix(in_oklab,var(--color-primary),black_12%)] lg:inline-block ${FOCUS}`}
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
+
+          {/* Avatar + dropdown */}
+          {!isPending && user && (
+            <UserMenu
+              user={user}
+              router={router}
+              scrolled={scrolled}
+              isOpen={isUserMenuOpen}
+              onOpenChange={(next) => {
+                setIsUserMenuOpen(next);
+
+                if (next) {
+                  setIsMenuOpen(false);
+                }
+              }}
+            />
+          )}
 
           {/* Mobile Menu Button */}
           <button
             type="button"
-            onClick={() => setIsMenuOpen((open) => !open)}
+            onClick={() => {
+              setIsMenuOpen((open) => !open);
+              setIsUserMenuOpen(false);
+            }}
             aria-label={
               isMenuOpen ? "Close navigation menu" : "Open navigation menu"
             }
             aria-expanded={isMenuOpen}
             aria-controls="mobile-menu"
-            className={`grid h-10 w-10 place-items-center rounded-full border bg-transparent transition-colors min-[1360px]:hidden ${CTRL} ${FOCUS}`}
+            className={`grid h-10 w-10 place-items-center rounded-full border bg-transparent transition-colors min-[1360px]:hidden ${controlClass} ${FOCUS}`}
           >
             {isMenuOpen ? <CloseIcon /> : <MenuIcon />}
           </button>
@@ -149,23 +221,26 @@ export default function Navbar() {
               })}
             </ul>
 
-            <div className="mt-3 grid grid-cols-2 gap-2 border-t border-on-dark/10 pt-3 lg:hidden">
-              <Link
-                href="#sign-in"
-                onClick={() => setIsMenuOpen(false)}
-                className="rounded-full border border-on-dark/35 px-4 py-2.5 text-center text-sm font-semibold text-on-dark transition-colors hover:bg-on-dark/10"
-              >
-                Sign In
-              </Link>
+            {/* Mobile auth buttons */}
+            {!isPending && !user && (
+              <div className="mt-3 grid grid-cols-2 gap-2 border-t border-on-dark/10 pt-3 lg:hidden">
+                <Link
+                  href="/sign-in"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="rounded-full border border-on-dark/35 px-4 py-2.5 text-center text-sm font-semibold text-on-dark transition-colors hover:bg-on-dark/10"
+                >
+                  Sign In
+                </Link>
 
-              <Link
-                href="#sign-up"
-                onClick={() => setIsMenuOpen(false)}
-                className="rounded-full bg-primary px-4 py-2.5 text-center text-sm font-semibold text-primary-foreground transition-colors hover:bg-[color-mix(in_oklab,var(--color-primary),black_12%)]"
-              >
-                Sign Up
-              </Link>
-            </div>
+                <Link
+                  href="/sign-up"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="rounded-full bg-primary px-4 py-2.5 text-center text-sm font-semibold text-primary-foreground transition-colors hover:bg-[color-mix(in_oklab,var(--color-primary),black_12%)]"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -173,14 +248,260 @@ export default function Navbar() {
   );
 }
 
-function ThemeToggle({ onToggle }: { onToggle: () => void }) {
+// ─── UserMenu ─────────────────────────────────────────────
+
+type UserMenuProps = {
+  user: { name: string; email: string; image?: string | null };
+  router: ReturnType<typeof useRouter>;
+  scrolled: boolean;
+  isOpen: boolean;
+  onOpenChange: (next: boolean) => void;
+};
+
+function UserMenu({
+  user,
+  router,
+  scrolled,
+  isOpen,
+  onOpenChange,
+}: UserMenuProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  // Close dropdown when clicking outside.
+  useEffect(() => {
+    if (!isOpen) return;
+
+    function handleOutsideClick(event: MouseEvent) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        onOpenChange(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleOutsideClick);
+
+    return () =>
+      document.removeEventListener("mousedown", handleOutsideClick);
+  }, [isOpen, onOpenChange]);
+
+  // Close dropdown with Escape key.
+  useEffect(() => {
+    if (!isOpen) return;
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        onOpenChange(false);
+        triggerRef.current?.focus();
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () =>
+      document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onOpenChange]);
+
+  async function handleSignOut() {
+    onOpenChange(false);
+
+    try {
+      const { error } = await authClient.signOut();
+
+      if (error) {
+        toast.error(error.message || "Sign out failed. Please try again.");
+        return;
+      }
+
+      toast.success("You've been signed out. See you soon!");
+
+      router.push("/");
+      router.refresh();
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.";
+
+      toast.error(message);
+    }
+  }
+
+  const initials = user.name
+    ? user.name.charAt(0).toUpperCase()
+    : "U";
+
+  const avatarCircle = user.image ? null : (
+    <span className="flex h-full w-full items-center justify-center bg-primary text-sm font-bold text-primary-foreground">
+      {initials}
+    </span>
+  );
+
+  return (
+    <div ref={containerRef} className="relative">
+
+      {/* Avatar trigger */}
+      <button
+        ref={triggerRef}
+        type="button"
+        onClick={() => onOpenChange(!isOpen)}
+        aria-label="Open user menu"
+        aria-expanded={isOpen}
+        aria-haspopup="true"
+        className={`grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full border-2 transition-all duration-200 hover:border-sky focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky ${
+          scrolled
+            ? "border-on-dark/40"
+            : "border-on-dark/40 lg:[html:not(.dark)_&]:border-navy/30 lg:[html:not(.dark)_&]:hover:border-primary"
+        }`}
+      >
+        {user.image ? (
+          <Image
+            src={user.image}
+            alt={user.name ?? "User avatar"}
+            width={40}
+            height={40}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          avatarCircle
+        )}
+      </button>
+
+      {/* Dropdown panel */}
+      {isOpen && (
+        <div
+          role="menu"
+          aria-label="User menu"
+          className={[
+            "absolute right-0 top-[calc(100%+0.625rem)] z-50",
+            "w-64 max-w-[calc(100vw-2rem)]",
+            "overflow-hidden rounded-2xl",
+            "border border-sky/20 bg-navy",
+            "shadow-[0_24px_64px_-16px_rgba(0,0,0,0.65),0_0_0_1px_rgba(77,168,218,0.08)]",
+            "lg:[html:not(.dark)_&]:border-navy/10 lg:[html:not(.dark)_&]:bg-white",
+            "lg:[html:not(.dark)_&]:shadow-[0_16px_48px_-12px_rgba(0,124,199,0.18),0_2px_8px_-2px_rgba(0,0,0,0.06)]",
+          ].join(" ")}
+        >
+
+          {/* User information */}
+          <div className="flex items-center gap-3 px-4 py-4 lg:[html:not(.dark)_&]:border-b lg:[html:not(.dark)_&]:border-navy/8">
+            <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border-2 border-sky/30 lg:[html:not(.dark)_&]:border-primary/20">
+              {user.image ? (
+                <Image
+                  src={user.image}
+                  alt={user.name ?? "User avatar"}
+                  width={40}
+                  height={40}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                avatarCircle
+              )}
+            </div>
+
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-[13.5px] font-bold leading-snug text-on-dark lg:[html:not(.dark)_&]:text-navy">
+                {user.name}
+              </p>
+
+              <p className="truncate text-[11.5px] font-medium leading-snug text-on-dark/50 lg:[html:not(.dark)_&]:text-navy/50">
+                {user.email}
+              </p>
+            </div>
+          </div>
+
+          <div
+            aria-hidden="true"
+            className="mx-3 h-px bg-on-dark/[0.08] lg:[html:not(.dark)_&]:bg-navy/[0.07]"
+          />
+
+          {/* Menu items */}
+          <ul className="px-2 py-2">
+
+            {/* Profile */}
+            <li>
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  onOpenChange(false);
+                  toast("Profile page coming soon.", { icon: "🔧" });
+                }}
+                className="group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-semibold text-on-dark/85 transition-colors duration-150 hover:bg-sky/10 hover:text-sky focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky lg:[html:not(.dark)_&]:text-navy/80 lg:[html:not(.dark)_&]:hover:bg-primary/8 lg:[html:not(.dark)_&]:hover:text-primary"
+              >
+                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-on-dark/[0.08] text-on-dark/60 transition-colors group-hover:bg-sky/15 group-hover:text-sky lg:[html:not(.dark)_&]:bg-navy/[0.06] lg:[html:not(.dark)_&]:text-navy/50 lg:[html:not(.dark)_&]:group-hover:bg-primary/10 lg:[html:not(.dark)_&]:group-hover:text-primary">
+                  <UserIcon />
+                </span>
+                Profile
+              </button>
+            </li>
+
+            {/* Dashboard */}
+            <li>
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  onOpenChange(false);
+                  toast("Dashboard page coming soon.", { icon: "🔧" });
+                }}
+                className="group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-semibold text-on-dark/85 transition-colors duration-150 hover:bg-sky/10 hover:text-sky focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky lg:[html:not(.dark)_&]:text-navy/80 lg:[html:not(.dark)_&]:hover:bg-primary/8 lg:[html:not(.dark)_&]:hover:text-primary"
+              >
+                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-on-dark/[0.08] text-on-dark/60 transition-colors group-hover:bg-sky/15 group-hover:text-sky lg:[html:not(.dark)_&]:bg-navy/[0.06] lg:[html:not(.dark)_&]:text-navy/50 lg:[html:not(.dark)_&]:group-hover:bg-primary/10 lg:[html:not(.dark)_&]:group-hover:text-primary">
+                  <DashboardIcon />
+                </span>
+                Dashboard
+              </button>
+            </li>
+
+            <li
+              aria-hidden="true"
+              className="my-1.5 mx-1 h-px bg-on-dark/[0.08] lg:[html:not(.dark)_&]:bg-navy/[0.07]"
+            />
+
+            {/* Sign Out */}
+            <li>
+              <button
+                type="button"
+                role="menuitem"
+                onClick={handleSignOut}
+                className="group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-semibold text-red-400/90 transition-colors duration-150 hover:bg-red-500/10 hover:text-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 lg:[html:not(.dark)_&]:text-red-500 lg:[html:not(.dark)_&]:hover:bg-red-50 lg:[html:not(.dark)_&]:hover:text-red-600"
+              >
+                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-red-500/[0.12] text-red-400 transition-colors group-hover:bg-red-500/20 lg:[html:not(.dark)_&]:bg-red-50 lg:[html:not(.dark)_&]:text-red-500 lg:[html:not(.dark)_&]:group-hover:bg-red-100">
+                  <SignOutIcon />
+                </span>
+                Sign Out
+              </button>
+            </li>
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Theme Toggle ──────────────────────────────────────────
+
+function ThemeToggle({
+  onToggle,
+  scrolled,
+}: {
+  onToggle: () => void;
+  scrolled: boolean;
+}) {
   return (
     <button
       type="button"
       onClick={onToggle}
       aria-label="Toggle color theme"
       title="Toggle color theme"
-      className={`grid h-10 w-10 place-items-center rounded-full bg-transparent transition-colors duration-300 ${CTRL} ${FOCUS}`}
+      className={`grid h-10 w-10 place-items-center rounded-full bg-transparent transition-colors duration-300 ${
+        scrolled
+          ? "text-on-dark border-on-dark/40 hover:bg-on-dark/10"
+          : CTRL
+      } ${FOCUS}`}
     >
       <span className="dark:hidden">
         <SunIcon />
@@ -208,7 +529,6 @@ function LogoMark() {
         </mask>
       </defs>
 
-      {/* Wrench */}
       <g
         transform="rotate(-45 24 24)"
         mask="url(#mz-wrench-slot)"
@@ -218,7 +538,6 @@ function LogoMark() {
         <rect x="20.5" y="16" width="7" height="29" rx="3.5" />
       </g>
 
-      {/* Screwdriver */}
       <g
         transform="rotate(45 24 24)"
         fill="currentColor"
@@ -298,6 +617,63 @@ function CloseIcon() {
       className="h-5 w-5"
     >
       <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
+  );
+}
+
+function UserIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className="h-4 w-4 shrink-0"
+    >
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+    </svg>
+  );
+}
+
+function DashboardIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className="h-4 w-4 shrink-0"
+    >
+      <rect x="3" y="3" width="7" height="7" rx="1.5" />
+      <rect x="14" y="3" width="7" height="7" rx="1.5" />
+      <rect x="3" y="14" width="7" height="7" rx="1.5" />
+      <rect x="14" y="14" width="7" height="7" rx="1.5" />
+    </svg>
+  );
+}
+
+function SignOutIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className="h-4 w-4 shrink-0"
+    >
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <polyline points="16 17 21 12 16 7" />
+      <line x1="21" y1="12" x2="9" y2="12" />
     </svg>
   );
 }
