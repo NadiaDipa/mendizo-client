@@ -1,0 +1,83 @@
+/* Hero entrance and slideshow animations */
+
+@keyframes mz-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes mz-reveal {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes mz-img-in {
+  from {
+    opacity: 0;
+    transform: translateX(60px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes mz-card-in {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.mz-up {
+  animation: mz-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.mz-reveal {
+  animation: mz-reveal 0.9s ease-out both;
+}
+
+.mz-img-in {
+  animation: mz-img-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+}
+
+.mz-card-in {
+  animation: mz-card-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Accessibility: respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .mz-up,
+  .mz-reveal,
+  .mz-img-in,
+  .mz-card-in {
+    animation: none;
+  }
+}
+
+
+/* Smooth crossfade between hero images */
+.mz-slide-layer {
+  transition: opacity 1.5s ease-in-out;
+  will-change: opacity;
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .mz-slide-layer {
+    transition: none;
+  }
+}

@@ -1,26 +1,136 @@
 @import "tailwindcss";
 
+/* Use the `.dark` class on <html> instead of the OS preference only. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #eefbfb;
+  --foreground: #12232e;
+
+  --navy: #12232e;
+  --surface: #203647;
+  --primary: #007cc7;
+  --primary-foreground: #eefbfb;
+  --sky: #4da8da;
+  --on-dark: #eefbfb;
+
+  /* Hero right panel (light) */
+  --hero-right-from: #eaf6fd;
+  --hero-right-to: #bfe3f7;
+  --hero-glow: rgba(77, 168, 218, 0);
+  --card-bg: rgba(255, 255, 255, 0.72);
+  --card-border: rgba(255, 255, 255, 0.7);
+  --card-text: #12232e;
+  --card-muted: rgba(18, 35, 46, 0.55);
+
+  /* Navbar controls. Below lg everything sits on the navy side -> light text. */
+  --ctrl-text: var(--on-dark);
+  --ctrl-border: rgb(238 251 251 / 0.4);
+  --ctrl-hover: rgb(238 251 251 / 0.1);
+
+  color-scheme: light;
+}
+
+.dark {
+  --background: #12232e;
+  --foreground: #eefbfb;
+
+  /* Hero right panel (dark) */
+  --hero-right-from: #0d5a9e;
+  --hero-right-to: #0b2a46;
+  --hero-glow: rgba(77, 168, 218, 0.35);
+  --card-bg: rgba(32, 54, 71, 0.55);
+  --card-border: rgba(77, 168, 218, 0.28);
+  --card-text: #eefbfb;
+  --card-muted: rgba(238, 251, 251, 0.6);
+
+  color-scheme: dark;
+}
+
+/*
+ * lg and up: the right side of the navbar sits on the pale (light) / blue (dark) panel.
+ * Plain CSS variables are used instead of stacked `lg:dark:` utilities, so the colors can
+ * never lose a specificity/order fight and Sign In always stays visible.
+ */
+@media (min-width: 64rem) {
+  :root {
+    --ctrl-text: var(--navy);
+    --ctrl-border: rgb(18 35 46 / 0.4);
+    --ctrl-hover: rgb(18 35 46 / 0.06);
+  }
+  .dark {
+    --ctrl-text: var(--on-dark);
+    --ctrl-border: rgb(238 251 251 / 0.4);
+    --ctrl-hover: rgb(238 251 251 / 0.1);
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-navy: var(--navy);
+  --color-surface: var(--surface);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-sky: var(--sky);
+  --color-on-dark: var(--on-dark);
+  --color-mist: #eefbfb;
+
+  --font-sans: var(--font-manrope);
+  --font-display: var(--font-dm-serif);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Show/hide content per theme (light-only / dark-only). Keeps the element's own display type. */
+.dark .mz-light-only {
+  display: none !important;
+}
+html:not(.dark) .mz-dark-only {
+  display: none !important;
+}
+
+/* Navbar controls (Sign In, theme toggle, menu button) */
+.mz-ctrl {
+  color: var(--ctrl-text);
+  border-color: var(--ctrl-border);
+}
+.mz-ctrl:hover {
+  background-color: var(--ctrl-hover);
+}
+
+/* Navbar links */
+.mz-nav-link {
+  color: var(--ctrl-text);
+}
+.mz-nav-link:hover {
+  color: var(--primary);
+}
+.dark .mz-nav-link:hover {
+  color: var(--sky);
+}
+.mz-nav-active {
+  color: var(--primary);
+}
+.dark .mz-nav-active {
+  color: var(--on-dark);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+}
+
+::selection {
+  background: #4da8da;
+  color: #12232e;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
