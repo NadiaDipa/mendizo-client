@@ -3,8 +3,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 import type { JSX } from "react";
+import { authClient } from "@/lib/auth-client";
 
 type DashboardSidebarProps = {
   collapsed: boolean;
@@ -39,9 +41,36 @@ export default function DashboardSidebar({
   onCloseMobile,
 }: DashboardSidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [logoutError, setLogoutError] = useState("");
 
   const labelClass = collapsed ? "lg:hidden" : "";
   const itemLayout = collapsed ? "lg:justify-center lg:px-0" : "";
+
+  const handleLogout = async () => {
+    if (loggingOut) return;
+
+    setLoggingOut(true);
+    setLogoutError("");
+
+    try {
+      await authClient.signOut({
+        fetchOptions: {
+          onSuccess: () => {
+            onCloseMobile();
+            router.replace("/sign-in");
+            router.refresh();
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Logout failed:", error);
+      setLogoutError("Logout failed. Please try again.");
+      setLoggingOut(false);
+    }
+  };
 
   return (
     <aside
@@ -180,18 +209,29 @@ export default function DashboardSidebar({
           <span className={`truncate ${labelClass}`}>Back to Home</span>
         </Link>
 
-        {/* UI only — sign-out wiring is out of scope for this preview. */}
+        {/* Logout */}
         <button
           type="button"
+          onClick={handleLogout}
+          disabled={loggingOut}
           aria-label="Logout"
           title={collapsed ? "Logout" : undefined}
-          className={`${ITEM_BASE} ${itemLayout} w-full text-red-300/80 hover:bg-red-500/10 hover:text-red-200`}
+          className={`${ITEM_BASE} ${itemLayout} mt-2 w-full bg-[#DA3633] text-white shadow-sm hover:bg-[#B62324] hover:text-white disabled:cursor-not-allowed disabled:opacity-50`}
         >
-          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-red-300/70">
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-white/15 text-white">
             <LogoutIcon />
           </span>
-          <span className={`truncate ${labelClass}`}>Logout</span>
+
+          <span className={`truncate ${labelClass}`}>
+            {loggingOut ? "Logging out..." : "Logout"}
+          </span>
         </button>
+
+        {logoutError && (
+          <p role="alert" className="mt-2 px-3 text-xs text-red-300">
+            {logoutError}
+          </p>
+        )}
       </div>
     </aside>
   );

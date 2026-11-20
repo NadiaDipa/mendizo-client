@@ -441,7 +441,7 @@ function UserMenu({
                 role="menuitem"
                 onClick={() => {
                   onOpenChange(false);
-                  toast("Dashboard page coming soon.", { icon: "🔧" });
+                  router.push("/dashboard/customer");
                 }}
                 className="group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-semibold text-on-dark/85 transition-colors duration-150 hover:bg-sky/10 hover:text-sky focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky lg:[html:not(.dark)_&]:text-navy/80 lg:[html:not(.dark)_&]:hover:bg-primary/8 lg:[html:not(.dark)_&]:hover:text-primary"
               >
