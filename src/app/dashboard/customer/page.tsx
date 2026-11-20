@@ -1,0 +1,307 @@
+import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
+import type { JSX } from "react";
+
+export const metadata: Metadata = {
+  title: "Customer Dashboard — Mendizo",
+  description:
+    "An overview of your repair requests, active jobs, and recent bookings.",
+};
+
+const CARD =
+  "rounded-2xl border border-foreground/8 bg-white shadow-[0_6px_28px_-14px_rgba(18,35,46,0.12)] dark:border-white/8 dark:bg-white/[0.04] dark:shadow-[0_6px_28px_-14px_rgba(0,0,0,0.5)]";
+
+// ─── Sample data (UI preview only) ───────────────────────────────────────────
+
+type Stat = {
+  label: string;
+  value: string;
+  hint: string;
+  tone: string;
+  Icon: () => JSX.Element;
+};
+
+const STATS: Stat[] = [
+  {
+    label: "Total Requests",
+    value: "12",
+    hint: "All time",
+    tone: "bg-primary/10 text-primary dark:bg-sky/15 dark:text-sky",
+    Icon: ClipboardIcon,
+  },
+  {
+    label: "Active Jobs",
+    value: "2",
+    hint: "Currently in progress",
+    tone: "bg-sky/15 text-[#0b6a9e] dark:bg-sky/15 dark:text-sky",
+    Icon: WrenchIcon,
+  },
+  {
+    label: "Completed Jobs",
+    value: "10",
+    hint: "Successfully completed",
+    tone: "bg-emerald-500/10 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-300",
+    Icon: CheckCircleIcon,
+  },
+];
+
+type RecentBooking = {
+  id: string;
+  service: string;
+  technician: string;
+  date: string;
+  amount: number;
+  status: "Confirmed" | "In Progress" | "Completed";
+  payment: "Paid" | "Unpaid";
+  image: string;
+};
+
+const RECENT_BOOKINGS: RecentBooking[] = [
+  {
+    id: "BK-1042",
+    service: "AC Deep Cleaning & Servicing",
+    technician: "Rafiqul Islam",
+    date: "Nov 18, 2026",
+    amount: 1200,
+    status: "In Progress",
+    payment: "Unpaid",
+    image: "/images/showcase-2.png",
+  },
+  {
+    id: "BK-1041",
+    service: "Laptop Screen Replacement",
+    technician: "Tanvir Ahmed",
+    date: "Nov 22, 2026",
+    amount: 4500,
+    status: "Confirmed",
+    payment: "Unpaid",
+    image: "/images/device-1.png",
+  },
+  {
+    id: "BK-1038",
+    service: "Washing Machine Motor Repair",
+    technician: "Sumon Hossain",
+    date: "Nov 09, 2026",
+    amount: 2300,
+    status: "Completed",
+    payment: "Paid",
+    image: "/images/technician-3.png",
+  },
+];
+
+const BOOKING_BADGE: Record<RecentBooking["status"], string> = {
+  "In Progress":
+    "bg-primary/10 text-primary dark:bg-sky/15 dark:text-sky",
+  Confirmed:
+    "bg-sky/18 text-[#0b6a9e] dark:bg-sky/15 dark:text-sky",
+  Completed:
+    "bg-emerald-500/10 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-300",
+};
+
+const PAYMENT_BADGE: Record<RecentBooking["payment"], string> = {
+  Paid: "bg-emerald-500/10 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-300",
+  Unpaid:
+    "bg-amber-500/10 text-amber-700 dark:bg-amber-400/15 dark:text-amber-300",
+};
+
+// ─── Page ────────────────────────────────────────────────────────────────────
+
+export default function CustomerDashboardPage() {
+  return (
+    <div className="flex flex-col gap-6">
+      {/* Intro */}
+      <div>
+        <p className="text-[10.5px] font-bold uppercase tracking-[0.18em] text-primary dark:text-sky">
+          Overview
+        </p>
+        <h2 className="mt-1 font-display text-[clamp(1.5rem,3vw,2rem)] leading-tight tracking-tight text-navy dark:text-on-dark">
+          Welcome back
+        </h2>
+        <p className="mt-1 text-[13px] text-foreground/55">
+          Your repair activity at a glance.
+        </p>
+      </div>
+
+      {/* Summary cards */}
+      <section aria-label="Booking summary" className="grid gap-4 sm:grid-cols-3">
+        {STATS.map((stat) => (
+          <article
+            key={stat.label}
+            className={`${CARD} group p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_34px_-18px_rgba(0,124,199,0.3)]`}
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[10.5px] font-bold uppercase tracking-[0.12em] text-foreground/45">
+                  {stat.label}
+                </p>
+                <p className="mt-2.5 font-display text-[34px] leading-none text-navy dark:text-on-dark">
+                  {stat.value}
+                </p>
+                <p className="mt-2 text-[11.5px] text-foreground/45">
+                  {stat.hint}
+                </p>
+              </div>
+
+              <span
+                className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl ${stat.tone}`}
+              >
+                <stat.Icon />
+              </span>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      {/* Recent bookings */}
+      <section className={`${CARD} overflow-hidden`}>
+        <div className="flex items-center justify-between gap-3 border-b border-foreground/8 px-5 py-4 dark:border-white/8 sm:px-6">
+          <div>
+            <h2 className="text-[15px] font-bold text-navy dark:text-on-dark">
+              Recent Bookings
+            </h2>
+            <p className="mt-0.5 text-[12px] text-foreground/50">
+              Your latest service requests.
+            </p>
+          </div>
+
+          <Link
+            href="/dashboard/customer/bookings"
+            className="group inline-flex shrink-0 items-center gap-1.5 rounded-full border border-primary/20 bg-primary/8 px-3.5 py-1.5 text-[11.5px] font-semibold text-primary transition-colors hover:border-primary/40 hover:bg-primary/14 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky dark:border-sky/25 dark:bg-sky/10 dark:text-sky dark:hover:border-sky/40 dark:hover:bg-sky/15"
+          >
+            View All
+            <ArrowRightIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        </div>
+
+        <ul className="divide-y divide-foreground/8 dark:divide-white/8">
+          {RECENT_BOOKINGS.map((booking) => (
+            <li
+              key={booking.id}
+              className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6"
+            >
+              <div className="flex min-w-0 items-center gap-3.5">
+                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-foreground/8 bg-mist dark:border-white/8 dark:bg-navy">
+                  <Image
+                    src={booking.image}
+                    alt={booking.service}
+                    width={56}
+                    height={56}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+
+                <div className="min-w-0">
+                  <p className="truncate text-[13.5px] font-semibold text-navy dark:text-on-dark">
+                    {booking.service}
+                  </p>
+                  <p className="mt-0.5 text-[12px] text-foreground/50">
+                    {booking.technician}
+                  </p>
+                  <p className="mt-0.5 flex items-center gap-1 text-[11.5px] text-foreground/40">
+                    <CalendarIcon className="h-3 w-3" />
+                    {booking.date}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between gap-3 pl-[4.4rem] sm:justify-end sm:pl-0">
+                <div className="flex flex-wrap gap-1.5">
+                  <StatusBadge
+                    label={booking.status}
+                    className={BOOKING_BADGE[booking.status]}
+                  />
+                  <StatusBadge
+                    label={booking.payment}
+                    className={PAYMENT_BADGE[booking.payment]}
+                  />
+                </div>
+
+                <p className="shrink-0 text-[14px] font-bold text-navy dark:text-on-dark">
+                  ৳{booking.amount.toLocaleString()}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
+  );
+}
+
+// ─── Sub-components ──────────────────────────────────────────────────────────
+
+function StatusBadge({
+  label,
+  className,
+}: {
+  label: string;
+  className: string;
+}) {
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.08em] ${className}`}
+    >
+      <span className="h-1.5 w-1.5 rounded-full bg-current" />
+      {label}
+    </span>
+  );
+}
+
+// ─── Icons ───────────────────────────────────────────────────────────────────
+
+function svgProps(className = "h-5 w-5") {
+  return {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.8,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    "aria-hidden": true,
+    className,
+  };
+}
+
+function ClipboardIcon() {
+  return (
+    <svg {...svgProps()}>
+      <rect x="5" y="4" width="14" height="17" rx="2.5" />
+      <path d="M9 4.5V3h6v1.5M9 10h6M9 14h6M9 18h4" />
+    </svg>
+  );
+}
+
+function WrenchIcon() {
+  return (
+    <svg {...svgProps()}>
+      <path d="M14.7 6.3a4.5 4.5 0 0 0 5.9 5.9l-9.3 9.3a2.5 2.5 0 0 1-3.5-3.5l9.3-9.3a4.5 4.5 0 0 0-5.9-5.9l3 3-2.5 2.5-3-3a4.5 4.5 0 0 0 6 1Z" />
+    </svg>
+  );
+}
+
+function CheckCircleIcon() {
+  return (
+    <svg {...svgProps()}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="m8.5 12.5 2.5 2.5 4.5-5" />
+    </svg>
+  );
+}
+
+function CalendarIcon({ className }: { className?: string }) {
+  return (
+    <svg {...svgProps(className)}>
+      <rect x="3" y="4" width="18" height="17" rx="2.5" />
+      <path d="M8 2v3M16 2v3M3 10h18" />
+    </svg>
+  );
+}
+
+function ArrowRightIcon({ className }: { className?: string }) {
+  return (
+    <svg {...svgProps(className)}>
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
+  );
+}
