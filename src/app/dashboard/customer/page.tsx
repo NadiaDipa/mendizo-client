@@ -1,18 +1,13 @@
-import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
-import type { JSX } from "react";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Customer Dashboard — Mendizo",
-  description:
-    "An overview of your repair requests, active jobs, and recent bookings.",
-};
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import type { JSX } from "react";
 
 const CARD =
   "rounded-2xl border border-foreground/8 bg-white shadow-[0_6px_28px_-14px_rgba(18,35,46,0.12)] dark:border-white/8 dark:bg-white/[0.04] dark:shadow-[0_6px_28px_-14px_rgba(0,0,0,0.5)]";
 
-// ─── Sample data (UI preview only) ───────────────────────────────────────────
+// ─── Types ───────────────────────────────────────────────────────────────────
 
 type Stat = {
   label: string;
@@ -22,92 +17,124 @@ type Stat = {
   Icon: () => JSX.Element;
 };
 
-const STATS: Stat[] = [
-  {
-    label: "Total Requests",
-    value: "12",
-    hint: "All time",
-    tone: "bg-primary/10 text-primary dark:bg-sky/15 dark:text-sky",
-    Icon: ClipboardIcon,
-  },
-  {
-    label: "Active Jobs",
-    value: "2",
-    hint: "Currently in progress",
-    tone: "bg-sky/15 text-[#0b6a9e] dark:bg-sky/15 dark:text-sky",
-    Icon: WrenchIcon,
-  },
-  {
-    label: "Completed Jobs",
-    value: "10",
-    hint: "Successfully completed",
-    tone: "bg-emerald-500/10 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-300",
-    Icon: CheckCircleIcon,
-  },
-];
-
-type RecentBooking = {
-  id: string;
-  service: string;
-  technician: string;
-  date: string;
+type ApiBooking = {
+  _id: string;
+  serviceTitle: string;
+  technicianName: string;
+  preferredDate: string;
   amount: number;
-  status: "Confirmed" | "In Progress" | "Completed";
-  payment: "Paid" | "Unpaid";
-  image: string;
+  status: string;
+  paymentStatus: string;
+  createdAt: string;
 };
 
-const RECENT_BOOKINGS: RecentBooking[] = [
-  {
-    id: "BK-1042",
-    service: "AC Deep Cleaning & Servicing",
-    technician: "Rafiqul Islam",
-    date: "Nov 18, 2026",
-    amount: 1200,
-    status: "In Progress",
-    payment: "Unpaid",
-    image: "/images/showcase-2.png",
-  },
-  {
-    id: "BK-1041",
-    service: "Laptop Screen Replacement",
-    technician: "Tanvir Ahmed",
-    date: "Nov 22, 2026",
-    amount: 4500,
-    status: "Confirmed",
-    payment: "Unpaid",
-    image: "/images/device-1.png",
-  },
-  {
-    id: "BK-1038",
-    service: "Washing Machine Motor Repair",
-    technician: "Sumon Hossain",
-    date: "Nov 09, 2026",
-    amount: 2300,
-    status: "Completed",
-    payment: "Paid",
-    image: "/images/technician-3.png",
-  },
-];
+// ─── Badge maps ──────────────────────────────────────────────────────────────
 
-const BOOKING_BADGE: Record<RecentBooking["status"], string> = {
-  "In Progress":
-    "bg-primary/10 text-primary dark:bg-sky/15 dark:text-sky",
-  Confirmed:
-    "bg-sky/18 text-[#0b6a9e] dark:bg-sky/15 dark:text-sky",
+const BOOKING_BADGE: Record<string, string> = {
+  Pending:
+    "bg-amber-500/10 text-amber-700 dark:bg-amber-400/15 dark:text-amber-300",
+  Confirmed: "bg-sky/18 text-[#0b6a9e] dark:bg-sky/15 dark:text-sky",
+  "In Progress": "bg-primary/10 text-primary dark:bg-sky/15 dark:text-sky",
   Completed:
     "bg-emerald-500/10 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-300",
+  Cancelled:
+    "bg-red-500/10 text-red-600 dark:bg-red-400/15 dark:text-red-300",
 };
 
-const PAYMENT_BADGE: Record<RecentBooking["payment"], string> = {
+const PAYMENT_BADGE: Record<string, string> = {
   Paid: "bg-emerald-500/10 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-300",
   Unpaid:
     "bg-amber-500/10 text-amber-700 dark:bg-amber-400/15 dark:text-amber-300",
 };
 
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function mapStatus(status: string): string {
+  const map: Record<string, string> = {
+    requested: "Pending",
+    confirmed: "Confirmed",
+    "in-progress": "In Progress",
+    completed: "Completed",
+    cancelled: "Cancelled",
+  };
+  return map[status] ?? status;
+}
+
+function mapPayment(paymentStatus: string): string {
+  if (paymentStatus === "paid") return "Paid";
+  return "Unpaid";
+}
+
+function formatDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function CustomerDashboardPage() {
+  const [stats, setStats] = useState<{ total: number; pending: number; completed: number } | null>(null);
+  const [recentBookings, setRecentBookings] = useState<ApiBooking[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [statsRes, bookingsRes] = await Promise.all([
+          fetch("http://localhost:5000/api/customer/stats", { credentials: "include" }),
+          fetch("http://localhost:5000/api/customer/bookings", { credentials: "include" }),
+        ]);
+
+        if (!statsRes.ok || !bookingsRes.ok) {
+          throw new Error("Failed to fetch dashboard data.");
+        }
+
+        const statsData = await statsRes.json();
+        const bookingsData = await bookingsRes.json();
+
+        setStats(statsData);
+        setRecentBookings(bookingsData.slice(0, 3));
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Something went wrong.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  if (loading) return <div className="flex items-center justify-center py-20 text-foreground/50">Loading...</div>;
+  if (error) return <div className="flex items-center justify-center py-20 text-red-500">{error}</div>;
+
+  const STATS: Stat[] = [
+    {
+      label: "Total Requests",
+      value: String(stats?.total ?? 0),
+      hint: "All time",
+      tone: "bg-primary/10 text-primary dark:bg-sky/15 dark:text-sky",
+      Icon: ClipboardIcon,
+    },
+    {
+      label: "Active Jobs",
+      value: String(stats?.pending ?? 0),
+      hint: "Currently in progress",
+      tone: "bg-sky/15 text-[#0b6a9e] dark:bg-sky/15 dark:text-sky",
+      Icon: WrenchIcon,
+    },
+    {
+      label: "Completed Jobs",
+      value: String(stats?.completed ?? 0),
+      hint: "Successfully completed",
+      tone: "bg-emerald-500/10 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-300",
+      Icon: CheckCircleIcon,
+    },
+  ];
+
   return (
     <div className="flex flex-col gap-6">
       {/* Intro */}
@@ -175,54 +202,52 @@ export default function CustomerDashboardPage() {
         </div>
 
         <ul className="divide-y divide-foreground/8 dark:divide-white/8">
-          {RECENT_BOOKINGS.map((booking) => (
-            <li
-              key={booking.id}
-              className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6"
-            >
-              <div className="flex min-w-0 items-center gap-3.5">
-                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-foreground/8 bg-mist dark:border-white/8 dark:bg-navy">
-                  <Image
-                    src={booking.image}
-                    alt={booking.service}
-                    width={56}
-                    height={56}
-                    className="h-full w-full object-cover"
-                  />
+          {recentBookings.map((booking) => {
+            const displayStatus = mapStatus(booking.status);
+            const displayPayment = mapPayment(booking.paymentStatus);
+
+            return (
+              <li
+                key={booking._id}
+                className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6"
+              >
+                <div className="flex min-w-0 items-center gap-3.5">
+                  {/* Placeholder gradient div instead of Image */}
+                  <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-foreground/8 bg-gradient-to-br from-primary/20 to-sky/30 dark:border-white/8 dark:from-sky/20 dark:to-primary/30" />
+
+                  <div className="min-w-0">
+                    <p className="truncate text-[13.5px] font-semibold text-navy dark:text-on-dark">
+                      {booking.serviceTitle}
+                    </p>
+                    <p className="mt-0.5 text-[12px] text-foreground/50">
+                      {booking.technicianName}
+                    </p>
+                    <p className="mt-0.5 flex items-center gap-1 text-[11.5px] text-foreground/40">
+                      <CalendarIcon className="h-3 w-3" />
+                      {formatDate(booking.preferredDate)}
+                    </p>
+                  </div>
                 </div>
 
-                <div className="min-w-0">
-                  <p className="truncate text-[13.5px] font-semibold text-navy dark:text-on-dark">
-                    {booking.service}
-                  </p>
-                  <p className="mt-0.5 text-[12px] text-foreground/50">
-                    {booking.technician}
-                  </p>
-                  <p className="mt-0.5 flex items-center gap-1 text-[11.5px] text-foreground/40">
-                    <CalendarIcon className="h-3 w-3" />
-                    {booking.date}
+                <div className="flex items-center justify-between gap-3 pl-[4.4rem] sm:justify-end sm:pl-0">
+                  <div className="flex flex-wrap gap-1.5">
+                    <StatusBadge
+                      label={displayStatus}
+                      className={BOOKING_BADGE[displayStatus] ?? "bg-foreground/8 text-foreground/60"}
+                    />
+                    <StatusBadge
+                      label={displayPayment}
+                      className={PAYMENT_BADGE[displayPayment] ?? "bg-foreground/8 text-foreground/60"}
+                    />
+                  </div>
+
+                  <p className="shrink-0 text-[14px] font-bold text-navy dark:text-on-dark">
+                    ৳{booking.amount.toLocaleString()}
                   </p>
                 </div>
-              </div>
-
-              <div className="flex items-center justify-between gap-3 pl-[4.4rem] sm:justify-end sm:pl-0">
-                <div className="flex flex-wrap gap-1.5">
-                  <StatusBadge
-                    label={booking.status}
-                    className={BOOKING_BADGE[booking.status]}
-                  />
-                  <StatusBadge
-                    label={booking.payment}
-                    className={PAYMENT_BADGE[booking.payment]}
-                  />
-                </div>
-
-                <p className="shrink-0 text-[14px] font-bold text-navy dark:text-on-dark">
-                  ৳{booking.amount.toLocaleString()}
-                </p>
-              </div>
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ul>
       </section>
     </div>
