@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -24,8 +23,7 @@ const CTRL =
 const LINK_IDLE =
   "text-on-dark hover:text-sky lg:[html:not(.dark)_&]:text-navy lg:[html:not(.dark)_&]:hover:text-primary";
 
-const LINK_ACTIVE =
-  "text-sky lg:[html:not(.dark)_&]:text-primary";
+const LINK_ACTIVE = "text-sky lg:[html:not(.dark)_&]:text-primary";
 
 type UserRole = "customer" | "technician" | "admin";
 
@@ -57,13 +55,9 @@ export default function Navbar() {
     ? "text-on-dark border-on-dark/40 hover:bg-on-dark/10"
     : CTRL;
 
-  const idleLinkClass = scrolled
-    ? "text-on-dark hover:text-sky"
-    : LINK_IDLE;
+  const idleLinkClass = scrolled ? "text-on-dark hover:text-sky" : LINK_IDLE;
 
-  const activeLinkClass = scrolled
-    ? "text-sky"
-    : LINK_ACTIVE;
+  const activeLinkClass = scrolled ? "text-sky" : LINK_ACTIVE;
 
   useEffect(() => {
     function onScroll() {
@@ -86,10 +80,7 @@ export default function Navbar() {
     root.dataset.theme = nextIsDark ? "dark" : "light";
 
     try {
-      localStorage.setItem(
-        "mendizo-theme",
-        nextIsDark ? "dark" : "light"
-      );
+      localStorage.setItem("mendizo-theme", nextIsDark ? "dark" : "light");
     } catch {
       /* storage unavailable */
     }
@@ -104,7 +95,6 @@ export default function Navbar() {
       }`}
     >
       <nav className="mx-auto flex h-20 max-w-7xl xl:max-w-[90rem] 2xl:max-w-[100rem] items-center justify-between gap-6 px-5 sm:px-8 min-[1360px]:grid min-[1360px]:grid-cols-[1fr_auto_1fr]">
-
         {/* Logo */}
         <Link
           href="/"
@@ -143,10 +133,7 @@ export default function Navbar() {
 
         {/* Right Controls */}
         <div className="flex items-center gap-2.5 justify-self-end">
-          <ThemeToggle
-            onToggle={toggleTheme}
-            scrolled={scrolled}
-          />
+          <ThemeToggle onToggle={toggleTheme} scrolled={scrolled} />
 
           {!isPending && !user && (
             <>
@@ -289,8 +276,7 @@ function UserMenu({
 
     document.addEventListener("mousedown", handleOutsideClick);
 
-    return () =>
-      document.removeEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, [isOpen, onOpenChange]);
 
   useEffect(() => {
@@ -305,8 +291,7 @@ function UserMenu({
 
     document.addEventListener("keydown", handleKeyDown);
 
-    return () =>
-      document.removeEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onOpenChange]);
 
   async function handleSignOut() {
@@ -334,9 +319,7 @@ function UserMenu({
     }
   }
 
-  const initials = user.name
-    ? user.name.charAt(0).toUpperCase()
-    : "U";
+  const initials = user.name ? user.name.charAt(0).toUpperCase() : "U";
 
   const avatarCircle = (
     <span className="flex h-full w-full items-center justify-center bg-primary text-sm font-bold text-primary-foreground">
@@ -346,7 +329,6 @@ function UserMenu({
 
   return (
     <div ref={containerRef} className="relative">
-
       {/* User name + avatar trigger */}
       <button
         ref={triggerRef}
@@ -395,7 +377,6 @@ function UserMenu({
             "lg:[html:not(.dark)_&]:shadow-[0_16px_48px_-12px_rgba(0,124,199,0.18),0_2px_8px_-2px_rgba(0,0,0,0.06)]",
           ].join(" ")}
         >
-
           {/* User information */}
           <div className="flex items-center gap-3 px-4 py-4 lg:[html:not(.dark)_&]:border-b lg:[html:not(.dark)_&]:border-navy/8">
             <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border-2 border-sky/30 lg:[html:not(.dark)_&]:border-primary/20">
@@ -437,23 +418,20 @@ function UserMenu({
 
           {/* Menu items */}
           <ul className="px-2 py-2">
-
+            {/* Profile */}
             {/* Profile */}
             <li>
-              <button
-                type="button"
+              <Link
+                href="/profile"
                 role="menuitem"
-                onClick={() => {
-                  onOpenChange(false);
-                  toast("Profile page coming soon.", { icon: "🔧" });
-                }}
+                onClick={() => onOpenChange(false)}
                 className="group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-semibold text-on-dark/85 transition-colors duration-150 hover:bg-sky/10 hover:text-sky focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky lg:[html:not(.dark)_&]:text-navy/80 lg:[html:not(.dark)_&]:hover:bg-primary/8 lg:[html:not(.dark)_&]:hover:text-primary"
               >
                 <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-on-dark/[0.08] text-on-dark/60 transition-colors group-hover:bg-sky/15 group-hover:text-sky lg:[html:not(.dark)_&]:bg-navy/[0.06] lg:[html:not(.dark)_&]:text-navy/50 lg:[html:not(.dark)_&]:group-hover:bg-primary/10 lg:[html:not(.dark)_&]:group-hover:text-primary">
                   <UserIcon />
                 </span>
                 Profile
-              </button>
+              </Link>
             </li>
 
             {/* Dashboard */}
@@ -516,9 +494,7 @@ function ThemeToggle({
       aria-label="Toggle color theme"
       title="Toggle color theme"
       className={`grid h-10 w-10 place-items-center rounded-full bg-transparent transition-colors duration-300 ${
-        scrolled
-          ? "text-on-dark border-on-dark/40 hover:bg-on-dark/10"
-          : CTRL
+        scrolled ? "text-on-dark border-on-dark/40 hover:bg-on-dark/10" : CTRL
       } ${FOCUS}`}
     >
       <span className="dark:hidden">

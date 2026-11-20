@@ -17,57 +17,68 @@ export const auth = betterAuth({
     autoSignIn: false,
   },
 
- user: {
-  additionalFields: {
-    role: {
-      type: ["customer", "technician"],
-      required: true,
-      defaultValue: "customer",
-      input: true,
-    },
+  user: {
+    additionalFields: {
+      role: {
+        type: ["customer", "technician"],
+        required: true,
+        defaultValue: "customer",
+        input: true,
+      },
 
-    phone: {
-      type: "string",
-      required: false,
-      input: true,
-    },
+      phone: {
+        type: "string",
+        required: false,
+        input: true,
+      },
 
-    area: {
-      type: "string",
-      required: false,
-      input: true,
-    },
+      area: {
+        type: "string",
+        required: false,
+        input: true,
+      },
 
-    bio: {
-      type: "string",
-      required: false,
-      input: true,
+      bio: {
+        type: "string",
+        required: false,
+        input: true,
+      },
     },
   },
-},
 
   hooks: {
     before: createAuthMiddleware(async (ctx) => {
-      if (ctx.path !== "/sign-up/email") {
-        return;
+      // Normalize role during signup
+      if (ctx.path === "/sign-up/email") {
+        const role = ctx.body?.role;
+
+        const normalizedRole =
+          role === "customer" || role === "technician"
+            ? role
+            : "customer";
+
+        return {
+          context: {
+            ...ctx,
+            body: {
+              ...ctx.body,
+              role: normalizedRole,
+            },
+          },
+        };
       }
 
-      const role = ctx.body?.role;
+      // Prevent users from changing their role through profile updates
+      if (ctx.path === "/update-user" && ctx.body) {
+        const { role, ...safeBody } = ctx.body;
 
-      const normalizedRole =
-        role === "customer" || role === "technician"
-          ? role
-          : "customer";
-
-      return {
-        context: {
-          ...ctx,
-          body: {
-            ...ctx.body,
-            role: normalizedRole,
+        return {
+          context: {
+            ...ctx,
+            body: safeBody,
           },
-        },
-      };
+        };
+      }
     }),
   },
 });
