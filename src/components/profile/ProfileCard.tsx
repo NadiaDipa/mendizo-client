@@ -1,7 +1,4 @@
-
-"use client";
-
-import { useState } from "react";
+import type { ReactNode } from "react";
 
 // ─── User Props Type ──────────────────────────────────────────────────────────
 
@@ -17,22 +14,25 @@ type ProfileUser = {
 
 const ROLE_BADGE: Record<
   string,
-  { label: string; className: string }
+  { label: string; className: string; icon: ReactNode }
 > = {
   customer: {
     label: "Customer",
     className:
-      "bg-primary/10 text-primary dark:bg-sky/15 dark:text-sky",
+      "border border-primary/20 bg-primary/8 text-primary dark:border-sky/25 dark:bg-sky/12 dark:text-sky",
+    icon: <UserCheckIcon />,
   },
   technician: {
     label: "Technician",
     className:
-      "bg-emerald-500/10 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-400",
+      "border border-transparent bg-navy text-mist shadow-[0_6px_16px_-8px_rgba(18,35,46,0.55)] dark:border-sky/25 dark:bg-sky/15 dark:text-sky dark:shadow-none",
+    icon: <WrenchIcon />,
   },
   admin: {
     label: "Admin",
     className:
-      "bg-amber-500/10 text-amber-700 dark:bg-amber-400/15 dark:text-amber-400",
+      "border border-surface/20 bg-surface/8 text-surface dark:border-white/15 dark:bg-white/10 dark:text-on-dark",
+    icon: <ShieldIcon />,
   },
 };
 
@@ -64,8 +64,6 @@ function formatMemberSince(createdAt?: Date | string) {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function ProfileCard({ user }: { user: ProfileUser }) {
-  const [hovering, setHovering] = useState(false);
-
   const role = user.role?.toLowerCase() ?? "";
   const badge = ROLE_BADGE[role];
 
@@ -73,140 +71,100 @@ export default function ProfileCard({ user }: { user: ProfileUser }) {
   const memberSince = formatMemberSince(user.createdAt);
 
   return (
-    <div
+    <article
       className={[
-        "flex flex-col items-center rounded-[22px] border p-6 text-center",
-        "border-foreground/10 bg-white shadow-[0_6px_28px_-10px_rgba(18,35,46,0.10)]",
-        "dark:border-white/8 dark:bg-white/[0.038] dark:shadow-[0_6px_28px_-10px_rgba(0,0,0,0.5)]",
-        "transition-all duration-200",
+        "group relative overflow-hidden rounded-[24px] border",
+        "border-foreground/10 bg-white shadow-[0_10px_34px_-14px_rgba(18,35,46,0.16)]",
+        "transition-shadow duration-300 hover:shadow-[0_16px_44px_-18px_rgba(0,124,199,0.28)]",
+        "dark:border-white/8 dark:bg-white/[0.04] dark:shadow-[0_10px_34px_-14px_rgba(0,0,0,0.55)]",
+        "dark:hover:shadow-[0_16px_44px_-18px_rgba(77,168,218,0.22)]",
       ].join(" ")}
     >
-      {/* ── Avatar ───────────────────────────────────────────────── */}
+      {/* ── Decorative banner ────────────────────────────────────── */}
       <div
-        className="relative mb-4 mt-2"
-        onMouseEnter={() => setHovering(true)}
-        onMouseLeave={() => setHovering(false)}
+        aria-hidden="true"
+        className="relative h-24 overflow-hidden bg-gradient-to-br from-primary/12 via-sky/10 to-transparent dark:from-primary/22 dark:via-sky/12 dark:to-transparent"
       >
-        {/* Avatar circle */}
-        <div className="relative h-24 w-24 overflow-hidden rounded-full border-4 border-primary/20 dark:border-sky/25 shadow-[0_8px_24px_-8px_rgba(0,124,199,0.4)]">
-          {user.image ? (
-            <img
-              src={user.image}
-              alt={`${user.name}'s profile`}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary to-sky text-2xl font-bold text-white select-none">
-              {initials}
-            </span>
-          )}
+        <div className="absolute -right-8 -top-10 h-32 w-32 rounded-full bg-sky/20 blur-2xl dark:bg-sky/15" />
+        <div className="absolute -left-10 top-4 h-24 w-24 rounded-full bg-primary/10 blur-2xl dark:bg-primary/20" />
+        <div className="absolute inset-x-0 bottom-0 h-px bg-foreground/5 dark:bg-white/8" />
+      </div>
 
-          {/* Hover overlay — "Change Photo" */}
-          <button
-            type="button"
-            aria-label="Change profile photo"
-            className={[
-              "absolute inset-0 flex flex-col items-center justify-center gap-0.5",
-              "bg-navy/60 backdrop-blur-[2px] transition-opacity duration-200",
-              hovering ? "opacity-100" : "opacity-0",
-            ].join(" ")}
-          >
-            <CameraIcon />
-            <span className="text-[9px] font-bold uppercase tracking-widest text-white/90">
-              Change
-            </span>
-          </button>
+      <div className="px-6 pb-6">
+        {/* ── Avatar ─────────────────────────────────────────────── */}
+        <div className="-mt-12 flex justify-center">
+          <div className="rounded-full bg-gradient-to-br from-primary via-sky to-primary/50 p-[3px] shadow-[0_14px_30px_-14px_rgba(0,124,199,0.65)]">
+            <div className="h-24 w-24 overflow-hidden rounded-full border-[3px] border-white bg-white dark:border-[#1b2c36] dark:bg-[#1b2c36]">
+              {user.image ? (
+                <img
+                  src={user.image}
+                  alt={`${user.name}'s profile`}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary to-sky text-2xl font-bold tracking-wide text-white select-none">
+                  {initials}
+                </span>
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* Online indicator dot */}
-        <span
-          aria-hidden="true"
-          className="absolute bottom-0.5 right-0.5 h-4 w-4 rounded-full border-2 border-white dark:border-[#1a3448] bg-emerald-500 shadow-sm"
-        />
+        {/* ── Name, email & role ─────────────────────────────────── */}
+        <div className="mt-4 flex flex-col items-center text-center">
+          <h2 className="max-w-full break-words font-display text-[22px] leading-tight tracking-tight text-navy dark:text-on-dark">
+            {user.name}
+          </h2>
+
+          <p className="mt-1.5 max-w-full break-words text-[12.5px] leading-relaxed text-foreground/55">
+            {user.email}
+          </p>
+
+          {badge && (
+            <span
+              className={[
+                "mt-4 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5",
+                "text-[10px] font-bold uppercase tracking-[0.14em]",
+                badge.className,
+              ].join(" ")}
+            >
+              {badge.icon}
+              {badge.label}
+            </span>
+          )}
+        </div>
+
+        {/* ── Stats ──────────────────────────────────────────────── */}
+        <div className="mt-6 grid grid-cols-2 divide-x divide-foreground/8 overflow-hidden rounded-2xl border border-foreground/8 bg-foreground/[0.02] dark:divide-white/8 dark:border-white/8 dark:bg-white/[0.02]">
+          <Stat value="—" label="Bookings" />
+          <Stat value="—" label="Rating" />
+        </div>
+
+        {/* ── Member since ───────────────────────────────────────── */}
+        <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-foreground/8 bg-foreground/[0.02] px-4 py-3 dark:border-white/8 dark:bg-white/[0.02]">
+          <span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-foreground/45">
+            <CalendarIcon />
+            Member Since
+          </span>
+
+          <span className="text-[13px] font-semibold text-navy dark:text-on-dark">
+            {memberSince}
+          </span>
+        </div>
       </div>
-
-      {/* ── Name & Role ───────────────────────────────────────────── */}
-      <h2 className="text-[17px] font-bold leading-snug text-navy dark:text-on-dark">
-        {user.name}
-      </h2>
-
-      <p className="mt-0.5 text-[13px] text-foreground/55">
-        {user.email}
-      </p>
-
-      {/* Role badge */}
-      {badge && (
-        <span
-          className={[
-            "mt-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider",
-            badge.className,
-          ].join(" ")}
-        >
-          <ShieldIcon />
-          {badge.label}
-        </span>
-      )}
-
-      {/* ── Divider ───────────────────────────────────────────────── */}
-      <div
-        aria-hidden="true"
-        className="my-5 h-px w-full bg-foreground/[0.07]"
-      />
-
-      {/* ── Stats row ─────────────────────────────────────────────── */}
-      <div className="flex w-full justify-around gap-2 text-center">
-        <StatPill value="—" label="Bookings" />
-        <StatPill value="—" label="Rating" />
-        <StatPill value={memberSince} label="Member since" compact />
-      </div>
-
-      {/* ── Divider ───────────────────────────────────────────────── */}
-      <div
-        aria-hidden="true"
-        className="my-5 h-px w-full bg-foreground/[0.07]"
-      />
-
-      {/* ── Change photo button (UI only) ─────────────────────────── */}
-      <button
-        type="button"
-        className={[
-          "flex w-full items-center justify-center gap-2 rounded-xl border",
-          "border-foreground/12 px-4 py-2.5 text-[13px] font-semibold",
-          "text-foreground/70 transition-all duration-200",
-          "hover:border-primary/40 hover:bg-primary/5 hover:text-primary",
-          "dark:border-white/10 dark:hover:border-sky/40 dark:hover:bg-sky/8 dark:hover:text-sky",
-          "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky",
-        ].join(" ")}
-      >
-        <CameraIcon className="h-4 w-4" />
-        Change Photo
-      </button>
-    </div>
+    </article>
   );
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function StatPill({
-  value,
-  label,
-  compact = false,
-}: {
-  value: string;
-  label: string;
-  compact?: boolean;
-}) {
+function Stat({ value, label }: { value: string; label: string }) {
   return (
-    <div className="flex flex-1 flex-col items-center gap-0.5 min-w-0">
-      <span
-        className={[
-          "font-bold text-navy dark:text-on-dark leading-snug",
-          compact ? "text-[11px]" : "text-[15px]",
-        ].join(" ")}
-      >
+    <div className="flex min-w-0 flex-col items-center gap-1 px-3 py-4">
+      <span className="text-[18px] font-bold leading-none text-navy dark:text-on-dark">
         {value}
       </span>
-      <span className="text-[10.5px] text-foreground/50 leading-tight">
+      <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-foreground/45">
         {label}
       </span>
     </div>
@@ -215,41 +173,50 @@ function StatPill({
 
 // ─── Inline SVG icons ─────────────────────────────────────────────────────────
 
-function CameraIcon({
-  className = "h-[18px] w-[18px]",
-}: {
-  className?: string;
-}) {
+function svgProps(className: string) {
+  return {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.8,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    "aria-hidden": true,
+    className,
+  };
+}
+
+function UserCheckIcon() {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.8}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      className={className}
-    >
-      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-      <circle cx="12" cy="13" r="4" />
+    <svg {...svgProps("h-3 w-3")}>
+      <circle cx="9" cy="8" r="3.5" />
+      <path d="M3 20c0-3.4 2.7-6 6-6 1.2 0 2.3.3 3.2 1" />
+      <path d="m16 17 2 2 3.5-3.5" />
+    </svg>
+  );
+}
+
+function WrenchIcon() {
+  return (
+    <svg {...svgProps("h-3 w-3")}>
+      <path d="M14.7 6.3a4.5 4.5 0 0 0 5.9 5.9l-9.3 9.3a2.5 2.5 0 0 1-3.5-3.5l9.3-9.3a4.5 4.5 0 0 0-5.9-5.9l3 3-2.5 2.5-3-3a4.5 4.5 0 0 0 6 1Z" />
     </svg>
   );
 }
 
 function ShieldIcon() {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      className="h-3 w-3"
-    >
+    <svg {...svgProps("h-3 w-3")}>
       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    </svg>
+  );
+}
+
+function CalendarIcon() {
+  return (
+    <svg {...svgProps("h-3.5 w-3.5")}>
+      <rect x="3" y="4" width="18" height="17" rx="2.5" />
+      <path d="M8 2v3M16 2v3M3 10h18" />
     </svg>
   );
 }

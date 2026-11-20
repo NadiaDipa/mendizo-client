@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from "react";
+import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
@@ -32,6 +33,34 @@ const INPUT_DISABLED =
 
 const FOCUS =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky";
+
+// ─── Profile tips ─────────────────────────────────────────────────────────────
+
+const PROFILE_TIPS: {
+  title: string;
+  description: string;
+  tone: string;
+  icon: ReactNode;
+}[] = [
+  {
+    title: "Keep Your Profile Updated",
+    description: "Keep your personal information accurate and up to date.",
+    tone: "bg-primary/8 text-primary dark:bg-sky/12 dark:text-sky",
+    icon: <UserCheckIcon />,
+  },
+  {
+    title: "Add Your Location",
+    description: "Your area helps make service coordination easier.",
+    tone: "bg-sky/15 text-primary dark:bg-sky/15 dark:text-sky",
+    icon: <MapPinIcon className="h-5 w-5" />,
+  },
+  {
+    title: "Tell Us About Yourself",
+    description: "A short bio helps others know a little more about you.",
+    tone: "bg-gradient-to-br from-primary/10 to-sky/20 text-primary dark:from-primary/20 dark:to-sky/20 dark:text-sky",
+    icon: <UserIcon className="h-5 w-5" />,
+  },
+];
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -298,78 +327,59 @@ export default function ProfileInfoSection({
         </form>
       </section>
 
-      {/* ── Account Security card ───────────────────────────────── */}
-      <section className={`${CARD} p-6 sm:p-7`}>
-        <h2 className="mb-1 text-[16px] font-bold text-navy dark:text-on-dark">
-          Account Security
-        </h2>
+      {/* ── Profile tips card ───────────────────────────────────── */}
+      <section className={`${CARD} relative overflow-hidden p-6 sm:p-7`}>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-12 -top-14 h-44 w-44 rounded-full bg-sky/12 blur-3xl dark:bg-sky/10"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-16 -left-10 h-40 w-40 rounded-full bg-primary/8 blur-3xl dark:bg-primary/12"
+        />
 
-        <p className="mb-5 text-[12.5px] text-foreground/50">
-          Manage your password and account access.
-        </p>
-
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-3">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-foreground/[0.06] text-foreground/50 dark:bg-white/[0.06]">
-              <LockIcon />
+        <div className="relative">
+          <div className="flex items-center gap-2.5">
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary/10 text-primary dark:bg-sky/15 dark:text-sky">
+              <SparkleIcon />
             </span>
 
-            <div>
-              <p className="text-[13.5px] font-semibold text-foreground/80">
-                Password
-              </p>
-              <p className="text-[12px] text-foreground/45">
-                Last changed 3 months ago
-              </p>
-            </div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-primary dark:text-sky">
+              Profile tips
+            </p>
           </div>
 
-          <button
-            type="button"
-            className={[
-              "flex shrink-0 items-center justify-center gap-2 rounded-xl border",
-              "border-foreground/15 px-5 py-2.5 text-[13px] font-semibold text-foreground/70",
-              "transition-all duration-200 hover:border-primary/35 hover:bg-primary/6 hover:text-primary",
-              "dark:border-white/10 dark:hover:border-sky/35 dark:hover:bg-sky/8 dark:hover:text-sky",
-              FOCUS,
-            ].join(" ")}
-          >
-            <KeyIcon />
-            Change Password
-          </button>
-        </div>
+          <h2 className="mt-3.5 font-display text-[20px] leading-snug tracking-tight text-navy dark:text-on-dark">
+            Make the Most of Mendizo
+          </h2>
 
-        <div aria-hidden="true" className="my-5 h-px bg-foreground/[0.07]" />
+          <p className="mt-1 text-[13px] text-foreground/55">
+            A better profile makes your experience better.
+          </p>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-3">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-red-500/8 text-red-500 dark:bg-red-400/10 dark:text-red-400">
-              <TrashIcon />
-            </span>
+          <ul className="mt-5 flex flex-col gap-3">
+            {PROFILE_TIPS.map((tip) => (
+              <li
+                key={tip.title}
+                className="flex items-start gap-3.5 rounded-2xl border border-foreground/8 bg-foreground/[0.015] p-3.5 dark:border-white/8 dark:bg-white/[0.02]"
+              >
+                <span
+                  className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${tip.tone}`}
+                >
+                  {tip.icon}
+                </span>
 
-            <div>
-              <p className="text-[13.5px] font-semibold text-foreground/80">
-                Delete Account
-              </p>
-              <p className="text-[12px] text-foreground/45">
-                Permanently removes your account and all data.
-              </p>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            className={[
-              "flex shrink-0 items-center justify-center gap-2 rounded-xl border",
-              "border-red-500/20 px-5 py-2.5 text-[13px] font-semibold text-red-500/80",
-              "transition-all duration-200 hover:border-red-500/40 hover:bg-red-50 hover:text-red-600",
-              "dark:border-red-400/15 dark:text-red-400/70 dark:hover:border-red-400/35 dark:hover:bg-red-400/8 dark:hover:text-red-400",
-              FOCUS,
-            ].join(" ")}
-          >
-            <TrashIcon className="h-4 w-4" />
-            Delete Account
-          </button>
+                <div className="min-w-0 pt-0.5">
+                  <h3 className="text-[13.5px] font-semibold leading-snug text-foreground">
+                    {tip.title}
+                  </h3>
+                  <p className="mt-0.5 text-[12.5px] leading-relaxed text-foreground/55">
+                    {tip.description}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
     </div>
@@ -417,11 +427,25 @@ function FieldGroup({
 
 // ─── Inline icons ─────────────────────────────────────────────────────────────
 
-function UserIcon() {
+function UserIcon({
+  className = "h-4 w-4 shrink-0",
+}: {
+  className?: string;
+}) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="h-4 w-4 shrink-0">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className={className}>
       <circle cx="12" cy="8" r="4" />
       <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+    </svg>
+  );
+}
+
+function UserCheckIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="h-5 w-5 shrink-0">
+      <circle cx="9" cy="8" r="3.5" />
+      <path d="M3 20c0-3.4 2.7-6 6-6 1.2 0 2.3.3 3.2 1" />
+      <path d="m16 17 2 2 3.5-3.5" />
     </svg>
   );
 }
@@ -443,9 +467,13 @@ function PhoneIcon() {
   );
 }
 
-function MapPinIcon() {
+function MapPinIcon({
+  className = "h-4 w-4 shrink-0",
+}: {
+  className?: string;
+}) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="h-4 w-4 shrink-0">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className={className}>
       <path d="M12 21s-7-6.2-7-11.2A7 7 0 0 1 19 9.8C19 14.8 12 21 12 21Z" />
       <circle cx="12" cy="9.8" r="2.6" />
     </svg>
@@ -464,35 +492,11 @@ function FileTextIcon() {
   );
 }
 
-function LockIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="h-5 w-5 shrink-0">
-      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-    </svg>
-  );
-}
-
-function KeyIcon() {
+function SparkleIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="h-4 w-4 shrink-0">
-      <circle cx="7.5" cy="15.5" r="5.5" />
-      <path d="m21 2-9.6 9.6M15.5 7.5l3 3L22 7l-3-3" />
-    </svg>
-  );
-}
-
-function TrashIcon({
-  className = "h-4 w-4 shrink-0",
-}: {
-  className?: string;
-}) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className={className}>
-      <polyline points="3 6 5 6 21 6" />
-      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-      <path d="M10 11v6M14 11v6" />
-      <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+      <path d="M12 3v4M12 17v4M3 12h4M17 12h4" />
+      <path d="M12 8.5 13.4 11l2.6 1-2.6 1L12 15.5 10.6 13 8 12l2.6-1L12 8.5Z" />
     </svg>
   );
 }

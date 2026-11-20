@@ -12,7 +12,7 @@ import ProfileInfoSection from "@/components/profile/ProfileInfoSection";
 export const metadata: Metadata = {
   title: "My Profile — Mendizo",
   description:
-    "View and manage your Mendizo profile. Update your personal information, photo, and account preferences.",
+    "View and update your Mendizo profile information, including your contact details, area, and bio.",
 };
 
 export default async function ProfilePage() {
@@ -44,11 +44,12 @@ export default async function ProfilePage() {
             </h1>
 
             <p className="mt-1.5 text-[14px] text-foreground/55">
-              Manage your personal information and account settings.
+              Manage your personal information and how others see you on
+              Mendizo.
             </p>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-[280px_1fr] lg:grid-cols-[300px_1fr] xl:grid-cols-[320px_1fr]">
+          <div className="grid items-start gap-6 md:grid-cols-[280px_1fr] lg:grid-cols-[300px_1fr] xl:grid-cols-[320px_1fr]">
             <ProfileCard user={user} />
 
             <ProfileInfoSection user={user} />
