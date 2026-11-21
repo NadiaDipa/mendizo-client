@@ -11,7 +11,8 @@ import { useSession, authClient } from "@/lib/auth-client";
 const NAV_LINKS = [
   { label: "Home", href: "/" },
   { label: "Services", href: "/services" },
-  { label: "How It Works", href: "/about" },
+  { label: "About", href: "/about" },
+  { label: "How It Works", href: "/how-it-works" },
   { label: "Contact", href: "/contact" },
 ];
 
@@ -19,12 +20,12 @@ const FOCUS =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky";
 
 const CTRL =
-  "text-on-dark border-on-dark/40 hover:bg-on-dark/10 lg:[html:not(.dark)_&]:text-navy lg:[html:not(.dark)_&]:border-navy/40 lg:[html:not(.dark)_&]:hover:bg-navy/5";
+  "text-on-dark border-on-dark/40 hover:bg-on-dark/10 xl:[html:not(.dark)_&]:text-navy xl:[html:not(.dark)_&]:border-navy/40 xl:[html:not(.dark)_&]:hover:bg-navy/5";
 
 const LINK_IDLE =
-  "text-on-dark hover:text-sky lg:[html:not(.dark)_&]:text-navy lg:[html:not(.dark)_&]:hover:text-primary";
+  "text-on-dark/85 hover:text-sky xl:[html:not(.dark)_&]:text-navy/85 xl:[html:not(.dark)_&]:hover:text-primary";
 
-const LINK_ACTIVE = "text-sky lg:[html:not(.dark)_&]:text-primary";
+const LINK_ACTIVE = "text-sky font-bold xl:[html:not(.dark)_&]:text-primary";
 
 type UserRole = "customer" | "technician" | "admin";
 
@@ -53,22 +54,18 @@ export default function Navbar() {
   const { data: session, isPending } = useSession();
   const user = session?.user ?? null;
 
-  const controlClass = !isHome
+  const isLightSolid = !isHome || scrolled;
+
+  const controlClass = isLightSolid
     ? "text-foreground border-foreground/30 hover:bg-foreground/5 dark:text-on-dark dark:border-on-dark/40 dark:hover:bg-on-dark/10"
-    : scrolled
-    ? "text-on-dark border-on-dark/40 hover:bg-on-dark/10"
     : CTRL;
 
-  const idleLinkClass = !isHome
-    ? "text-foreground/80 hover:text-primary dark:text-on-dark/80 dark:hover:text-sky"
-    : scrolled
-    ? "text-on-dark/85 hover:text-sky"
+  const idleLinkClass = isLightSolid
+    ? "text-foreground/80 hover:text-primary dark:text-on-dark/85 dark:hover:text-sky"
     : LINK_IDLE;
 
-  const activeLinkClass = !isHome
+  const activeLinkClass = isLightSolid
     ? "text-primary font-bold dark:text-sky"
-    : scrolled
-    ? "text-sky font-bold"
     : LINK_ACTIVE;
 
   useEffect(() => {
@@ -104,17 +101,17 @@ export default function Navbar() {
         !isHome
           ? "sticky bg-white/95 border-b border-foreground/10 text-foreground shadow-xs backdrop-blur-md dark:bg-navy/95 dark:border-white/10 dark:text-on-dark dark:shadow-md"
           : scrolled
-          ? "fixed bg-navy shadow-[0_2px_20px_-4px_rgba(0,0,0,0.5)] text-on-dark"
+          ? "fixed bg-white/95 border-b border-foreground/10 text-foreground shadow-sm backdrop-blur-md dark:bg-navy/95 dark:border-white/10 dark:text-on-dark dark:shadow-[0_2px_20px_-4px_rgba(0,0,0,0.5)]"
           : "absolute md:top-10 text-on-dark"
       }`}
     >
-      <nav className="mx-auto flex h-20 max-w-7xl xl:max-w-[90rem] 2xl:max-w-[100rem] items-center justify-between gap-6 px-5 sm:px-8 min-[1360px]:grid min-[1360px]:grid-cols-[1fr_auto_1fr]">
+      <nav className="mx-auto flex h-20 max-w-7xl xl:max-w-[90rem] 2xl:max-w-[100rem] items-center justify-between gap-6 px-5 sm:px-8 xl:grid xl:grid-cols-[1fr_auto_1fr]">
         {/* Logo */}
         <Link
           href="/"
           aria-label="Mendizo home"
           className={`group flex items-center gap-2.5 justify-self-start ${
-            !isHome ? "text-foreground dark:text-on-dark" : "text-on-dark"
+            isLightSolid ? "text-foreground dark:text-on-dark" : "text-on-dark"
           }`}
         >
           <LogoMark />
@@ -125,12 +122,12 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Navigation */}
-        <ul className="hidden items-center gap-9 min-[1360px]:flex">
+        <ul className="hidden items-center gap-7 xl:flex">
           {NAV_LINKS.map((link) => {
             const isActive =
               link.href === "/"
                 ? pathname === "/"
-                : pathname.startsWith(link.href);
+                : pathname === link.href || pathname.startsWith(`${link.href}/`);
 
             return (
               <li key={link.href}>
@@ -152,7 +149,7 @@ export default function Navbar() {
 
         {/* Right Controls */}
         <div className="flex items-center gap-2.5 justify-self-end">
-          <ThemeToggle onToggle={toggleTheme} scrolled={scrolled} />
+          <ThemeToggle onToggle={toggleTheme} isLightSolid={isLightSolid} />
 
           {!isPending && !user && (
             <>
@@ -205,7 +202,7 @@ export default function Navbar() {
             }
             aria-expanded={isMenuOpen}
             aria-controls="mobile-menu"
-            className={`grid h-10 w-10 place-items-center rounded-full border bg-transparent transition-colors min-[1360px]:hidden ${controlClass} ${FOCUS}`}
+            className={`grid h-10 w-10 place-items-center rounded-full border bg-transparent transition-colors xl:hidden ${controlClass} ${FOCUS}`}
           >
             {isMenuOpen ? <CloseIcon /> : <MenuIcon />}
           </button>
@@ -216,7 +213,7 @@ export default function Navbar() {
       {isMenuOpen && (
         <div
           id="mobile-menu"
-          className="absolute inset-x-4 top-20 z-40 min-[1360px]:hidden"
+          className="absolute inset-x-4 top-20 z-40 xl:hidden"
         >
           <div className="overflow-hidden rounded-3xl border border-on-dark/10 bg-navy p-3 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)]">
             <ul className="flex flex-col">
@@ -224,7 +221,7 @@ export default function Navbar() {
                 const isActive =
                   link.href === "/"
                     ? pathname === "/"
-                    : pathname.startsWith(link.href);
+                    : pathname === link.href || pathname.startsWith(`${link.href}/`);
 
                 return (
                   <li key={link.href}>
@@ -232,10 +229,11 @@ export default function Navbar() {
                       href={link.href}
                       aria-current={isActive ? "page" : undefined}
                       onClick={() => setIsMenuOpen(false)}
-                      className={`block rounded-xl px-4 py-3 text-sm font-semibold transition-colors duration-200 ${isActive
-                        ? "bg-on-dark/10 text-sky"
-                        : "text-on-dark hover:bg-on-dark/5 hover:text-sky"
-                        }`}
+                      className={`block rounded-xl px-4 py-3 text-sm font-semibold transition-colors duration-200 ${
+                        isActive
+                          ? "bg-on-dark/10 text-sky font-bold"
+                          : "text-on-dark hover:bg-on-dark/5 hover:text-sky"
+                      }`}
                     >
                       {link.label}
                     </Link>
@@ -512,10 +510,10 @@ function UserMenu({
 
 function ThemeToggle({
   onToggle,
-  scrolled,
+  isLightSolid,
 }: {
   onToggle: () => void;
-  scrolled: boolean;
+  isLightSolid: boolean;
 }) {
   return (
     <button
@@ -523,8 +521,11 @@ function ThemeToggle({
       onClick={onToggle}
       aria-label="Toggle color theme"
       title="Toggle color theme"
-      className={`grid h-10 w-10 place-items-center rounded-full bg-transparent transition-colors duration-300 ${scrolled ? "text-on-dark border-on-dark/40 hover:bg-on-dark/10" : CTRL
-        } ${FOCUS}`}
+      className={`grid h-10 w-10 place-items-center rounded-full border shadow-xs transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky ${
+        isLightSolid
+          ? "border-slate-300/90 bg-slate-100 text-slate-800 hover:border-primary hover:bg-slate-200 hover:text-primary dark:border-white/20 dark:bg-white/10 dark:text-sky dark:hover:border-sky dark:hover:bg-white/20 dark:hover:text-sky"
+          : "border-white/30 bg-white/10 text-sky hover:border-sky hover:bg-white/20 hover:text-sky dark:border-white/30 dark:bg-white/10 dark:text-sky dark:hover:border-sky dark:hover:bg-white/20 dark:hover:text-sky"
+      } ${FOCUS}`}
     >
       <span className="dark:hidden">
         <SunIcon />
@@ -583,11 +584,11 @@ function MoonIcon() {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.8"
+      strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
-      className="h-[18px] w-[18px]"
+      className="h-5 w-5"
     >
       <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
     </svg>
@@ -600,11 +601,11 @@ function SunIcon() {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.8"
+      strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
-      className="h-[18px] w-[18px]"
+      className="h-5 w-5"
     >
       <circle cx="12" cy="12" r="4" />
       <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41" />

@@ -14,36 +14,36 @@ const CONTACT = {
  * This bar has NO background of its own. It sits on top of the Hero background, so it always
  * matches it (navy on the left, pale blue on the right in light mode, blue gradient in dark mode).
  * Text colors follow the same rule as the Navbar:
- *  - default (below lg, and in dark mode): light text
- *  - lg and up in LIGHT mode: navy text, because the center/right sit on the pale panel
+ *  - default (below xl, and in dark mode): light text
+ *  - xl and up in LIGHT mode: navy text, because the center/right sit on the pale panel
  * The left tagline always sits on the navy side, so it stays light.
  */
-const TXT = "text-on-dark/85 lg:[html:not(.dark)_&]:text-navy/85";
-const TXT_HOVER = "hover:text-sky lg:[html:not(.dark)_&]:hover:text-primary";
-const ICON = "text-sky lg:[html:not(.dark)_&]:text-primary";
+const TXT = "text-on-dark/85 xl:[html:not(.dark)_&]:text-navy/85";
+const TXT_HOVER = "hover:text-sky xl:[html:not(.dark)_&]:hover:text-primary";
+const ICON = "text-sky xl:[html:not(.dark)_&]:text-primary";
 
 export default function TopBar() {
   return (
-    <div className="absolute inset-x-0 top-0 z-[45] hidden h-10 border-b border-on-dark/10 md:block lg:[html:not(.dark)_&]:border-navy/10">
+    <div className="absolute inset-x-0 top-0 z-[45] hidden h-10 border-b border-on-dark/10 md:block xl:[html:not(.dark)_&]:border-navy/10">
       {/* Same max-width and padding as the Navbar container, so the edges line up */}
-      <div className="mx-auto flex h-full w-full max-w-7xl items-center justify-between gap-x-8 px-5 text-[13px] font-medium sm:px-8 lg:grid lg:grid-cols-[1fr_auto_1fr] xl:max-w-[90rem] 2xl:max-w-[100rem]">
+      <div className="mx-auto flex h-full w-full max-w-7xl items-center justify-between gap-x-8 px-5 text-[13px] font-medium sm:px-8 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-x-6 lg:text-[12px] xl:max-w-[90rem] xl:gap-x-8 xl:text-[13px] 2xl:max-w-[100rem]">
         {/* Left: tagline (always on the navy side) */}
-        <p className="inline-flex items-center gap-2 justify-self-start text-on-dark/85">
+        <p className="inline-flex items-center gap-2 justify-self-start whitespace-nowrap text-on-dark/85">
           <PinIcon className="text-sky" />
           {TAGLINE}
         </p>
 
         {/* Center: working hours (lg and up) */}
-        <p className={`hidden items-center gap-2 lg:inline-flex ${TXT}`}>
+        <p className={`hidden items-center gap-2 whitespace-nowrap lg:inline-flex ${TXT}`}>
           <ClockIcon className={ICON} />
           {HOURS}
         </p>
 
         {/* Right: contact links */}
-        <div className="flex items-center gap-x-8 justify-self-end">
+        <div className="flex items-center gap-x-8 justify-self-end lg:gap-x-4 xl:gap-x-8">
           <a
             href={CONTACT.phone.href}
-            className={`inline-flex items-center gap-2 transition-colors ${TXT} ${TXT_HOVER}`}
+            className={`inline-flex items-center gap-2 whitespace-nowrap transition-colors ${TXT} ${TXT_HOVER}`}
           >
             <PhoneIcon className={ICON} />
             {CONTACT.phone.label}
@@ -51,7 +51,7 @@ export default function TopBar() {
 
           <a
             href={CONTACT.email.href}
-            className={`inline-flex items-center gap-2 transition-colors ${TXT} ${TXT_HOVER}`}
+            className={`inline-flex items-center gap-2 whitespace-nowrap transition-colors ${TXT} ${TXT_HOVER}`}
           >
             <MailIcon className={ICON} />
             {CONTACT.email.label}
@@ -62,7 +62,7 @@ export default function TopBar() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Mendizo on Facebook"
-            className={`transition-colors ${ICON} hover:text-on-dark lg:[html:not(.dark)_&]:hover:text-navy`}
+            className={`transition-colors ${ICON} hover:text-on-dark xl:[html:not(.dark)_&]:hover:text-navy`}
           >
             <FacebookIcon />
           </a>

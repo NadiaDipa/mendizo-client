@@ -10,6 +10,8 @@ import "./hero-motion.css";
 // Transparent PNGs with the empty space around the subject trimmed (place them in public/images/).
 //   sx / sy : width / height stretch (1.2 = 20% larger), applied as an inline transform.
 //   tx      : shift right (+) / left (-) in px. Increase if it touches the navy curve, decrease if it touches the cards.
+//   mi      : PHONE ONLY. Left/right inset of the image inside the circle. Bigger % = smaller image. (sm and up ignore it)
+//   --k     : TABLET ONLY (sm to xl). Extra shrink set in the class on the slide layer: sm:[--k:0.85]. Lower = smaller (0.8 = 20% smaller).
 // IMG_SCALE resizes all images together: 1 = as is, 0.88 = 12% smaller, 0.8 = 20% smaller.
 const IMG_SCALE = 0.9;
 
@@ -20,6 +22,7 @@ const HERO_IMAGES = [
     sx: 0.9,
     sy: 1,
     tx: 0,
+    mi: "6%",
   },
   {
     src: "/images/showcase-2.png",
@@ -27,6 +30,7 @@ const HERO_IMAGES = [
     sx: 1.1,
     sy: 1.1,
     tx: -10,
+    mi: "17%",
   },
   {
     src: "/images/technician-3.png",
@@ -34,6 +38,7 @@ const HERO_IMAGES = [
     sx: 0.85,
     sy: 1.0,
     tx: 10,
+    mi: "8%",
   },
 ];
 
@@ -47,25 +52,25 @@ const LIGHT_CARDS = [
     label: "Smartphone Repair",
     href: "/services?category=Smartphone",
     Icon: PhoneIcon,
-    offset: "lg:ml-0",
+    offset: "xl:ml-0",
   },
   {
     label: "Laptop & PC Service",
     href: "/services?category=Laptop & PC",
     Icon: LaptopIcon,
-    offset: "lg:ml-10",
+    offset: "xl:ml-10",
   },
   {
     label: "Washing Machine Repair",
     href: "/services?category=Washing Machine",
     Icon: WasherIcon,
-    offset: "lg:ml-6",
+    offset: "xl:ml-6",
   },
   {
     label: "AC Servicing",
     href: "/services?category=AC",
     Icon: SnowflakeIcon,
-    offset: "lg:ml-0",
+    offset: "xl:ml-0",
   },
 ];
 
@@ -74,25 +79,25 @@ const DARK_CARDS = [
     label: "Electrical Repair",
     href: "/services?category=Electrical",
     Icon: PlugIcon,
-    offset: "lg:ml-0",
+    offset: "xl:ml-0",
   },
   {
     label: "Refrigerator Service",
     href: "/services?category=Refrigerator",
     Icon: WasherIcon,
-    offset: "lg:ml-8",
+    offset: "xl:ml-8",
   },
   {
     label: "Smartphone Repair",
     href: "/services?category=Smartphone",
     Icon: PhoneIcon,
-    offset: "lg:ml-4",
+    offset: "xl:ml-4",
   },
   {
     label: "LED TV Repair",
     href: "/services?category=TV",
     Icon: LaptopIcon,
-    offset: "lg:ml-0",
+    offset: "xl:ml-0",
   },
 ];
 
@@ -113,26 +118,25 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative isolate flex min-h-screen items-center overflow-hidden bg-navy text-on-dark lg:min-h-[880px] xl:min-h-[920px]"
+      className="relative isolate flex items-start overflow-hidden bg-navy text-on-dark xl:min-h-[920px] xl:items-center"
     >
       <HeroBackground />
       <TopBar />
-     
 
-      <div className="relative z-10 mx-auto w-full max-w-7xl xl:max-w-[90rem] 2xl:max-w-[100rem] px-5 pb-14 pt-24 sm:px-8 sm:pb-16 md:pt-[9.5rem] lg:px-12 lg:pb-16 lg:pt-[9.5rem]">
-        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-6">
+      <div className="relative z-10 mx-auto w-full max-w-7xl xl:max-w-[90rem] 2xl:max-w-[100rem] px-5 pb-16 pt-32 sm:px-8 sm:pb-20 md:pb-24 md:pt-36 lg:px-12 xl:pb-16 xl:pt-[9.5rem]">
+        <div className="grid items-center gap-8 md:gap-12 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] xl:gap-6">
           {/* Left: hero content */}
-          <div className="mx-auto w-full max-w-[34rem] text-center lg:mx-0 lg:text-left">
+          <div className="mx-auto w-full max-w-[34rem] text-center xl:mx-0 xl:text-left">
             <p
-              className="mz-up flex items-center justify-center gap-3 text-[13px] font-medium tracking-wide text-on-dark/80 sm:text-sm lg:justify-start"
+              className="mz-up flex items-center justify-center gap-3 text-[13px] font-medium tracking-wide text-on-dark/80 sm:text-sm xl:justify-start"
               style={{ animationDelay: "0ms" }}
             >
               <span>Smart Repair. Better Life.</span>
-              <span className="hidden h-px w-14 bg-on-dark/40 lg:block" aria-hidden="true" />
+              <span className="hidden h-px w-14 bg-on-dark/40 xl:block" aria-hidden="true" />
             </p>
 
             <h1
-              className="mz-up mt-4 font-display text-[clamp(2rem,9.5vw,2.6rem)] leading-[1.05] tracking-tight text-on-dark sm:mt-5 sm:text-[clamp(2.6rem,4.8vw,4.4rem)] sm:leading-[1.04]"
+              className="mz-up mt-3 font-display text-[clamp(2.1rem,9vw,2.75rem)] leading-[1.06] tracking-tight text-on-dark sm:mt-5 sm:text-[clamp(2.6rem,4.8vw,4.4rem)] sm:leading-[1.04]"
               style={{ animationDelay: "100ms" }}
             >
               <span className="block dark:hidden">
@@ -147,7 +151,7 @@ export default function Hero() {
             </h1>
 
             <p
-              className="mz-up mx-auto mt-4 max-w-[28rem] text-[15px] leading-7 text-on-dark/75 sm:mt-6 sm:text-[17px] sm:leading-8 lg:mx-0 lg:mt-6"
+              className="mz-up mx-auto mt-3.5 max-w-[28rem] text-[15px] leading-7 text-on-dark/75 sm:mt-5 sm:text-[17px] sm:leading-8 xl:mx-0 xl:mt-6"
               style={{ animationDelay: "200ms" }}
             >
               <span className="dark:hidden">
@@ -162,12 +166,12 @@ export default function Hero() {
             </p>
 
             <div
-              className="mz-up mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-3 sm:mt-9 sm:gap-x-5 sm:gap-y-4 lg:justify-start"
+              className="mz-up mt-5 flex flex-col items-stretch justify-center gap-3 sm:mt-8 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5 sm:gap-y-4 xl:justify-start"
               style={{ animationDelay: "300ms" }}
             >
               <Link
                 href="/services"
-                className="inline-flex items-center justify-center gap-2.5 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[0_18px_40px_-16px_rgba(0,124,199,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[color-mix(in_oklab,var(--color-primary),black_12%)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky sm:py-3.5 xl:px-7"
+                className="inline-flex w-full sm:w-auto items-center justify-center gap-2.5 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[0_18px_40px_-16px_rgba(0,124,199,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[color-mix(in_oklab,var(--color-primary),black_12%)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky sm:py-3.5 xl:px-7"
               >
                 Explore Services
                 <ArrowRightIcon className="h-4 w-4" />
@@ -175,7 +179,7 @@ export default function Hero() {
 
               <a
                 href="#how-it-works"
-                className="group inline-flex items-center gap-3 rounded-full border-2 border-primary py-1 pl-1 pr-5 text-sm font-semibold text-on-dark transition-colors duration-300 hover:bg-primary/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky xl:pr-6"
+                className="group inline-flex w-full sm:w-auto items-center justify-center gap-3 rounded-full border-2 border-primary py-1 pl-1 pr-5 text-sm font-semibold text-on-dark transition-colors duration-300 hover:bg-primary/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky xl:pr-6"
               >
                 <span className="grid h-10 w-10 place-items-center rounded-full bg-primary/20 text-on-dark transition-colors duration-300 group-hover:bg-primary">
                   <PlayIcon />
@@ -185,7 +189,7 @@ export default function Hero() {
             </div>
 
             <ul
-              className="mz-up mt-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[clamp(0.75rem,3.4vw,0.8125rem)] font-medium text-on-dark/75 sm:mt-8 sm:gap-x-6 sm:text-[13px] lg:justify-start"
+              className="mz-up mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-3 text-[clamp(0.75rem,3.4vw,0.8125rem)] font-medium text-on-dark/75 sm:mt-7 sm:gap-x-6 sm:text-[13px] xl:justify-start"
               style={{ animationDelay: "400ms" }}
             >
               {[
@@ -199,40 +203,74 @@ export default function Hero() {
                 </li>
               ))}
             </ul>
+          </div>
 
-            {/* Image stays visible below lg: a single centered column (text first, then hero visual) */}
-            <div
-              className="mz-up mx-auto mt-6 w-full max-w-[21rem] sm:mt-10 sm:max-w-[26rem] md:mt-12 md:max-w-[30rem] lg:hidden"
-              style={{ animationDelay: "500ms" }}
-            >
+          {/*
+            Mobile/tablet visual.
+            - Phones: image above a single-column card list.
+            - sm: image above a 2x2 card grid.
+            - md–xl: image and a one-column card list side by side.
+            FIX: added pt-* so the stage circle (which overflows its frame) no longer
+            touches the "Verified technicians" line. md:pt-10 = 40px on medium screens.
+          */}
+          <div
+            className="mz-up mx-auto w-full max-w-[24rem] pt-4 sm:max-w-[28rem] sm:pt-6 md:max-w-[52rem] md:pt-10 xl:hidden"
+            style={{ animationDelay: "500ms" }}
+          >
+            <div className="md:grid md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] md:items-center md:gap-6">
               <HeroStage
                 activeImage={activeImage}
                 frameClassName="aspect-[16/11] sm:aspect-[4/3]"
-                sizes="(min-width: 768px) 30rem, (min-width: 640px) 26rem, 21rem"
+                sizes="(min-width: 1024px) 30rem, (min-width: 768px) 26rem, (min-width: 640px) 28rem, 24rem"
               />
+
+              <div className="mt-12 grid grid-cols-1 gap-3 text-left sm:mt-14 sm:grid-cols-2 sm:gap-3.5 md:mt-0 md:grid-cols-1 md:gap-3">
+                <div className="contents dark:hidden">
+                  {LIGHT_CARDS.map((card) => (
+                    <ServiceCard
+                      key={card.label}
+                      variant="light"
+                      label={card.label}
+                      href={card.href}
+                      Icon={card.Icon}
+                    />
+                  ))}
+                </div>
+                <div className="hidden dark:contents">
+                  {DARK_CARDS.map((card) => (
+                    <ServiceCard
+                      key={card.label}
+                      variant="dark"
+                      label={card.label}
+                      href={card.href}
+                      Icon={card.Icon}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Spacer column for desktop visuals */}
-          <div className="hidden lg:block lg:min-h-[560px]" aria-hidden="true" />
+          <div className="hidden xl:block xl:min-h-[560px]" aria-hidden="true" />
         </div>
       </div>
 
       {/* Dark mode glow behind image and cards */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 left-[38%] right-0 z-[4] hidden lg:block"
+        className="pointer-events-none absolute inset-y-0 left-[38%] right-0 z-[4] hidden xl:block"
       >
         <div className="hidden h-full w-full bg-[radial-gradient(ellipse_60%_55%_at_55%_55%,rgba(40,130,230,0.35),transparent_70%)] dark:block" />
       </div>
 
       {/*
         Right: image slideshow (transparent PNGs)
-        - left: just right of the navy curve (lg: 52%, xl: 50%, 2xl: 43%). If CURVE_TIERS change, update this too.
+        - left: just right of the navy curve (xl: 50%, 2xl: 43%). If CURVE_TIERS change, update this too.
         - right: stops 12px before the cards' left edge. --maxw and --gap match the Navbar container.
       */}
       <div
-        className="pointer-events-none absolute inset-y-0 left-[52%] z-[5] hidden items-center justify-center [--gap:1.25rem] [--maxw:80rem] sm:[--gap:2rem] lg:flex xl:left-[50%] xl:[--maxw:90rem] 2xl:left-[43%] 2xl:[--maxw:100rem]"
+        className="pointer-events-none absolute inset-y-0 left-[52%] z-[5] hidden items-center justify-center [--gap:1.25rem] [--maxw:80rem] sm:[--gap:2rem] xl:left-[50%] xl:flex xl:[--maxw:90rem] 2xl:left-[43%] 2xl:[--maxw:100rem]"
         style={
           {
             "--card-w": CARD_W,
@@ -253,7 +291,7 @@ export default function Hero() {
         Uses the exact same max-width and padding as the Navbar container, so
         right-5 / sm:right-8 lines the cards up with the Sign Up button's right edge.
       */}
-      <div className="pointer-events-none absolute inset-0 z-20 hidden lg:block">
+      <div className="pointer-events-none absolute inset-0 z-20 hidden xl:block">
         <div className="relative mx-auto h-full w-full max-w-7xl xl:max-w-[90rem] 2xl:max-w-[100rem] px-5 sm:px-8">
           <div
             className="absolute right-5 top-1/2 -translate-y-1/2 sm:right-8"
@@ -324,13 +362,13 @@ function HeroStage({
   return (
     <div className={`relative w-full ${frameClassName} ${className}`}>
       {/*
-        Stage: large circle behind the images, so they look like they stand on it
-        and the images' bottom edge no longer needs to line up with anything.
-        Change h-[120%] to resize it; adjust the -translate-y value to align it vertically with the images.
+        Stage: large circle behind the images, so they look like they stand on it.
+        The circle is sized from the frame height (aspect-square). 112% on phones,
+        114% on tablet (md), 120% on desktop (xl).
       */}
       <div
         aria-hidden="true"
-        className="absolute left-1/2 top-1/2 aspect-square h-[120%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/70 bg-[radial-gradient(circle_at_50%_35%,rgba(255,255,255,0.95),rgba(255,255,255,0.45)_55%,rgba(0,124,199,0.10)_100%)] shadow-[0_40px_80px_-30px_rgba(0,124,199,0.35),inset_0_2px_0_rgba(255,255,255,0.9)] dark:border-sky/25 dark:bg-[radial-gradient(circle_at_50%_35%,rgba(77,168,218,0.35),rgba(18,70,127,0.25)_60%,rgba(11,42,70,0.15)_100%)] dark:shadow-[0_40px_80px_-30px_rgba(0,0,0,0.7)]"
+        className="absolute left-1/2 top-1/2 aspect-square h-[112%] md:h-[114%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/70 bg-[radial-gradient(circle_at_50%_35%,rgba(255,255,255,0.95),rgba(255,255,255,0.45)_55%,rgba(0,124,199,0.10)_100%)] shadow-[0_40px_80px_-30px_rgba(0,124,199,0.35),inset_0_2px_0_rgba(255,255,255,0.9)] dark:border-sky/25 dark:bg-[radial-gradient(circle_at_50%_35%,rgba(77,168,218,0.35),rgba(18,70,127,0.25)_60%,rgba(11,42,70,0.15)_100%)] dark:shadow-[0_40px_80px_-30px_rgba(0,0,0,0.7)] xl:h-[120%]"
       />
       {/* Small shadow under the stage so it looks grounded */}
       <div
@@ -342,17 +380,18 @@ function HeroStage({
         <div
           key={image.src}
           aria-hidden={activeImage !== index}
-          className={`mz-slide-layer absolute inset-0 ${
+          className={`mz-slide-layer absolute inset-y-0 inset-x-[var(--mi)] [--k:1] sm:inset-x-0 sm:[--k:0.85] xl:[--k:1] ${
             activeImage === index ? "opacity-100" : "opacity-0"
           }`}
           style={{
-            transform: `translateX(${image.tx}px) scale(${image.sx * IMG_SCALE}, ${image.sy * IMG_SCALE})`,
+            "--mi": image.mi,
+            transform: `translateX(${image.tx}px) scale(calc(${image.sx * IMG_SCALE} * var(--k)), calc(${image.sy * IMG_SCALE} * var(--k)))`,
             // Fade-out first, then fade-in, so two images are never visible at once (no ghosting).
             transitionProperty: "opacity",
             transitionDuration: "450ms",
             transitionTimingFunction: "ease-in-out",
             transitionDelay: activeImage === index ? "450ms" : "0ms",
-          }}
+          } as CSSProperties}
         >
           <Image
             src={image.src}
@@ -370,7 +409,6 @@ function HeroStage({
 
 // Curve between the navy and light blue areas. shift = how far the curve moves left (viewBox units).
 const CURVE_TIERS = [
-  { id: "lg", shift: 0, show: "hidden lg:block xl:hidden" },
   { id: "xl", shift: 50, show: "hidden xl:block 2xl:hidden" },
   { id: "2xl", shift: 110, show: "hidden 2xl:block" },
 ] as const;
@@ -446,7 +484,7 @@ function HeroBackground() {
       <svg
         viewBox="0 0 1440 900"
         preserveAspectRatio="none"
-        className="absolute inset-0 h-full w-full lg:hidden"
+        className="absolute inset-0 h-full w-full xl:hidden"
       >
         <defs>
           <linearGradient
@@ -496,20 +534,20 @@ function ServiceCard({ variant, label, href, Icon }: ServiceCardProps) {
   return (
     <Link
       href={href}
-      className={`pointer-events-auto flex min-h-[72px] w-full items-center gap-3 rounded-[20px] border p-3.5 backdrop-blur-md transition duration-300 hover:-translate-y-0.5 ${styles.link}`}
+      className={`pointer-events-auto flex min-h-[60px] w-full items-center gap-3 rounded-[20px] border p-3 backdrop-blur-md transition duration-300 hover:-translate-y-0.5 sm:min-h-[72px] sm:p-3.5 ${styles.link}`}
     >
       <span
-        className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${styles.icon}`}
+        className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl sm:h-10 sm:w-10 ${styles.icon}`}
       >
         <Icon />
       </span>
 
-      <span className="min-w-0 flex-1 text-[13px] font-semibold leading-snug">
+      <span className="min-w-0 flex-1 text-[12.5px] font-semibold leading-snug sm:text-[13px]">
         {label}
       </span>
 
       <span
-        className={`grid h-7 w-7 shrink-0 place-items-center rounded-full ${styles.arrow}`}
+        className={`grid h-6 w-6 shrink-0 place-items-center rounded-full sm:h-7 sm:w-7 ${styles.arrow}`}
       >
         <ArrowUpRightIcon />
       </span>

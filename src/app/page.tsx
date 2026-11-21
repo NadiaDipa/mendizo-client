@@ -11,7 +11,7 @@ import Footer from "@/components/Footer";
 
 export default function Home() {
   return (
-    <main className="relative flex-1 bg-background">
+    <main className="relative flex-1 bg-background overflow-x-hidden">
       <Navbar />
       <Hero />
       <PopularCategories />
