@@ -105,8 +105,18 @@ export default function AdminBookingsPage() {
             Loading bookings...
           </div>
         ) : bookings.length === 0 ? (
-          <div className="p-12 text-center text-sm text-foreground/50">
-            No bookings found under status &quot;{filter}&quot;.
+          <div className="p-12 text-center">
+            <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-foreground/5 text-foreground/40">
+              <Calendar className="h-6 w-6" />
+            </div>
+            <h3 className="font-display text-base font-semibold text-navy dark:text-on-dark">
+              {filter === "all" ? "No Bookings Found" : `No ${filter} bookings`}
+            </h3>
+            <p className="mt-1 text-xs text-foreground/55">
+              {filter === "all"
+                ? "No service requests have been placed on the platform yet."
+                : `There are currently no bookings with status "${filter}".`}
+            </p>
           </div>
         ) : (
           <div className="overflow-x-auto">

@@ -13,8 +13,6 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
-  const isMock = searchParams.get("mock") === "true";
-  const bookingId = searchParams.get("bookingId");
 
   const [verifying, setVerifying] = useState(true);
   const [success, setSuccess] = useState(false);
@@ -35,9 +33,6 @@ function PaymentSuccessContent() {
 
       try {
         let verifyUrl = `${API_URL}/api/payments/verify?session_id=${encodeURIComponent(sessionId)}`;
-        if (isMock && bookingId) {
-          verifyUrl += `&mock=true&bookingId=${encodeURIComponent(bookingId)}`;
-        }
 
         const res = await fetch(verifyUrl, {
           credentials: "include",
@@ -65,7 +60,7 @@ function PaymentSuccessContent() {
     }
 
     verifyPayment();
-  }, [sessionId, isMock, bookingId]);
+  }, [sessionId]);
 
   return (
     <div className="min-h-screen bg-background">

@@ -87,7 +87,7 @@ export default function AdminOverviewPage() {
       value: stats.pendingServices,
       hint: "Awaiting admin approval",
       icon: Clock,
-      color: "bg-amber-500/10 text-amber-600 dark:bg-amber-400/15 dark:text-amber-400",
+      color: "bg-sky-500/10 text-sky-600 dark:bg-sky/15 dark:text-sky",
       href: "/dashboard/admin/services?approvalStatus=pending",
     },
     {
@@ -179,7 +179,7 @@ export default function AdminOverviewPage() {
             className="flex items-center justify-between rounded-2xl border border-foreground/10 bg-white p-5 shadow-sm hover:border-primary/40 hover:bg-primary/5 transition dark:border-white/10 dark:bg-surface/30"
           >
             <div className="flex items-center gap-3">
-              <div className="grid h-10 w-10 place-items-center rounded-xl bg-amber-500/10 text-amber-600">
+              <div className="grid h-10 w-10 place-items-center rounded-xl bg-sky-500/10 text-sky-600 dark:bg-sky/15 dark:text-sky">
                 <Clock className="h-5 w-5" />
               </div>
               <div>

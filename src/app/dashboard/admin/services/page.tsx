@@ -132,8 +132,16 @@ export default function AdminServicesPage() {
         </div>
       ) : services.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-foreground/20 bg-white p-12 text-center dark:border-white/15 dark:bg-surface/30">
-          <p className="font-semibold text-sm text-foreground/60 dark:text-on-dark/60">
-            No services found under &quot;{activeTab}&quot;.
+          <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-foreground/5 text-foreground/40">
+            <CheckCircle className="h-6 w-6" />
+          </div>
+          <h3 className="font-display text-base font-semibold text-navy dark:text-on-dark">
+            {activeTab === "pending" ? "No Pending Services" : `No ${activeTab} services found`}
+          </h3>
+          <p className="mt-1 text-xs text-foreground/55">
+            {activeTab === "pending"
+              ? "All submitted services have been reviewed."
+              : `There are no ${activeTab} services at this time.`}
           </p>
         </div>
       ) : (

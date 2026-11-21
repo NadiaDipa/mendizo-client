@@ -129,9 +129,9 @@ export default function DashboardSidebar({
         ].join(" ")}
       >
         <Link
-          href={overviewHref}
+          href="/"
           onClick={onCloseMobile}
-          aria-label="Mendizo dashboard"
+          aria-label="Mendizo home"
           className="flex min-w-0 items-center gap-2.5"
         >
           <Image

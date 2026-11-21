@@ -239,8 +239,30 @@ function BookingsPageInner() {
       {/* Booking cards */}
       <div className="flex flex-col gap-4">
         {filteredBookings.length === 0 && (
-          <div className="rounded-2xl border border-dashed border-foreground/15 p-12 text-center text-[13px] text-foreground/45">
-            No bookings found under &quot;{filter}&quot;.
+          <div className="rounded-2xl border border-dashed border-foreground/15 p-12 text-center">
+            {filter === "All" && bookings.length === 0 ? (
+              <>
+                <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-foreground/5 text-foreground/40">
+                  <CalendarIcon className="h-6 w-6" />
+                </div>
+                <h3 className="font-display text-base font-semibold text-navy dark:text-on-dark">
+                  No Bookings Yet
+                </h3>
+                <p className="mt-1 text-[13px] text-foreground/50">
+                  You haven&apos;t booked any services yet.
+                </p>
+                <a
+                  href="/services"
+                  className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-primary px-5 py-2 text-xs font-bold text-white hover:bg-sky hover:text-navy transition"
+                >
+                  Browse Services
+                </a>
+              </>
+            ) : (
+              <p className="text-[13px] text-foreground/45">
+                No bookings found under &quot;{filter}&quot;.
+              </p>
+            )}
           </div>
         )}
         {filteredBookings.map((booking) => {

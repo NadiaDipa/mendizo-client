@@ -85,110 +85,120 @@ export default function TechnicianDashboardPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#EEFBFB] p-4 sm:p-6 lg:p-8">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-[#12232E] sm:text-3xl">
-              Technician Overview
-            </h1>
-            <p className="mt-2 text-sm text-[#203647]">
-              Manage your services and customer requests.
-            </p>
-          </div>
-
-          <Link
-            href="/dashboard/technician/add-service"
-            className="inline-flex items-center gap-2 rounded-lg bg-[#007CC7] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#0066A6]"
-          >
-            <Plus size={18} />
-            Add New Service
-          </Link>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary dark:text-sky">
+            Technician Portal
+          </p>
+          <h1 className="mt-1 font-display text-2xl font-bold text-navy dark:text-on-dark sm:text-3xl">
+            Technician Overview
+          </h1>
+          <p className="mt-1 text-xs sm:text-sm text-foreground/60 dark:text-on-dark/60">
+            Manage your services and customer requests.
+          </p>
         </div>
 
-        {error && (
-          <div className="mb-5 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            {error}
-          </div>
-        )}
-
-        {loading ? (
-          <p className="py-10 text-center text-[#203647]">
-            Loading dashboard...
-          </p>
-        ) : (
-          <>
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {stats.map((stat) => {
-                const Icon = stat.icon;
-
-                return (
-                  <div
-                    key={stat.title}
-                    className="rounded-xl border border-[#D5E8F0] bg-white p-6 shadow-sm"
-                  >
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium text-[#526777]">
-                        {stat.title}
-                      </p>
-                      <div className="rounded-lg bg-[#EEFBFB] p-3">
-                        <Icon className="h-5 w-5 text-[#007CC7]" />
-                      </div>
-                    </div>
-
-                    <p className="mt-4 text-3xl font-bold text-[#12232E]">
-                      {stat.value}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="mt-8 rounded-xl border border-[#D5E8F0] bg-white p-6 shadow-sm">
-              <div className="mb-5 flex items-center justify-between">
-                <h2 className="text-lg font-bold text-[#12232E]">
-                  Recent Services
-                </h2>
-
-                <Link
-                  href="/dashboard/technician/my-services"
-                  className="inline-flex items-center gap-1 text-sm font-semibold text-[#007CC7] hover:underline"
-                >
-                  View All <ArrowRight size={16} />
-                </Link>
-              </div>
-
-              {services.length === 0 ? (
-                <div className="py-8 text-center">
-                  <BriefcaseBusiness className="mx-auto mb-3 h-10 w-10 text-[#4DA8DA]" />
-                  <p className="font-medium text-[#203647]">
-                    You haven&apos;t added any services yet.
-                  </p>
-                  <p className="mt-1 text-sm text-gray-500">
-                    Add your first service to get started.
-                  </p>
-                </div>
-              ) : (
-                <div className="divide-y divide-gray-100">
-                  {services.slice(0, 5).map((service) => (
-                    <div
-                      key={service._id}
-                      className="flex flex-wrap items-center justify-between gap-3 py-4"
-                    >
-                      <p className="font-medium text-[#203647]">
-                        {service.title}
-                      </p>
-                      <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold capitalize text-amber-700">
-                        {service.approvalStatus}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </>
-        )}
+        <Link
+          href="/dashboard/technician/add-service"
+          className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:bg-sky hover:text-navy"
+        >
+          <Plus size={18} />
+          Add New Service
+        </Link>
       </div>
-    </main>
+
+      {error && (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-950/20 dark:text-red-300">
+          {error}
+        </div>
+      )}
+
+      {loading ? (
+        <p className="py-10 text-center text-foreground/50">
+          Loading dashboard...
+        </p>
+      ) : (
+        <>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {stats.map((stat) => {
+              const Icon = stat.icon;
+
+              return (
+                <div
+                  key={stat.title}
+                  className="rounded-2xl border border-foreground/10 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-white/[0.04]"
+                >
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-bold uppercase tracking-wider text-foreground/50 dark:text-on-dark/50">
+                      {stat.title}
+                    </p>
+                    <div className="rounded-xl bg-primary/10 p-3 dark:bg-sky/15">
+                      <Icon className="h-5 w-5 text-primary dark:text-sky" />
+                    </div>
+                  </div>
+
+                  <p className="mt-4 font-display text-3xl font-bold text-navy dark:text-on-dark">
+                    {stat.value}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="rounded-2xl border border-foreground/10 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
+            <div className="mb-5 flex items-center justify-between">
+              <h2 className="text-lg font-bold text-navy dark:text-on-dark">
+                Recent Services
+              </h2>
+
+              <Link
+                href="/dashboard/technician/my-services"
+                className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline dark:text-sky"
+              >
+                View All <ArrowRight size={16} />
+              </Link>
+            </div>
+
+            {services.length === 0 ? (
+              <div className="py-8 text-center">
+                <BriefcaseBusiness className="mx-auto mb-3 h-10 w-10 text-primary/40 dark:text-sky/40" />
+                <p className="font-medium text-foreground/70 dark:text-on-dark/70">
+                  You haven&apos;t added any services yet.
+                </p>
+                <p className="mt-1 text-sm text-foreground/50 dark:text-on-dark/50">
+                  Add your first service to get started.
+                </p>
+              </div>
+            ) : (
+              <div className="divide-y divide-foreground/8 dark:divide-white/8">
+                {services.slice(0, 5).map((service) => (
+                  <div
+                    key={service._id}
+                    className="flex flex-wrap items-center justify-between gap-3 py-4"
+                  >
+                    <p className="font-medium text-foreground dark:text-on-dark">
+                      {service.title}
+                    </p>
+                    <span
+                      className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${
+                        service.approvalStatus === "approved"
+                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300"
+                          : service.approvalStatus === "rejected"
+                          ? "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300"
+                          : "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
+                      }`}
+                    >
+                      {service.approvalStatus}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </>
+      )}
+    </div>
   );
 }
