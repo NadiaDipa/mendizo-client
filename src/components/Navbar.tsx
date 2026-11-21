@@ -1,10 +1,11 @@
+
 "use client";
 
 import { useState, useRef, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { useSession, authClient } from "@/lib/auth-client";
 
 const NAV_LINKS = [
@@ -47,17 +48,28 @@ export default function Navbar() {
 
   const pathname = usePathname();
   const router = useRouter();
+  const isHome = pathname === "/";
 
   const { data: session, isPending } = useSession();
   const user = session?.user ?? null;
 
-  const controlClass = scrolled
+  const controlClass = !isHome
+    ? "text-foreground border-foreground/30 hover:bg-foreground/5 dark:text-on-dark dark:border-on-dark/40 dark:hover:bg-on-dark/10"
+    : scrolled
     ? "text-on-dark border-on-dark/40 hover:bg-on-dark/10"
     : CTRL;
 
-  const idleLinkClass = scrolled ? "text-on-dark hover:text-sky" : LINK_IDLE;
+  const idleLinkClass = !isHome
+    ? "text-foreground/80 hover:text-primary dark:text-on-dark/80 dark:hover:text-sky"
+    : scrolled
+    ? "text-on-dark/85 hover:text-sky"
+    : LINK_IDLE;
 
-  const activeLinkClass = scrolled ? "text-sky" : LINK_ACTIVE;
+  const activeLinkClass = !isHome
+    ? "text-primary font-bold dark:text-sky"
+    : scrolled
+    ? "text-sky font-bold"
+    : LINK_ACTIVE;
 
   useEffect(() => {
     function onScroll() {
@@ -89,9 +101,11 @@ export default function Navbar() {
   return (
     <header
       className={`inset-x-0 top-0 z-40 transition-[background-color,box-shadow] duration-300 ${
-        scrolled
-          ? "fixed bg-navy shadow-[0_2px_20px_-4px_rgba(0,0,0,0.5)]"
-          : "absolute md:top-10"
+        !isHome
+          ? "sticky bg-white/95 border-b border-foreground/10 text-foreground shadow-xs backdrop-blur-md dark:bg-navy/95 dark:border-white/10 dark:text-on-dark dark:shadow-md"
+          : scrolled
+          ? "fixed bg-navy shadow-[0_2px_20px_-4px_rgba(0,0,0,0.5)] text-on-dark"
+          : "absolute md:top-10 text-on-dark"
       }`}
     >
       <nav className="mx-auto flex h-20 max-w-7xl xl:max-w-[90rem] 2xl:max-w-[100rem] items-center justify-between gap-6 px-5 sm:px-8 min-[1360px]:grid min-[1360px]:grid-cols-[1fr_auto_1fr]">
@@ -99,7 +113,9 @@ export default function Navbar() {
         <Link
           href="/"
           aria-label="Mendizo home"
-          className="group flex items-center gap-2.5 justify-self-start text-on-dark"
+          className={`group flex items-center gap-2.5 justify-self-start ${
+            !isHome ? "text-foreground dark:text-on-dark" : "text-on-dark"
+          }`}
         >
           <LogoMark />
 
@@ -111,7 +127,10 @@ export default function Navbar() {
         {/* Desktop Navigation */}
         <ul className="hidden items-center gap-9 min-[1360px]:flex">
           {NAV_LINKS.map((link) => {
-            const isActive = pathname === link.href;
+            const isActive =
+              link.href === "/"
+                ? pathname === "/"
+                : pathname.startsWith(link.href);
 
             return (
               <li key={link.href}>
@@ -120,7 +139,7 @@ export default function Navbar() {
                   aria-current={isActive ? "page" : undefined}
                   className={`block border-b-2 py-2 text-[15px] font-semibold transition-colors duration-200 ${FOCUS} ${
                     isActive
-                      ? `${activeLinkClass} border-[#007CC7]`
+                      ? `${activeLinkClass} border-[#007CC7] dark:border-sky`
                       : `${idleLinkClass} border-transparent`
                   }`}
                 >
@@ -202,7 +221,10 @@ export default function Navbar() {
           <div className="overflow-hidden rounded-3xl border border-on-dark/10 bg-navy p-3 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)]">
             <ul className="flex flex-col">
               {NAV_LINKS.map((link) => {
-                const isActive = pathname === link.href;
+                const isActive =
+                  link.href === "/"
+                    ? pathname === "/"
+                    : pathname.startsWith(link.href);
 
                 return (
                   <li key={link.href}>
@@ -210,11 +232,10 @@ export default function Navbar() {
                       href={link.href}
                       aria-current={isActive ? "page" : undefined}
                       onClick={() => setIsMenuOpen(false)}
-                      className={`block rounded-xl px-4 py-3 text-sm font-semibold transition-colors duration-200 ${
-                        isActive
-                          ? "bg-on-dark/10 text-sky"
-                          : "text-on-dark hover:bg-on-dark/5 hover:text-sky"
-                      }`}
+                      className={`block rounded-xl px-4 py-3 text-sm font-semibold transition-colors duration-200 ${isActive
+                        ? "bg-on-dark/10 text-sky"
+                        : "text-on-dark hover:bg-on-dark/5 hover:text-sky"
+                        }`}
                     >
                       {link.label}
                     </Link>
@@ -319,6 +340,14 @@ function UserMenu({
     }
   }
 
+  // Determine dashboard route based on the logged-in user's role.
+  const dashboardPath =
+    user.role === "technician"
+      ? "/dashboard/technician"
+      : user.role === "admin"
+        ? "/dashboard/admin"
+        : "/dashboard/customer";
+
   const initials = user.name ? user.name.charAt(0).toUpperCase() : "U";
 
   const avatarCircle = (
@@ -337,11 +366,10 @@ function UserMenu({
         aria-label="Open user menu"
         aria-expanded={isOpen}
         aria-haspopup="true"
-        className={`flex h-11 max-w-[190px] items-center gap-2 rounded-full border py-1 pl-3 pr-1.5 transition-all duration-200 hover:border-sky hover:bg-on-dark/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky ${
-          scrolled
-            ? "border-on-dark/40 text-on-dark"
-            : "border-on-dark/40 text-on-dark lg:[html:not(.dark)_&]:border-navy/30 lg:[html:not(.dark)_&]:text-navy lg:[html:not(.dark)_&]:hover:border-primary"
-        }`}
+        className={`flex h-11 max-w-[190px] items-center gap-2 rounded-full border py-1 pl-3 pr-1.5 transition-all duration-200 hover:border-sky hover:bg-on-dark/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky ${scrolled
+          ? "border-on-dark/40 text-on-dark"
+          : "border-on-dark/40 text-on-dark lg:[html:not(.dark)_&]:border-navy/30 lg:[html:not(.dark)_&]:text-navy lg:[html:not(.dark)_&]:hover:border-primary"
+          }`}
       >
         <span className="max-w-[105px] truncate text-sm font-semibold">
           {user.name}
@@ -419,10 +447,9 @@ function UserMenu({
           {/* Menu items */}
           <ul className="px-2 py-2">
             {/* Profile */}
-            {/* Profile */}
             <li>
               <Link
-                href="/profile"
+                href="/dashboard/profile"
                 role="menuitem"
                 onClick={() => onOpenChange(false)}
                 className="group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-semibold text-on-dark/85 transition-colors duration-150 hover:bg-sky/10 hover:text-sky focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky lg:[html:not(.dark)_&]:text-navy/80 lg:[html:not(.dark)_&]:hover:bg-primary/8 lg:[html:not(.dark)_&]:hover:text-primary"
@@ -440,8 +467,11 @@ function UserMenu({
                 type="button"
                 role="menuitem"
                 onClick={() => {
+                  console.log("User role:", user.role);
+                  console.log("Dashboard path:", dashboardPath);
+
                   onOpenChange(false);
-                  router.push("/dashboard/customer");
+                  router.push(dashboardPath);
                 }}
                 className="group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-semibold text-on-dark/85 transition-colors duration-150 hover:bg-sky/10 hover:text-sky focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky lg:[html:not(.dark)_&]:text-navy/80 lg:[html:not(.dark)_&]:hover:bg-primary/8 lg:[html:not(.dark)_&]:hover:text-primary"
               >
@@ -493,9 +523,8 @@ function ThemeToggle({
       onClick={onToggle}
       aria-label="Toggle color theme"
       title="Toggle color theme"
-      className={`grid h-10 w-10 place-items-center rounded-full bg-transparent transition-colors duration-300 ${
-        scrolled ? "text-on-dark border-on-dark/40 hover:bg-on-dark/10" : CTRL
-      } ${FOCUS}`}
+      className={`grid h-10 w-10 place-items-center rounded-full bg-transparent transition-colors duration-300 ${scrolled ? "text-on-dark border-on-dark/40 hover:bg-on-dark/10" : CTRL
+        } ${FOCUS}`}
     >
       <span className="dark:hidden">
         <SunIcon />
