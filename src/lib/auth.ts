@@ -20,7 +20,7 @@ export const auth = betterAuth({
   user: {
     additionalFields: {
       role: {
-        type: ["customer", "technician"],
+        type: "string",
         required: true,
         defaultValue: "customer",
         input: true,
@@ -48,14 +48,12 @@ export const auth = betterAuth({
 
   hooks: {
     before: createAuthMiddleware(async (ctx) => {
-      // Normalize role during signup
+      // Normalize role during signup - admin is never selectable
       if (ctx.path === "/sign-up/email") {
         const role = ctx.body?.role;
 
         const normalizedRole =
-          role === "customer" || role === "technician"
-            ? role
-            : "customer";
+          role === "technician" ? "technician" : "customer";
 
         return {
           context: {
