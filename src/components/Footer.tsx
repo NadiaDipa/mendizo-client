@@ -10,17 +10,16 @@ import Link from "next/link";
 const QUICK_LINKS = [
   { label: "Home", href: "/" },
   { label: "Services", href: "/services" },
-  { label: "How It Works", href: "/#how-it-works" },
-  { label: "About", href: "#" }, // placeholder — page not created yet
-  { label: "Contact", href: "#" }, // placeholder — page not created yet
+  { label: "How It Works", href: "/about" },
+  { label: "Contact Us", href: "/contact" },
 ];
 
 const POPULAR_SERVICES = [
-  { label: "AC Repair", href: "/services?category=ac-servicing" },
-  { label: "Refrigerator Repair", href: "/services?category=refrigerator" },
-  { label: "Washing Machine Repair", href: "/services?category=washing-machine" },
-  { label: "Laptop Repair", href: "/services?category=laptop-service" },
-  { label: "Mobile Repair", href: "/services?category=mobile-phone" },
+  { label: "AC Repair", href: "/services?category=AC" },
+  { label: "Refrigerator Repair", href: "/services?category=Refrigerator" },
+  { label: "Washing Machine Repair", href: "/services?category=Washing Machine" },
+  { label: "Laptop & PC Repair", href: "/services?category=Laptop & PC" },
+  { label: "Smartphone Repair", href: "/services?category=Smartphone" },
 ];
 
 const CONTACT_INFO = {
