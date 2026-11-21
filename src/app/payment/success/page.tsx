@@ -6,6 +6,7 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { CheckCircle2, ArrowRight, Loader2, AlertCircle, Receipt } from "lucide-react";
+import { toast } from "sonner";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -49,6 +50,7 @@ function PaymentSuccessContent() {
         }
 
         setSuccess(true);
+        toast.success("Payment verified! Your booking is fully paid.");
         setPaymentDetails({
           amount: data.payment?.amount,
           transactionId: data.payment?.transactionId,

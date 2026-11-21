@@ -218,9 +218,9 @@ function ServicesContent() {
 
       {/* Filter and Control Bar */}
       <section className="sticky top-20 z-20 border-b border-foreground/10 bg-white/95 px-5 py-4 backdrop-blur-md dark:border-white/10 dark:bg-navy/95 sm:px-8">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           {/* Category Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar lg:pb-0">
+          <div className="flex min-w-0 flex-nowrap items-center gap-2 overflow-x-auto pb-1 no-scrollbar sm:flex-wrap sm:overflow-visible sm:pb-0">
             {CATEGORIES.map((cat) => {
               const active = selectedCategory === cat;
               return (
@@ -243,9 +243,9 @@ function ServicesContent() {
           </div>
 
           {/* Mode & Sort Dropdowns */}
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3 sm:flex-nowrap">
             {/* Service Mode Filter */}
-            <div className="flex items-center gap-2 rounded-xl border border-foreground/15 bg-background px-3 py-2 text-xs sm:text-sm dark:border-white/15">
+            <div className="flex shrink-0 items-center gap-2 rounded-xl border border-foreground/15 bg-background px-3 py-2 text-xs sm:text-sm dark:border-white/15">
               <SlidersHorizontal className="h-4 w-4 text-primary dark:text-sky" />
               <select
                 value={selectedMode}
@@ -264,7 +264,7 @@ function ServicesContent() {
             </div>
 
             {/* Sort Dropdown */}
-            <div className="flex items-center gap-2 rounded-xl border border-foreground/15 bg-background px-3 py-2 text-xs sm:text-sm dark:border-white/15">
+            <div className="flex shrink-0 items-center gap-2 rounded-xl border border-foreground/15 bg-background px-3 py-2 text-xs sm:text-sm dark:border-white/15">
               <ArrowUpDown className="h-4 w-4 text-primary dark:text-sky" />
               <select
                 value={selectedSort}
@@ -287,7 +287,7 @@ function ServicesContent() {
               <button
                 type="button"
                 onClick={handleResetFilters}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-600 transition hover:bg-red-100 dark:border-red-500/30 dark:bg-red-900/20 dark:text-red-400"
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-600 transition hover:bg-red-100 dark:border-red-500/30 dark:bg-red-900/20 dark:text-red-400"
               >
                 <RotateCcw className="h-3.5 w-3.5" />
                 Reset
