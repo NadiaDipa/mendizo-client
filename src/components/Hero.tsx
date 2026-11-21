@@ -44,26 +44,26 @@ const HERO_BG = "/images/hero-bg.jpg";
 // Only the left margin is staggered, so the cards differ in width but the right edge never moves.
 const LIGHT_CARDS = [
   {
-    label: "Mobile Phone Repair",
-    href: "/services?category=mobile-phone",
+    label: "Smartphone Repair",
+    href: "/services?category=Smartphone",
     Icon: PhoneIcon,
     offset: "lg:ml-0",
   },
   {
-    label: "Laptop Service",
-    href: "/services?category=laptop-service",
+    label: "Laptop & PC Service",
+    href: "/services?category=Laptop & PC",
     Icon: LaptopIcon,
     offset: "lg:ml-10",
   },
   {
     label: "Washing Machine Repair",
-    href: "/services?category=washing-machine",
+    href: "/services?category=Washing Machine",
     Icon: WasherIcon,
     offset: "lg:ml-6",
   },
   {
     label: "AC Servicing",
-    href: "/services?category=ac-servicing",
+    href: "/services?category=AC",
     Icon: SnowflakeIcon,
     offset: "lg:ml-0",
   },
@@ -72,26 +72,26 @@ const LIGHT_CARDS = [
 const DARK_CARDS = [
   {
     label: "Electrical Repair",
-    href: "/services?category=electrical-wiring",
+    href: "/services?category=Electrical",
     Icon: PlugIcon,
     offset: "lg:ml-0",
   },
   {
-    label: "Home Appliance Service",
-    href: "/services?category=home-appliance",
+    label: "Refrigerator Service",
+    href: "/services?category=Refrigerator",
     Icon: WasherIcon,
     offset: "lg:ml-8",
   },
   {
-    label: "Device Repair",
-    href: "/services?category=device-repair",
-    Icon: LaptopIcon,
+    label: "Smartphone Repair",
+    href: "/services?category=Smartphone",
+    Icon: PhoneIcon,
     offset: "lg:ml-4",
   },
   {
-    label: "Plumbing Service",
-    href: "/services?category=plumbing",
-    Icon: TapIcon,
+    label: "LED TV Repair",
+    href: "/services?category=TV",
+    Icon: LaptopIcon,
     offset: "lg:ml-0",
   },
 ];
@@ -165,13 +165,13 @@ export default function Hero() {
               className="mz-up mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-3 sm:mt-9 sm:gap-x-5 sm:gap-y-4 lg:justify-start"
               style={{ animationDelay: "300ms" }}
             >
-              <a
-                href="#services"
+              <Link
+                href="/services"
                 className="inline-flex items-center justify-center gap-2.5 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[0_18px_40px_-16px_rgba(0,124,199,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[color-mix(in_oklab,var(--color-primary),black_12%)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky sm:py-3.5 xl:px-7"
               >
                 Explore Services
                 <ArrowRightIcon className="h-4 w-4" />
-              </a>
+              </Link>
 
               <a
                 href="#how-it-works"

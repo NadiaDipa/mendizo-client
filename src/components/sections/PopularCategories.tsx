@@ -14,45 +14,52 @@ type Category = {
 const CATEGORIES: Category[] = [
   {
     label: "AC Repair",
-    href: "/services?category=ac-servicing",
+    href: "/services?category=AC",
     Icon: ACIcon,
     description: "Expert AC servicing, gas refill & cooling solutions.",
     accent: "bg-sky/15 text-sky",
   },
   {
     label: "Refrigerator Repair",
-    href: "/services?category=refrigerator",
+    href: "/services?category=Refrigerator",
     Icon: FridgeIcon,
     description: "Cooling issues, compressor faults & general fridge fixes.",
     accent: "bg-primary/10 text-primary",
   },
   {
     label: "Washing Machine",
-    href: "/services?category=washing-machine",
+    href: "/services?category=Washing Machine",
     Icon: WasherIcon,
     description: "Drum, motor, and electronic control board repairs.",
     accent: "bg-sky/15 text-sky",
   },
   {
-    label: "Laptop Repair",
-    href: "/services?category=laptop-service",
+    label: "Laptop & PC Repair",
+    href: "/services?category=Laptop & PC",
     Icon: LaptopIcon,
     description: "Screen, keyboard, battery & motherboard diagnostics.",
     accent: "bg-primary/10 text-primary",
   },
   {
-    label: "Mobile Repair",
-    href: "/services?category=mobile-phone",
+    label: "Smartphone Repair",
+    href: "/services?category=Smartphone",
     Icon: MobileIcon,
     description: "Screen replacement, charging port & software fixes.",
     accent: "bg-sky/15 text-sky",
   },
   {
     label: "TV Repair",
-    href: "/services?category=tv-repair",
+    href: "/services?category=TV",
     Icon: TVIcon,
     description: "LED/LCD panel, HDMI, power board & smart TV repairs.",
     accent: "bg-primary/10 text-primary",
+  },
+  {
+    label: "Electrical Wiring",
+    href: "/services?category=Electrical",
+    Icon: ACIcon,
+    description: "Short circuits, DB board rewiring & installation.",
+    accent: "bg-sky/15 text-sky",
   },
 ];
 
@@ -82,7 +89,7 @@ export default function PopularCategories() {
         </div>
 
         {/* Category grid */}
-        <ul className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6 sm:gap-5 lg:mt-14">
+        <ul className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 sm:gap-5 lg:mt-14">
           {CATEGORIES.map((cat) => (
             <li key={cat.label}>
               <Link
