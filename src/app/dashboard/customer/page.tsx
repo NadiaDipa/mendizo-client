@@ -7,6 +7,8 @@ import type { JSX } from "react";
 const CARD =
   "rounded-2xl border border-foreground/8 bg-white shadow-[0_6px_28px_-14px_rgba(18,35,46,0.12)] dark:border-white/8 dark:bg-white/[0.04] dark:shadow-[0_6px_28px_-14px_rgba(0,0,0,0.5)]";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 type Stat = {
@@ -85,8 +87,8 @@ export default function CustomerDashboardPage() {
     async function fetchData() {
       try {
         const [statsRes, bookingsRes] = await Promise.all([
-          fetch("http://localhost:5000/api/customer/stats", { credentials: "include" }),
-          fetch("http://localhost:5000/api/customer/bookings", { credentials: "include" }),
+          fetch(`${API_URL}/api/customer/stats`, { credentials: "include" }),
+          fetch(`${API_URL}/api/customer/bookings`, { credentials: "include" }),
         ]);
 
         if (!statsRes.ok || !bookingsRes.ok) {
