@@ -4,8 +4,8 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
+import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 
 import {
   AUTH_FOCUS,
@@ -26,6 +26,7 @@ const LINK =
 
 export default function SignInForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -98,7 +99,32 @@ export default function SignInForm() {
 
       toast.success("Welcome back to Mendizo!");
 
-      router.push("/");
+      // 1. Check for returnTo / redirect param
+      const returnTo =
+        searchParams.get("returnTo") ||
+        searchParams.get("redirect") ||
+        searchParams.get("callbackUrl");
+
+      if (returnTo && returnTo.startsWith("/")) {
+        router.push(returnTo);
+        router.refresh();
+        return;
+      }
+
+      // 2. Route to role-specific dashboard based on active session
+      try {
+        const sessionRes = await authClient.getSession();
+        const userRole = (sessionRes?.data?.user as { role?: string })?.role;
+        if (userRole === "technician") {
+          router.push("/dashboard/technician");
+        } else if (userRole === "admin") {
+          router.push("/dashboard/admin");
+        } else {
+          router.push("/dashboard/customer");
+        }
+      } catch {
+        router.push("/dashboard");
+      }
       router.refresh();
     } catch {
       toast.error("Something went wrong. Please try again.");

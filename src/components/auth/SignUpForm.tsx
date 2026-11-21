@@ -3,7 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { FormEvent, RefObject } from "react";
 import Link from "next/link";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 import { PasswordField, SubmitButton, TextField } from "./FormControls";
