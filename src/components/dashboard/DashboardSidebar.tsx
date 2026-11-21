@@ -6,7 +6,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import type { JSX } from "react";
-import { authClient } from "@/lib/auth-client";
+import { toast } from "sonner";
+import { authClient, useSession } from "@/lib/auth-client";
 
 type DashboardSidebarProps = {
   collapsed: boolean;
@@ -24,13 +25,6 @@ type NavItem = {
   exact?: boolean;
 };
 
-const NAV_ITEMS: NavItem[] = [
-  { label: "Overview", href: "/dashboard/customer", Icon: OverviewIcon, exact: true },
-  { label: "My Bookings", href: "/dashboard/customer/bookings", Icon: CalendarIcon },
-  { label: "Payment History", href: "/dashboard/customer/payments", Icon: CardIcon },
-  { label: "My Profile", href: "/dashboard/profile", Icon: UserIcon },
-];
-
 const ITEM_BASE =
   "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-semibold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky";
 
@@ -43,8 +37,49 @@ export default function DashboardSidebar({
   const pathname = usePathname();
   const router = useRouter();
 
+  const { data: session } = useSession();
+  const user = session?.user as { role?: string | null } | undefined;
+
+  // First check the current dashboard URL, then use the session role.
+  const pathRole = pathname.startsWith("/dashboard/technician")
+    ? "technician"
+    : pathname.startsWith("/dashboard/admin")
+      ? "admin"
+      : pathname.startsWith("/dashboard/customer")
+        ? "customer"
+        : null;
+
+  const role = pathRole || user?.role || "customer";
+
   const [loggingOut, setLoggingOut] = useState(false);
   const [logoutError, setLogoutError] = useState("");
+
+  const navigation: Record<string, NavItem[]> = {
+    customer: [
+      { label: "Overview", href: "/dashboard/customer", Icon: OverviewIcon, exact: true },
+      { label: "My Bookings", href: "/dashboard/customer/bookings", Icon: CalendarIcon },
+      { label: "Payment History", href: "/dashboard/customer/payments", Icon: CardIcon },
+      { label: "My Profile", href: "/dashboard/profile", Icon: UserIcon },
+    ],
+    technician: [
+      { label: "Overview", href: "/dashboard/technician", Icon: OverviewIcon, exact: true },
+      { label: "Add Service", href: "/dashboard/technician/add-service", Icon: AddIcon },
+      { label: "My Services", href: "/dashboard/technician/my-services", Icon: CardIcon },
+      { label: "Requests", href: "/dashboard/technician/requests", Icon: CalendarIcon },
+      { label: "My Profile", href: "/dashboard/profile", Icon: UserIcon },
+    ],
+    admin: [
+      { label: "Overview", href: "/dashboard/admin", Icon: OverviewIcon, exact: true },
+      { label: "Users", href: "/dashboard/admin/users", Icon: UserIcon },
+      { label: "Services", href: "/dashboard/admin/services", Icon: CardIcon },
+      { label: "Bookings", href: "/dashboard/admin/bookings", Icon: CalendarIcon },
+      { label: "Transactions", href: "/dashboard/admin/transactions", Icon: TransactionIcon },
+      { label: "My Profile", href: "/dashboard/profile", Icon: UserIcon },
+    ],
+  };
+
+  const navItems = navigation[role] || navigation.customer;
+  const overviewHref = navItems[0].href;
 
   const labelClass = collapsed ? "lg:hidden" : "";
   const itemLayout = collapsed ? "lg:justify-center lg:px-0" : "";
@@ -59,6 +94,7 @@ export default function DashboardSidebar({
       await authClient.signOut({
         fetchOptions: {
           onSuccess: () => {
+            toast.success("Signed out successfully. See you soon!");
             onCloseMobile();
             router.replace("/sign-in");
             router.refresh();
@@ -67,6 +103,7 @@ export default function DashboardSidebar({
       });
     } catch (error) {
       console.error("Logout failed:", error);
+      toast.error("Logout failed. Please try again.");
       setLogoutError("Logout failed. Please try again.");
       setLoggingOut(false);
     }
@@ -92,7 +129,7 @@ export default function DashboardSidebar({
         ].join(" ")}
       >
         <Link
-          href="/dashboard/customer"
+          href={overviewHref}
           onClick={onCloseMobile}
           aria-label="Mendizo dashboard"
           className="flex min-w-0 items-center gap-2.5"
@@ -112,7 +149,6 @@ export default function DashboardSidebar({
           </span>
         </Link>
 
-        {/* Mobile close button */}
         <button
           type="button"
           onClick={onCloseMobile}
@@ -122,7 +158,6 @@ export default function DashboardSidebar({
           <CloseIcon />
         </button>
 
-        {/* Desktop collapse button */}
         <button
           type="button"
           onClick={onToggleCollapsed}
@@ -147,7 +182,7 @@ export default function DashboardSidebar({
         </p>
 
         <ul className="flex flex-col gap-1.5">
-          {NAV_ITEMS.map((item) => {
+          {navItems.map((item) => {
             const isActive = item.exact
               ? pathname === item.href
               : pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -209,16 +244,15 @@ export default function DashboardSidebar({
           <span className={`truncate ${labelClass}`}>Back to Home</span>
         </Link>
 
-        {/* Logout */}
         <button
           type="button"
           onClick={handleLogout}
           disabled={loggingOut}
           aria-label="Logout"
           title={collapsed ? "Logout" : undefined}
-          className={`${ITEM_BASE} ${itemLayout} mt-2 w-full bg-[#DA3633] text-white shadow-sm hover:bg-[#B62324] hover:text-white disabled:cursor-not-allowed disabled:opacity-50`}
+          className={`${ITEM_BASE} ${itemLayout} mt-2 w-full border border-red-500/25 bg-red-500/10 text-red-300 transition-colors duration-200 hover:border-red-500/40 hover:bg-red-500/20 hover:text-red-200 disabled:cursor-not-allowed disabled:opacity-50`}
         >
-          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-white/15 text-white">
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-red-500/20 text-red-300">
             <LogoutIcon />
           </span>
 
@@ -237,7 +271,7 @@ export default function DashboardSidebar({
   );
 }
 
-/* ─── Icons ──────────────────────────────────────────────────────────────── */
+/* Icons */
 
 function svgProps(className = "h-[18px] w-[18px]") {
   return {
@@ -247,7 +281,7 @@ function svgProps(className = "h-[18px] w-[18px]") {
     strokeWidth: 1.8,
     strokeLinecap: "round" as const,
     strokeLinejoin: "round" as const,
-    "aria-hidden": true,
+    "aria-hidden": true as const,
     className,
   };
 }
@@ -287,6 +321,23 @@ function UserIcon({ className }: IconProps) {
     <svg {...svgProps(className)}>
       <circle cx="12" cy="8" r="3.8" />
       <path d="M4.5 20c0-3.8 3.4-6.5 7.5-6.5s7.5 2.7 7.5 6.5" />
+    </svg>
+  );
+}
+
+function AddIcon({ className }: IconProps) {
+  return (
+    <svg {...svgProps(className)}>
+      <path d="M12 5v14M5 12h14" />
+      <rect x="3" y="3" width="18" height="18" rx="4" />
+    </svg>
+  );
+}
+
+function TransactionIcon({ className }: IconProps) {
+  return (
+    <svg {...svgProps(className)}>
+      <path d="M4 7h16M4 17h16M7 4l-3 3 3 3M17 14l3 3-3 3" />
     </svg>
   );
 }
