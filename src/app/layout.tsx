@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Serif_Display, Manrope } from "next/font/google";
 import { Toaster } from "react-hot-toast";
+import { Toaster as SonnerToaster } from "sonner";
 import "./globals.css";
 
 const dmSerif = DM_Serif_Display({
@@ -69,6 +70,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             },
           }}
         />
+        <SonnerToaster position="top-center" richColors closeButton />
       </body>
     </html>
   );
