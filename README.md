@@ -76,10 +76,10 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🔑 Test Credentials
 
-| Role | Email | Password | Dashboard Route |
-|---|---|---|---|
-| **Admin** | `admin@fixmate.com` | `Admin@1234` | `/dashboard/admin` |
-| **Technician** | `rafiqul.tech@fixmate.com` | `Tech@1234` | `/dashboard/technician` |
-| **Technician** | `tanvir.tech@fixmate.com` | `Tech@1234` | `/dashboard/technician` |
-| **Technician** | `sumon.tech@fixmate.com` | `Tech@1234` | `/dashboard/technician` |
-| **Customer** | `customer@fixmate.com` | `Cust@1234` | `/dashboard/customer` |
+| Role | Primary Email | Secondary Email | Password | Dashboard Route |
+|---|---|---|---|---|
+| **Admin** | `admin@mendizo.com` | `admin@fixmate.com` | `Admin@1234` | `/dashboard/admin` |
+| **Technician** | `rafiqul.tech@mendizo.com` | `rafiqul.tech@fixmate.com` | `Tech@1234` | `/dashboard/technician` |
+| **Technician** | `tanvir.tech@mendizo.com` | `tanvir.tech@fixmate.com` | `Tech@1234` | `/dashboard/technician` |
+| **Technician** | `sumon.tech@mendizo.com` | `sumon.tech@fixmate.com` | `Tech@1234` | `/dashboard/technician` |
+| **Customer** | `customer@mendizo.com` | `customer@fixmate.com` | `Cust@1234` | `/dashboard/customer` |

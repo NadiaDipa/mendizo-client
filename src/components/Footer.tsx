@@ -10,7 +10,8 @@ import Link from "next/link";
 const QUICK_LINKS = [
   { label: "Home", href: "/" },
   { label: "Services", href: "/services" },
-  { label: "How It Works", href: "/about" },
+  { label: "About Us", href: "/about" },
+  { label: "How It Works", href: "/how-it-works" },
   { label: "Contact Us", href: "/contact" },
 ];
 
