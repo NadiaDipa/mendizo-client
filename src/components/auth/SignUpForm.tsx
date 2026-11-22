@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
@@ -119,7 +118,8 @@ export default function SignUpForm() {
     try {
       const { error } = await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/auth/callback",
+        // Client ও server আলাদা domain-এ, তাই client-এর পুরো origin দিতে হবে
+        callbackURL: `${window.location.origin}/auth/callback`,
       });
 
       if (error) {

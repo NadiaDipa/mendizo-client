@@ -1,0 +1,50 @@
+diff --git a/src/components/Navbar.tsx b/src/components/Navbar.tsx
+index 33c67a1..2480bc4 100644
+--- a/src/components/Navbar.tsx
++++ b/src/components/Navbar.tsx
+@@ -105,18 +105,18 @@ export default function Navbar() {
+           : "absolute md:top-10 text-on-dark"
+       }`}
+     >
+-      <nav className="mx-auto flex h-20 max-w-7xl xl:max-w-[90rem] 2xl:max-w-[100rem] items-center justify-between gap-6 px-5 sm:px-8 xl:grid xl:grid-cols-[1fr_auto_1fr]">
++      <nav className="mx-auto flex h-20 max-w-7xl xl:max-w-[90rem] 2xl:max-w-[100rem] items-center justify-between gap-2 px-4 sm:gap-4 sm:px-8 xl:grid xl:grid-cols-[1fr_auto_1fr] xl:gap-6">
+         {/* Logo */}
+         <Link
+           href="/"
+           aria-label="Mendizo home"
+-          className={`group flex items-center gap-2.5 justify-self-start ${
++          className={`group flex shrink-0 items-center gap-2 justify-self-start sm:gap-2.5 ${
+             isLightSolid ? "text-foreground dark:text-on-dark" : "text-on-dark"
+           }`}
+         >
+           <LogoMark />
+ 
+-          <span className="font-display text-[28px] leading-none tracking-wide">
++          <span className="font-display text-[22px] leading-none tracking-wide sm:text-[28px]">
+             Mendizo
+           </span>
+         </Link>
+@@ -148,7 +148,7 @@ export default function Navbar() {
+         </ul>
+ 
+         {/* Right Controls */}
+-        <div className="flex items-center gap-2.5 justify-self-end">
++        <div className="flex shrink-0 items-center gap-2 justify-self-end sm:gap-2.5">
+           <ThemeToggle onToggle={toggleTheme} isLightSolid={isLightSolid} />
+ 
+           {!isPending && !user && (
+@@ -364,12 +364,12 @@ function UserMenu({
+         aria-label="Open user menu"
+         aria-expanded={isOpen}
+         aria-haspopup="true"
+-        className={`flex h-11 max-w-[190px] items-center gap-2 rounded-full border py-1 pl-3 pr-1.5 transition-all duration-200 hover:border-sky hover:bg-on-dark/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky ${scrolled
++        className={`flex h-11 max-w-[150px] items-center gap-2 rounded-full border py-1 pl-1.5 pr-1.5 transition-all duration-200 hover:border-sky hover:bg-on-dark/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky sm:max-w-[190px] sm:pl-3 ${scrolled
+           ? "border-on-dark/40 text-on-dark"
+           : "border-on-dark/40 text-on-dark lg:[html:not(.dark)_&]:border-navy/30 lg:[html:not(.dark)_&]:text-navy lg:[html:not(.dark)_&]:hover:border-primary"
+           }`}
+       >
+-        <span className="max-w-[105px] truncate text-sm font-semibold">
++        <span className="hidden max-w-[105px] truncate text-sm font-semibold sm:inline-block">
+           {user.name}
+         </span>
+ 
