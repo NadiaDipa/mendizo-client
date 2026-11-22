@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Wrench, Home, RotateCcw } from "lucide-react";
+import { Wrench, Home } from "lucide-react";
 
 export default function NotFound() {
   return (
@@ -14,11 +14,13 @@ export default function NotFound() {
       </div>
 
       <h1 className="font-display text-3xl sm:text-5xl font-bold text-navy dark:text-on-dark tracking-tight">
-        Page Under Repair!
+        404 – Page Not Found
       </h1>
 
       <p className="mx-auto mt-4 max-w-md text-sm sm:text-base text-foreground/60 dark:text-on-dark/60 leading-relaxed">
-        The link you followed seems to be disconnected or under maintenance. Let&apos;s get you back to safety.
+        Oops! Looks like this page couldn't be found.
+
+        The page you're looking for may have been moved, removed, or the link might be incorrect. Let's help you find your way back.
       </p>
 
       <div className="mt-8 flex flex-wrap justify-center gap-4">

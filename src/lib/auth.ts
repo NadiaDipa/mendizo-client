@@ -5,7 +5,11 @@ import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { createAuthMiddleware } from "better-auth/api";
 
 const client = new MongoClient(process.env.MONGODB_URI!);
-const db = client.db("mendizo");
+
+// Shared database handle. Exported so server components (for example the
+// profile page) can read role-specific statistics without duplicating the
+// BetterAuth connection configuration.
+export const db = client.db("mendizo");
 
 export const auth = betterAuth({
   database: mongodbAdapter(db, {

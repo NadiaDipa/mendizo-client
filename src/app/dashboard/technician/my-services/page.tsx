@@ -110,16 +110,22 @@ export default function MyServicesPage() {
         throw new Error(data.message || data.error || "Could not update availability.");
       }
 
+      // Trust the value returned by the server so the UI and MongoDB always agree.
+      const nextAvailability =
+        typeof data.isAvailable === "boolean" ? data.isAvailable : !service.isAvailable;
+
       setServices((current) =>
         current.map((item) =>
           item._id === service._id
-            ? { ...item, isAvailable: !service.isAvailable }
+            ? { ...item, isAvailable: nextAvailability }
             : item
         )
       );
 
       toast.success(
-        !service.isAvailable ? "Service is now visible to customers." : "Service turned off."
+        nextAvailability
+          ? "Service is now available and visible to customers."
+          : "Service is now unavailable and hidden from customer requests."
       );
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Availability update failed.");
@@ -345,24 +351,53 @@ export default function MyServicesPage() {
                     </div>
 
                     {/* Availability toggle */}
-                    <div className="flex items-center justify-between border-t border-foreground/10 pt-3 dark:border-white/10">
-                      <div>
-                        <span className="text-[10px] uppercase font-bold text-foreground/45 block">
-                          Listing Visibility
-                        </span>
-                        <span className={`text-xs font-semibold ${service.isAvailable ? "text-green-600" : "text-foreground/40"}`}>
-                          {service.isAvailable ? "Available (Online)" : "Hidden (Offline)"}
-                        </span>
+                    <div className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-3 dark:border-white/10 dark:bg-white/[0.04]">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="min-w-0">
+                          <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-foreground/50 dark:text-on-dark/50">
+                            <Power className="h-3 w-3" />
+                            Service Availability
+                          </span>
+                          <span
+                            className={`mt-1 block text-xs font-semibold leading-snug ${
+                              service.isAvailable
+                                ? "text-emerald-600 dark:text-emerald-400"
+                                : "text-red-600 dark:text-red-400"
+                            }`}
+                          >
+                            {service.isAvailable
+                              ? "Available — customers can request this service"
+                              : "Unavailable — hidden from customer requests"}
+                          </span>
+                        </div>
+
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={service.isAvailable}
+                          aria-label={`Toggle availability for ${service.title}`}
+                          disabled={actionId === service._id}
+                          onClick={() => toggleAvailability(service)}
+                          className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-60 ${
+                            service.isAvailable
+                              ? "bg-emerald-500"
+                              : "bg-foreground/25 dark:bg-white/25"
+                          }`}
+                        >
+                          <span
+                            className={`inline-block h-5 w-5 rounded-full bg-white shadow transition-transform duration-200 ${
+                              service.isAvailable ? "translate-x-6" : "translate-x-1"
+                            }`}
+                          />
+                        </button>
                       </div>
 
-                      <button
-                        type="button"
-                        disabled={actionId === service._id}
-                        onClick={() => toggleAvailability(service)}
-                        className="rounded-lg border border-foreground/15 px-3 py-1.5 text-xs font-semibold text-foreground/75 hover:border-primary hover:text-primary disabled:opacity-50 transition"
-                      >
-                        {actionId === service._id ? "Saving..." : service.isAvailable ? "Turn Off" : "Turn On"}
-                      </button>
+                      {actionId === service._id && (
+                        <p className="mt-2 flex items-center gap-1.5 text-[11px] font-medium text-foreground/50 dark:text-on-dark/50">
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                          Saving availability...
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>

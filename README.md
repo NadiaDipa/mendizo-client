@@ -1,85 +1,168 @@
 # Mendizo — Client Application
 
-Smart Device & Home Appliance Repair Service Platform (Category 006).
+**Smart Device & Home Appliance Repair Service Platform**
 
-Mendizo connects homeowners and device owners with verified, expert repair technicians. Every job follows a transparent, step-by-step pipeline with payment processed securely via Stripe only after the repair is completed.
-
----
+Mendizo connects homeowners and device owners with verified repair technicians. It provides a structured repair-request workflow, service management, and secure Stripe payments after job completion.
 
 ## 🌟 Key Features
 
-1. **Brand Identity & UI/UX**:
-   - Modern, responsive design built with Next.js App Router, Tailwind CSS, and shadcn/ui.
-   - Dedicated color palette: Navy (`#12232E`), Surface (`#203647`), Primary (`#007CC7`), Sky (`#4DA8DA`), and Mist (`#EEFBFB`).
-   - Unified Light/Dark theme system with an in-header dashboard toggle, flash-free startup, and `localStorage` persistence.
-   - Sticky navbar on all public pages (`/services`, `/about`, `/contact`) with clear link contrast in both themes.
-   - Custom `not-found.tsx` with animated repair wrench, `error.tsx` boundary, and `loading.tsx` spinner.
+### 1. Brand Identity & UI/UX
+- Modern, responsive interface built with Next.js App Router, Tailwind CSS, and shadcn/ui.
+- Custom color palette:
+  - Navy: `#12232E`
+  - Surface: `#203647`
+  - Primary: `#007CC7`
+  - Sky: `#4DA8DA`
+  - Mist: `#EEFBFB`
+- Unified Light/Dark theme with persistent user preference.
+- Sticky navigation across public pages.
+- Custom 404 page, error boundary, and loading states.
 
-2. **Public Pages**:
-   - `/`: Hero with category shortcuts, Exactly 6 Featured Services fetched from MongoDB (`approvalStatus: "approved"`, `isAvailable: true`), How It Works, Why Choose Mendizo, and Testimonials.
-   - `/services`: Challenge 1 server-side search (title/category), category filter (7 categories), service mode filter, sorting (price asc/desc, newest), URL query persistence, and server-side pagination (25 items/page).
-   - `/services/[id]`: Full service details, technician profile summary, and customer-only "Request Repair" modal with phone, address, date picker, 20-character problem description counter, and duplicate request check.
-   - `/about`: 4-step repair process walkthrough, trust guarantees, and company mission.
-   - `/contact`: Responsive contact form with email, phone, headquarters info, full input validation, and toast feedback.
-   - `/sign-in` & `/sign-up`: BetterAuth email/password authentication, role selection (customer/technician), and returnTo/role-based redirection.
-   - `/payment/success` & `/payment/cancel`: Stripe Checkout receipt and friendly cancellation pages.
+### 2. Public Pages
 
-3. **Dashboards by Role**:
-   - **Customer** (`/dashboard/customer`): Overview statistics, My Bookings (cancellation modal for `requested` jobs, Stripe "Pay Now" gate for `completed` & `unpaid` jobs), and Payment History.
-   - **Technician** (`/dashboard/technician`): Overview metrics, Add Service with ImgBB upload, My Services full CRUD with in-place edit modal (resets to `pending`) and availability toggle, Requests workflow manager (`requested` -> `accepted`/`rejected`, `accepted` -> `in-progress`, `in-progress` -> `completed` with final amount input).
-   - **Admin** (`/dashboard/admin`): Platform overview, Users role management (cannot demote self), Services approval moderation tabs (`pending`, `approved`, `rejected`), Read-only platform Bookings audit ledger, and Transactions financial ledger with total revenue.
-   - **Shared Profile** (`/dashboard/profile`): Available to all authenticated roles to update name, phone, area, bio, and photo via ImgBB.
+- **Home (`/`)**: Hero section, category shortcuts, six featured services, How It Works, Why Choose Mendizo, and testimonials.
+- **Services (`/services`)**: Server-side search by title and category, category and service-mode filters, price sorting, newest-first sorting, URL query persistence, and pagination.
+- **Service Details (`/services/[id]`)**: Service information, technician profile summary, and customer-only repair request modal with validation and duplicate-request prevention.
+- **About (`/about`)**: Repair process, trust guarantees, and company mission.
+- **Contact (`/contact`)**: Validated contact form with contact information and toast feedback.
+- **Authentication (`/sign-in`, `/sign-up`)**: Better Auth email/password authentication, role selection, and role-based redirection.
+- **Payment Pages**: Stripe Checkout success and cancellation pages.
 
-4. **Notifications**:
-   - Universal toast notification system powered by Sonner across both public and dashboard pages, supporting Light and Dark modes.
+### 3. Role-Based Dashboards
 
----
+#### Customer (`/dashboard/customer`)
+- Dashboard overview and statistics.
+- View and manage repair bookings.
+- Cancel requested bookings.
+- Pay for completed and unpaid jobs through Stripe.
+- View payment history.
 
-## 🛠️ Tech Stack & Dependencies
+#### Technician (`/dashboard/technician`)
+- Dashboard overview and service statistics.
+- Add, edit, and delete services.
+- Upload service images through ImgBB.
+- Toggle service availability.
+- Manage repair requests through the workflow:
+  - Requested → Accepted / Rejected
+  - Accepted → In Progress
+  - In Progress → Completed
+- Set the final repair amount when completing a job.
 
-- **Framework**: Next.js 16 (App Router, Turbopack, React 19)
-- **Styling**: Tailwind CSS v4, Lucide React icons
-- **Authentication**: BetterAuth (`better-auth`, `@better-auth/mongo-adapter`)
-- **Notifications**: Sonner (`sonner`), React Hot Toast
-- **Database Client**: MongoDB (`mongodb`)
+#### Admin (`/dashboard/admin`)
+- Platform overview.
+- Manage user roles.
+- Moderate services through Pending, Approved, and Rejected statuses.
+- View platform bookings through a read-only audit page.
+- View transactions and total revenue.
 
----
+#### Shared Profile (`/dashboard/profile`)
+- Available to all authenticated users.
+- Update name, phone number, area, bio, and profile photo.
+- Upload profile photos through ImgBB.
+
+### 4. Notifications
+- Global toast notification system powered by Sonner.
+- Success, error, warning, and informational notifications.
+- Light and Dark theme support.
+
+## 🛠️ Tech Stack
+
+| Category | Technologies |
+|---|---|
+| Framework | Next.js 16, React 19 |
+| Language | TypeScript |
+| Styling | Tailwind CSS v4, shadcn/ui |
+| Authentication | Better Auth |
+| Database | MongoDB |
+| Notifications | Sonner, React Hot Toast |
+| Icons | Lucide React |
+| Image Hosting | ImgBB |
+| Payments | Stripe |
 
 ## 🚀 Getting Started
 
-### 1. Environment Setup
+### 1. Clone the Repository
 
-Create a `.env` file in `mendizo-client/`:
+```bash
+git clone <your-client-repository-url>
+cd mendizo-client
+```
+
+### 2. Install Dependencies
+
+```bash
+npm install
+```
+
+### 3. Configure Environment Variables
+
+Create a `.env` file in the project root:
 
 ```env
-BETTER_AUTH_SECRET=your_better_auth_secret_here
+BETTER_AUTH_SECRET=your_better_auth_secret
 BETTER_AUTH_URL=http://localhost:3000
 MONGODB_URI=your_mongodb_connection_string
 NEXT_PUBLIC_API_URL=http://localhost:5000
 NEXT_PUBLIC_SERVER_URL=http://localhost:5000
-IMGBB_API_KEY=your_imgbb_api_key_here
+IMGBB_API_KEY=your_imgbb_api_key
 ```
 
-### 2. Install & Run
+Make sure the backend server is also configured and running.
+
+### 4. Start the Development Server
 
 ```bash
-# Install dependencies
-npm install
-
-# Start development server
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
+### 5. Build for Production
+
+```bash
+npm run build
+```
+
+## 🔑 Demo Accounts
+
+The project includes demo accounts for testing different user roles.
+
+| Role | Dashboard Route |
+|---|---|
+| Admin | `/dashboard/admin` |
+| Technician | `/dashboard/technician` |
+| Customer | `/dashboard/customer` |
+
+Demo account credentials should be shared separately and must not contain real or production passwords.
+
+## 📁 Project Structure
+
+```text
+mendizo-client/
+├── public/
+├── src/
+│   ├── app/
+│   │   ├── api/
+│   │   ├── dashboard/
+│   │   ├── payment/
+│   │   ├── services/
+│   │   ├── sign-in/
+│   │   └── sign-up/
+│   ├── components/
+│   └── lib/
+├── .env
+├── next.config.ts
+├── package.json
+└── README.md
+```
+
+## 🔒 Security Notes
+
+- Keep all environment variables and API keys private.
+- Never commit `.env` files.
+- Authentication and role-based access must be enforced on the server.
+- Payment verification is handled through the backend before confirming payment status.
+
 ---
 
-## 🔑 Test Credentials
-
-| Role | Primary Email | Secondary Email | Password | Dashboard Route |
-|---|---|---|---|---|
-| **Admin** | `admin@mendizo.com` | `admin@fixmate.com` | `Admin@1234` | `/dashboard/admin` |
-| **Technician** | `rafiqul.tech@mendizo.com` | `rafiqul.tech@fixmate.com` | `Tech@1234` | `/dashboard/technician` |
-| **Technician** | `tanvir.tech@mendizo.com` | `tanvir.tech@fixmate.com` | `Tech@1234` | `/dashboard/technician` |
-| **Technician** | `sumon.tech@mendizo.com` | `sumon.tech@fixmate.com` | `Tech@1234` | `/dashboard/technician` |
-| **Customer** | `customer@mendizo.com` | `customer@fixmate.com` | `Cust@1234` | `/dashboard/customer` |
+**Mendizo — Making Home Repairs Easier.**

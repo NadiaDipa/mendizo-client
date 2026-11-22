@@ -134,3 +134,131 @@ body {
     scroll-behavior: auto;
   }
 }
+
+/* ── Horizontal scrollers ─────────────────────────────────────────────────── */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Sonner toast theme (Mendizo design system) ─────────────────────────────
+   Sonner injects its own light/dark variables at runtime, so every rule here is
+   scoped with `html` and `[data-sonner-theme]` to keep Mendizo colours winning. */
+html [data-sonner-toaster] {
+  --border-radius: 16px;
+  font-family: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+}
+
+html:not(.dark) [data-sonner-toaster][data-sonner-theme] {
+  --normal-bg: #ffffff;
+  --normal-bg-hover: #f6f9fb;
+  --normal-border: rgba(18, 35, 46, 0.12);
+  --normal-border-hover: rgba(18, 35, 46, 0.22);
+  --normal-text: #12232e;
+
+  --success-bg: #ecfdf5;
+  --success-border: rgba(5, 150, 105, 0.32);
+  --success-text: #047857;
+
+  --error-bg: #fef2f2;
+  --error-border: rgba(220, 38, 38, 0.3);
+  --error-text: #b91c1c;
+
+  --warning-bg: #fffbeb;
+  --warning-border: rgba(217, 119, 6, 0.34);
+  --warning-text: #b45309;
+
+  --info-bg: #eff8ff;
+  --info-border: rgba(0, 124, 199, 0.28);
+  --info-text: #0069a8;
+}
+
+html.dark [data-sonner-toaster][data-sonner-theme] {
+  --normal-bg: #1b2c36;
+  --normal-bg-hover: #233945;
+  --normal-border: rgba(238, 251, 251, 0.12);
+  --normal-border-hover: rgba(238, 251, 251, 0.24);
+  --normal-text: #eefbfb;
+
+  --success-bg: #0c2b22;
+  --success-border: rgba(52, 211, 153, 0.3);
+  --success-text: #6ee7b7;
+
+  --error-bg: #2d1518;
+  --error-border: rgba(248, 113, 113, 0.3);
+  --error-text: #fca5a5;
+
+  --warning-bg: #2a2110;
+  --warning-border: rgba(251, 191, 36, 0.3);
+  --warning-text: #fcd34d;
+
+  --info-bg: #0d2438;
+  --info-border: rgba(77, 168, 218, 0.34);
+  --info-text: #7dd3fc;
+}
+
+html [data-sonner-toaster] [data-sonner-toast][data-styled="true"] {
+  border-radius: 16px;
+  padding: 14px 16px;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  box-shadow:
+    0 18px 48px -20px rgba(18, 35, 46, 0.42),
+    0 2px 10px -4px rgba(18, 35, 46, 0.16);
+}
+
+html.dark [data-sonner-toaster][data-sonner-theme] [data-sonner-toast][data-styled="true"] {
+  box-shadow:
+    0 18px 48px -20px rgba(0, 0, 0, 0.72),
+    0 2px 10px -4px rgba(0, 0, 0, 0.45);
+}
+
+html [data-sonner-toaster] [data-sonner-toast][data-styled="true"] [data-title] {
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+html [data-sonner-toaster] [data-sonner-toast][data-styled="true"] [data-description] {
+  color: inherit;
+  font-weight: 500;
+  opacity: 0.82;
+}
+
+html [data-sonner-toaster] [data-sonner-toast][data-styled="true"] [data-close-button] {
+  background: var(--normal-bg);
+  border-color: var(--normal-border);
+  color: var(--normal-text);
+}
+
+html [data-sonner-toaster] [data-sonner-toast][data-styled="true"] [data-close-button]:hover {
+  background: var(--normal-bg-hover);
+  border-color: var(--normal-border-hover);
+}
+
+html [data-sonner-toaster] [data-sonner-toast][data-styled="true"][data-type="success"] [data-close-button] {
+  background: var(--success-bg);
+  border-color: var(--success-border);
+  color: var(--success-text);
+}
+
+html [data-sonner-toaster] [data-sonner-toast][data-styled="true"][data-type="error"] [data-close-button] {
+  background: var(--error-bg);
+  border-color: var(--error-border);
+  color: var(--error-text);
+}
+
+html [data-sonner-toaster] [data-sonner-toast][data-styled="true"][data-type="warning"] [data-close-button] {
+  background: var(--warning-bg);
+  border-color: var(--warning-border);
+  color: var(--warning-text);
+}
+
+html [data-sonner-toaster] [data-sonner-toast][data-styled="true"][data-type="info"] [data-close-button] {
+  background: var(--info-bg);
+  border-color: var(--info-border);
+  color: var(--info-text);
+}

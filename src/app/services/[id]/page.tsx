@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AvailabilityBadge from "@/components/AvailabilityBadge";
 import { useSession } from "@/lib/auth-client";
 import { toast } from "sonner";
 import {
@@ -103,6 +104,11 @@ export default function ServiceDetailsPage({
 
   // Handle clicking "Request Repair"
   const handleOpenRequestModal = () => {
+    if (service && !service.isAvailable) {
+      toast.error("This service is currently unavailable. Please check back later.");
+      return;
+    }
+
     if (!currentUser) {
       toast.info("Please sign in to submit a repair request.");
       router.push(`/sign-in?callbackUrl=/services/${serviceId}`);
@@ -274,6 +280,7 @@ export default function ServiceDetailsPage({
                   <ShieldCheck className="h-4 w-4" />
                   Mendizo Verified
                 </span>
+                <AvailabilityBadge isAvailable={service.isAvailable} />
               </div>
             </div>
 
@@ -344,11 +351,19 @@ export default function ServiceDetailsPage({
                   <span>Estimated Time:</span>
                   <span className="font-semibold text-foreground dark:text-on-dark">{service.estimatedDuration}</span>
                 </div>
+                <div className="flex items-center justify-between">
+                  <span>Availability:</span>
+                  <AvailabilityBadge isAvailable={service.isAvailable} />
+                </div>
               </div>
 
               {/* Request Button */}
               <div className="mt-8">
-                {isTechnicianOrAdmin ? (
+                {!service.isAvailable ? (
+                  <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-center text-xs font-semibold leading-relaxed text-red-700 dark:border-red-500/30 dark:bg-red-950/30 dark:text-red-300">
+                    This service is currently unavailable. The technician has turned off new requests — please check back later or browse other services.
+                  </div>
+                ) : isTechnicianOrAdmin ? (
                   <div className="rounded-2xl bg-amber-50 p-4 text-center text-xs font-semibold text-amber-800 dark:bg-amber-950/30 dark:text-amber-300">
                     Only customer accounts can request a repair service. Log in with a customer account to place a request.
                   </div>

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { ProfileMeta, ProfileMetaTone, ProfileStat } from "@/lib/profile-stats";
 
 // ─── User Props Type ──────────────────────────────────────────────────────────
 
@@ -7,7 +8,14 @@ type ProfileUser = {
   email: string;
   role?: string | null;
   image?: string | null;
-  createdAt?: Date | string;
+  createdAt?: Date | string | null;
+};
+
+type ProfileCardProps = {
+  user: ProfileUser;
+  stats?: ProfileStat[];
+  meta?: ProfileMeta[];
+  verifiedTechnician?: boolean;
 };
 
 // ─── Role badge config ────────────────────────────────────────────────────────
@@ -36,6 +44,13 @@ const ROLE_BADGE: Record<
   },
 };
 
+const VERIFIED_TECHNICIAN_BADGE = {
+  label: "Verified Technician",
+  className:
+    "border border-emerald-500/25 bg-emerald-500/10 text-emerald-700 dark:border-emerald-400/30 dark:bg-emerald-400/12 dark:text-emerald-300",
+  icon: <BadgeCheckIcon />,
+};
+
 // ─── Helper Functions ────────────────────────────────────────────────────────
 
 function getInitials(name: string) {
@@ -48,27 +63,34 @@ function getInitials(name: string) {
     .toUpperCase();
 }
 
-function formatMemberSince(createdAt?: Date | string) {
-  if (!createdAt) return "—";
-
-  const date = new Date(createdAt);
-
-  if (Number.isNaN(date.getTime())) return "—";
-
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    year: "numeric",
-  });
+function statGridClass(count: number) {
+  if (count <= 1) return "grid-cols-1";
+  if (count === 2) return "grid-cols-2";
+  return "grid-cols-3";
 }
+
+const META_TONE: Record<ProfileMetaTone, string> = {
+  success: "text-emerald-600 dark:text-emerald-400",
+  warning: "text-amber-600 dark:text-amber-400",
+  danger: "text-red-600 dark:text-red-400",
+  neutral: "text-navy dark:text-on-dark",
+};
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function ProfileCard({ user }: { user: ProfileUser }) {
+export default function ProfileCard({
+  user,
+  stats = [],
+  meta = [],
+  verifiedTechnician = false,
+}: ProfileCardProps) {
   const role = user.role?.toLowerCase() ?? "";
-  const badge = ROLE_BADGE[role];
+  const badge =
+    role === "technician" && verifiedTechnician
+      ? VERIFIED_TECHNICIAN_BADGE
+      : ROLE_BADGE[role];
 
   const initials = getInitials(user.name);
-  const memberSince = formatMemberSince(user.createdAt);
 
   return (
     <article
@@ -96,6 +118,7 @@ export default function ProfileCard({ user }: { user: ProfileUser }) {
           <div className="rounded-full bg-gradient-to-br from-primary via-sky to-primary/50 p-[3px] shadow-[0_14px_30px_-14px_rgba(0,124,199,0.65)]">
             <div className="h-24 w-24 overflow-hidden rounded-full border-[3px] border-white bg-white dark:border-[#1b2c36] dark:bg-[#1b2c36]">
               {user.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={user.image}
                   alt={`${user.name}'s profile`}
@@ -134,23 +157,47 @@ export default function ProfileCard({ user }: { user: ProfileUser }) {
           )}
         </div>
 
-        {/* ── Stats ──────────────────────────────────────────────── */}
-        <div className="mt-6 grid grid-cols-2 divide-x divide-foreground/8 overflow-hidden rounded-2xl border border-foreground/8 bg-foreground/[0.02] dark:divide-white/8 dark:border-white/8 dark:bg-white/[0.02]">
-          <Stat value="—" label="Bookings" />
-          <Stat value="—" label="Rating" />
-        </div>
+        {/* ── Role-specific stats ─────────────────────────────────── */}
+        {stats.length > 0 && (
+          <div
+            className={[
+              "mt-6 grid divide-x divide-foreground/8 overflow-hidden rounded-2xl",
+              "border border-foreground/8 bg-foreground/[0.02]",
+              "dark:divide-white/8 dark:border-white/8 dark:bg-white/[0.02]",
+              statGridClass(stats.length),
+            ].join(" ")}
+          >
+            {stats.map((stat) => (
+              <Stat key={stat.label} value={stat.value} label={stat.label} />
+            ))}
+          </div>
+        )}
 
-        {/* ── Member since ───────────────────────────────────────── */}
-        <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-foreground/8 bg-foreground/[0.02] px-4 py-3 dark:border-white/8 dark:bg-white/[0.02]">
-          <span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-foreground/45">
-            <CalendarIcon />
-            Member Since
-          </span>
+        {/* ── Account details ─────────────────────────────────────── */}
+        {meta.length > 0 && (
+          <div className="mt-3 flex flex-col gap-2">
+            {meta.map((row) => (
+              <div
+                key={row.label}
+                className="flex items-center justify-between gap-3 rounded-2xl border border-foreground/8 bg-foreground/[0.02] px-4 py-3 dark:border-white/8 dark:bg-white/[0.02]"
+              >
+                <span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-foreground/45">
+                  {row.label === "Account Status" ? <StatusIcon /> : <CalendarIcon />}
+                  {row.label}
+                </span>
 
-          <span className="text-[13px] font-semibold text-navy dark:text-on-dark">
-            {memberSince}
-          </span>
-        </div>
+                <span
+                  className={[
+                    "text-right text-[13px] font-semibold",
+                    META_TONE[row.tone ?? "neutral"],
+                  ].join(" ")}
+                >
+                  {row.value}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </article>
   );
@@ -160,7 +207,7 @@ export default function ProfileCard({ user }: { user: ProfileUser }) {
 
 function Stat({ value, label }: { value: string; label: string }) {
   return (
-    <div className="flex min-w-0 flex-col items-center gap-1 px-3 py-4">
+    <div className="flex min-w-0 flex-col items-center gap-1 px-2.5 py-4 text-center">
       <span className="text-[18px] font-bold leading-none text-navy dark:text-on-dark">
         {value}
       </span>
@@ -212,11 +259,29 @@ function ShieldIcon() {
   );
 }
 
+function BadgeCheckIcon() {
+  return (
+    <svg {...svgProps("h-3 w-3")}>
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      <path d="m8.5 12 2.2 2.2 4.8-4.8" />
+    </svg>
+  );
+}
+
 function CalendarIcon() {
   return (
     <svg {...svgProps("h-3.5 w-3.5")}>
       <rect x="3" y="4" width="18" height="17" rx="2.5" />
       <path d="M8 2v3M16 2v3M3 10h18" />
+    </svg>
+  );
+}
+
+function StatusIcon() {
+  return (
+    <svg {...svgProps("h-3.5 w-3.5")}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="m8.5 12 2.2 2.2 4.8-4.8" />
     </svg>
   );
 }

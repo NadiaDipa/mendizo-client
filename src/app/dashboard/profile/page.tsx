@@ -2,12 +2,22 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import { getProfileData } from "@/lib/profile-stats";
 import ProfileCard from "@/components/profile/ProfileCard";
 import ProfileInfoSection from "@/components/profile/ProfileInfoSection";
 
 export const metadata: Metadata = {
   title: "My Profile — Mendizo",
   description: "View and update your Mendizo profile information.",
+};
+
+const ROLE_COPY: Record<string, string> = {
+  customer:
+    "Manage your personal information and review your repair booking activity.",
+  technician:
+    "Manage your personal information and review your service and job activity.",
+  admin:
+    "Manage your personal information and review your Mendizo account details.",
 };
 
 export default async function DashboardProfilePage() {
@@ -19,7 +29,9 @@ export default async function DashboardProfilePage() {
     redirect("/sign-in");
   }
 
-  const user = session.user;
+  const { user, stats, meta, verifiedTechnician } = await getProfileData(
+    session.user
+  );
 
   return (
     <div className="space-y-8">
@@ -33,12 +45,17 @@ export default async function DashboardProfilePage() {
         </h1>
 
         <p className="mt-1 text-xs sm:text-sm text-foreground/55">
-          Manage your personal information, contact number, area, and bio.
+          {ROLE_COPY[user.role] ?? ROLE_COPY.customer}
         </p>
       </div>
 
       <div className="grid items-start gap-6 md:grid-cols-[280px_1fr] lg:grid-cols-[300px_1fr] xl:grid-cols-[320px_1fr]">
-        <ProfileCard user={user} />
+        <ProfileCard
+          user={user}
+          stats={stats}
+          meta={meta}
+          verifiedTechnician={verifiedTechnician}
+        />
         <ProfileInfoSection user={user} />
       </div>
     </div>

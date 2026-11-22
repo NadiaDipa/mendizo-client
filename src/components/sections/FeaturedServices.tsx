@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import AvailabilityBadge from "@/components/AvailabilityBadge";
 import { ArrowRight, Wrench, CheckCircle2, Clock, MapPin, Loader2 } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -117,6 +118,10 @@ export default function FeaturedServices() {
                       <span className="absolute right-3 top-3 rounded-full bg-navy/85 px-2.5 py-1 text-[11px] font-medium text-sky shadow backdrop-blur-sm">
                         {service.serviceMode}
                       </span>
+                      <AvailabilityBadge
+                        isAvailable={service.isAvailable}
+                        className="absolute bottom-3 left-3"
+                      />
                     </div>
 
                     {/* Card Body */}

@@ -45,7 +45,10 @@ function PaymentSuccessContent() {
         }
 
         setSuccess(true);
-        toast.success("Payment verified! Your booking is fully paid.");
+        // Stable id prevents duplicate toasts when the effect re-runs.
+        toast.success("Payment verified! Your booking is fully paid.", {
+          id: "payment-verified",
+        });
         setPaymentDetails({
           amount: data.payment?.amount,
           transactionId: data.payment?.transactionId,

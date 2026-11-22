@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState, useCallback, Suspense } from "react";
+import { useEffect, useState, useCallback, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AvailabilityBadge from "@/components/AvailabilityBadge";
 import {
   Search,
   SlidersHorizontal,
@@ -15,6 +15,8 @@ import {
   RotateCcw,
   Wrench,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -81,6 +83,45 @@ function ServicesContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // Category strip navigation (arrows + edge fades + mobile swipe)
+  const categoryScrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateCategoryScroll = useCallback(() => {
+    const el = categoryScrollRef.current;
+    if (!el) return;
+
+    setCanScrollLeft(el.scrollLeft > 4);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  }, []);
+
+  const scrollCategories = useCallback((direction: -1 | 1) => {
+    const el = categoryScrollRef.current;
+    if (!el) return;
+
+    el.scrollBy({
+      left: direction * Math.max(el.clientWidth * 0.7, 180),
+      behavior: "smooth",
+    });
+  }, []);
+
+  useEffect(() => {
+    updateCategoryScroll();
+    window.addEventListener("resize", updateCategoryScroll);
+    return () => window.removeEventListener("resize", updateCategoryScroll);
+  }, [updateCategoryScroll]);
+
+  // Keep the selected category visible inside the horizontal strip.
+  useEffect(() => {
+    const el = categoryScrollRef.current;
+    if (!el) return;
+
+    const active = el.querySelector<HTMLElement>('[data-active="true"]');
+    active?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    updateCategoryScroll();
+  }, [selectedCategory, updateCategoryScroll]);
+
   // Sync state when URL params change (e.g. from Home category click or back/forward)
   useEffect(() => {
     const urlCategory = searchParams.get("category");
@@ -132,6 +173,11 @@ function ServicesContent() {
 
       // Update browser URL query string without reloading page
       router.replace(`/services?${params.toString()}`, { scroll: false });
+
+      // All Services shows approved listings even when the technician has turned
+      // them off, so customers can see the availability badge. The homepage keeps
+      // the default available-only behaviour.
+      params.set("includeUnavailable", "true");
 
       const res = await fetch(`${API_URL}/api/services?${params.toString()}`);
       if (!res.ok) {
@@ -220,26 +266,73 @@ function ServicesContent() {
       <section className="sticky top-20 z-20 border-b border-foreground/10 bg-white/95 px-5 py-4 backdrop-blur-md dark:border-white/10 dark:bg-navy/95 sm:px-8">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           {/* Category Tabs */}
-          <div className="flex min-w-0 flex-nowrap items-center gap-2 overflow-x-auto pb-1 no-scrollbar sm:flex-wrap sm:overflow-visible sm:pb-0">
-            {CATEGORIES.map((cat) => {
-              const active = selectedCategory === cat;
-              return (
+          <div className="relative min-w-0 flex-1 xl:max-w-3xl">
+            {/* Left fade + arrow (mobile / narrow screens) */}
+            {canScrollLeft && (
+              <>
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-white via-white/85 to-transparent dark:from-navy dark:via-navy/85 sm:hidden"
+                />
                 <button
-                  key={cat}
-                  onClick={() => {
-                    setSelectedCategory(cat);
-                    setCurrentPage(1);
-                  }}
-                  className={`shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition-all sm:text-sm ${
-                    active
-                      ? "bg-primary text-white shadow-md"
-                      : "border border-foreground/15 text-foreground/70 hover:border-primary hover:text-primary dark:border-white/15 dark:text-on-dark/70 dark:hover:text-sky"
-                  }`}
+                  type="button"
+                  onClick={() => scrollCategories(-1)}
+                  aria-label="Scroll categories left"
+                  className="absolute left-0 top-1/2 z-20 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full border border-foreground/15 bg-white text-foreground shadow-md transition hover:border-primary hover:text-primary dark:border-white/15 dark:bg-navy dark:text-on-dark dark:hover:border-sky dark:hover:text-sky sm:hidden"
                 >
-                  {cat}
+                  <ChevronLeft className="h-4 w-4" />
                 </button>
-              );
-            })}
+              </>
+            )}
+
+            <div
+              ref={categoryScrollRef}
+              onScroll={updateCategoryScroll}
+              role="group"
+              aria-label="Filter services by category"
+              className="flex min-w-0 flex-nowrap items-center gap-2 overflow-x-auto overscroll-x-contain scroll-smooth pb-1 no-scrollbar snap-x sm:flex-wrap sm:overflow-visible sm:pb-0"
+            >
+              {CATEGORIES.map((cat) => {
+                const active = selectedCategory === cat;
+                return (
+                  <button
+                    key={cat}
+                    type="button"
+                    data-active={active}
+                    aria-pressed={active}
+                    onClick={() => {
+                      setSelectedCategory(cat);
+                      setCurrentPage(1);
+                    }}
+                    className={`shrink-0 snap-start whitespace-nowrap rounded-full px-4 py-2 text-xs font-semibold transition-all sm:text-sm ${
+                      active
+                        ? "bg-primary text-white shadow-md ring-2 ring-primary/25 ring-offset-2 ring-offset-white dark:ring-primary/40 dark:ring-offset-navy"
+                        : "border border-foreground/15 text-foreground/70 hover:border-primary hover:text-primary dark:border-white/15 dark:text-on-dark/70 dark:hover:text-sky"
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Right fade + arrow (mobile / narrow screens) */}
+            {canScrollRight && (
+              <>
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-white via-white/85 to-transparent dark:from-navy dark:via-navy/85 sm:hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => scrollCategories(1)}
+                  aria-label="Scroll categories right"
+                  className="absolute right-0 top-1/2 z-20 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full border border-foreground/15 bg-white text-foreground shadow-md transition hover:border-primary hover:text-primary dark:border-white/15 dark:bg-navy dark:text-on-dark dark:hover:border-sky dark:hover:text-sky sm:hidden"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </>
+            )}
           </div>
 
           {/* Mode & Sort Dropdowns */}
@@ -301,9 +394,10 @@ function ServicesContent() {
       <section className="mx-auto max-w-7xl px-5 py-10 sm:px-8 sm:py-14">
         {/* Results summary */}
         <div className="mb-8 flex items-center justify-between">
-          <p className="text-sm font-medium text-foreground/60 dark:text-on-dark/60">
+          <p className="min-w-0 text-sm font-medium text-foreground/60 dark:text-on-dark/60">
             Showing <span className="font-bold text-foreground dark:text-on-dark">{services.length}</span>{" "}
-            available approved service{services.length === 1 ? "" : "s"}
+            approved service{services.length === 1 ? "" : "s"}
+            <span className="hidden sm:inline"> — availability is shown on every listing</span>
           </p>
         </div>
 
@@ -363,7 +457,7 @@ function ServicesContent() {
               return (
                 <article
                   key={service._id}
-                  className="group flex flex-col overflow-hidden rounded-2xl border border-foreground/8 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-[0_16px_36px_-12px_rgba(0,124,199,0.22)] dark:border-white/10 dark:bg-surface/40"
+                  className="group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-foreground/8 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-[0_16px_36px_-12px_rgba(0,124,199,0.22)] dark:border-white/10 dark:bg-surface/40"
                 >
                   {/* Card Image */}
                   <div className="relative h-48 w-full overflow-hidden bg-foreground/5 dark:bg-navy">
@@ -380,15 +474,19 @@ function ServicesContent() {
                     <span className="absolute right-3 top-3 rounded-full bg-navy/80 px-2.5 py-1 text-[11px] font-medium text-sky shadow-sm backdrop-blur-sm">
                       {service.serviceMode}
                     </span>
+                    <AvailabilityBadge
+                      isAvailable={service.isAvailable}
+                      className="absolute bottom-3 left-3"
+                    />
                   </div>
 
                   {/* Card Body */}
                   <div className="flex flex-1 flex-col p-5">
-                    <h2 className="font-semibold text-base leading-snug text-foreground transition-colors group-hover:text-primary dark:text-on-dark dark:group-hover:text-sky">
+                    <h2 className="break-words font-semibold text-base leading-snug text-foreground transition-colors group-hover:text-primary dark:text-on-dark dark:group-hover:text-sky">
                       {service.title}
                     </h2>
 
-                    <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-foreground/60 dark:text-on-dark/60">
+                    <p className="mt-2 line-clamp-2 break-words text-xs leading-relaxed text-foreground/60 dark:text-on-dark/60">
                       {service.description}
                     </p>
 
