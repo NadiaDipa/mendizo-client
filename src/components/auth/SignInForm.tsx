@@ -67,7 +67,7 @@ export default function SignInForm() {
     try {
       const returnTo = getReturnTo();
 
-      // Client ও server আলাদা domain-এ, তাই client-এর পুরো origin দিতে হবে
+      
       const origin = window.location.origin;
 
       const callbackURL = returnTo

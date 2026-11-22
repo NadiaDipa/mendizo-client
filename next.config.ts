@@ -1,5 +1,10 @@
 import type { NextConfig } from "next";
 
+// Server-এর লিংক (শেষে / ছাড়া)
+const API_URL = (
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
+).replace(/\/$/, "");
+
 const nextConfig: NextConfig = {
   reactCompiler: true,
   images: {
@@ -21,6 +26,16 @@ const nextConfig: NextConfig = {
         as: "*.css",
       },
     },
+  },
+
+ 
+  async rewrites() {
+    return [
+      {
+        source: "/api/auth/:path*",
+        destination: `${API_URL}/api/auth/:path*`,
+      },
+    ];
   },
 };
 
