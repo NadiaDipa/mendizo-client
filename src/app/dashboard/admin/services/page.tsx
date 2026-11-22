@@ -3,9 +3,17 @@
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
-import { CheckCircle, XCircle, Clock, Loader2, MapPin, DollarSign, Filter } from "lucide-react";
+import {
+  CheckCircle,
+  XCircle,
+  Clock,
+  Loader2,
+  MapPin,
+  DollarSign,
+  Filter,
+} from "lucide-react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = "";
 
 type Service = {
   _id: string;
@@ -28,7 +36,9 @@ type Service = {
 export default function AdminServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"all" | "pending" | "approved" | "rejected">("pending");
+  const [activeTab, setActiveTab] = useState<
+    "all" | "pending" | "approved" | "rejected"
+  >("pending");
   const [actionId, setActionId] = useState<string | null>(null);
 
   const fetchServices = useCallback(async () => {
@@ -49,7 +59,9 @@ export default function AdminServicesPage() {
       setServices(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Admin services error:", err);
-      toast.error(err instanceof Error ? err.message : "Failed to load services.");
+      toast.error(
+        err instanceof Error ? err.message : "Failed to load services.",
+      );
     } finally {
       setLoading(false);
     }
@@ -59,16 +71,22 @@ export default function AdminServicesPage() {
     fetchServices();
   }, [fetchServices]);
 
-  const handleApproval = async (service: Service, status: "approved" | "rejected") => {
+  const handleApproval = async (
+    service: Service,
+    status: "approved" | "rejected",
+  ) => {
     try {
       setActionId(service._id);
 
-      const res = await fetch(`${API_URL}/api/admin/services/${service._id}/approval`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ approvalStatus: status }),
-      });
+      const res = await fetch(
+        `${API_URL}/api/admin/services/${service._id}/approval`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ approvalStatus: status }),
+        },
+      );
 
       const data = await res.json();
 
@@ -78,7 +96,9 @@ export default function AdminServicesPage() {
 
       toast.success(`Service "${service.title}" has been ${status}.`);
       setServices((prev) =>
-        prev.map((s) => (s._id === service._id ? { ...s, approvalStatus: status } : s))
+        prev.map((s) =>
+          s._id === service._id ? { ...s, approvalStatus: status } : s,
+        ),
       );
     } catch (err) {
       console.error("Approval error:", err);
@@ -103,7 +123,8 @@ export default function AdminServicesPage() {
           Service Approval & Moderation
         </h1>
         <p className="mt-1 text-xs sm:text-sm text-foreground/60 dark:text-on-dark/60">
-          Review repair services submitted by technicians. Approve or reject before public listing.
+          Review repair services submitted by technicians. Approve or reject
+          before public listing.
         </p>
       </div>
 
@@ -136,7 +157,9 @@ export default function AdminServicesPage() {
             <CheckCircle className="h-6 w-6" />
           </div>
           <h3 className="font-display text-base font-semibold text-navy dark:text-on-dark">
-            {activeTab === "pending" ? "No Pending Services" : `No ${activeTab} services found`}
+            {activeTab === "pending"
+              ? "No Pending Services"
+              : `No ${activeTab} services found`}
           </h3>
           <p className="mt-1 text-xs text-foreground/55">
             {activeTab === "pending"
@@ -147,7 +170,8 @@ export default function AdminServicesPage() {
       ) : (
         <div className="grid gap-5 md:grid-cols-2">
           {services.map((service) => {
-            const displayImg = service.image || service.imageUrl || "/images/showcase-2.png";
+            const displayImg =
+              service.image || service.imageUrl || "/images/showcase-2.png";
             return (
               <div
                 key={service._id}
@@ -174,8 +198,8 @@ export default function AdminServicesPage() {
                             service.approvalStatus === "approved"
                               ? "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300"
                               : service.approvalStatus === "rejected"
-                              ? "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300"
-                              : "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
+                                ? "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300"
+                                : "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
                           }`}
                         >
                           {service.approvalStatus}
@@ -187,11 +211,20 @@ export default function AdminServicesPage() {
                       </h3>
 
                       <p className="mt-1 text-xs text-foreground/50 dark:text-on-dark/50">
-                        Technician: <span className="font-semibold text-foreground/80 dark:text-on-dark/80">{service.technicianName}</span> ({service.technicianEmail})
+                        Technician:{" "}
+                        <span className="font-semibold text-foreground/80 dark:text-on-dark/80">
+                          {service.technicianName}
+                        </span>{" "}
+                        ({service.technicianEmail})
                       </p>
 
                       <div className="mt-2 flex items-center gap-3 text-xs text-foreground/60 dark:text-on-dark/60">
-                        <span>Price: <strong className="text-navy dark:text-on-dark">${service.basePrice}</strong></span>
+                        <span>
+                          Price:{" "}
+                          <strong className="text-navy dark:text-on-dark">
+                            ${service.basePrice}
+                          </strong>
+                        </span>
                         <span>•</span>
                         <span>{service.serviceMode}</span>
                       </div>
@@ -207,7 +240,10 @@ export default function AdminServicesPage() {
                 <div className="border-t border-foreground/10 p-3 bg-foreground/[0.015] dark:border-white/10 dark:bg-white/[0.02] flex items-center justify-end gap-2.5">
                   <button
                     type="button"
-                    disabled={actionId === service._id || service.approvalStatus === "approved"}
+                    disabled={
+                      actionId === service._id ||
+                      service.approvalStatus === "approved"
+                    }
                     onClick={() => handleApproval(service, "approved")}
                     className="inline-flex items-center gap-1.5 rounded-xl bg-green-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-green-700 disabled:opacity-40"
                   >
@@ -217,7 +253,10 @@ export default function AdminServicesPage() {
 
                   <button
                     type="button"
-                    disabled={actionId === service._id || service.approvalStatus === "rejected"}
+                    disabled={
+                      actionId === service._id ||
+                      service.approvalStatus === "rejected"
+                    }
                     onClick={() => handleApproval(service, "rejected")}
                     className="inline-flex items-center gap-1.5 rounded-xl border border-red-200 px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50 dark:border-red-500/30 dark:hover:bg-red-950/30 disabled:opacity-40 transition"
                   >

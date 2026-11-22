@@ -7,7 +7,7 @@ import type { JSX } from "react";
 const CARD =
   "rounded-2xl border border-foreground/8 bg-white shadow-[0_6px_28px_-14px_rgba(18,35,46,0.12)] dark:border-white/8 dark:bg-white/[0.04] dark:shadow-[0_6px_28px_-14px_rgba(0,0,0,0.5)]";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = "";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -39,8 +39,7 @@ const BOOKING_BADGE: Record<string, string> = {
   "In Progress": "bg-primary/10 text-primary dark:bg-sky/15 dark:text-sky",
   Completed:
     "bg-emerald-500/10 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-300",
-  Cancelled:
-    "bg-red-500/10 text-red-600 dark:bg-red-400/15 dark:text-red-300",
+  Cancelled: "bg-red-500/10 text-red-600 dark:bg-red-400/15 dark:text-red-300",
 };
 
 const PAYMENT_BADGE: Record<string, string> = {
@@ -78,7 +77,11 @@ function formatDate(dateStr: string): string {
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function CustomerDashboardPage() {
-  const [stats, setStats] = useState<{ total: number; pending: number; completed: number } | null>(null);
+  const [stats, setStats] = useState<{
+    total: number;
+    pending: number;
+    completed: number;
+  } | null>(null);
   const [recentBookings, setRecentBookings] = useState<ApiBooking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -110,8 +113,18 @@ export default function CustomerDashboardPage() {
     fetchData();
   }, []);
 
-  if (loading) return <div className="flex items-center justify-center py-20 text-foreground/50">Loading...</div>;
-  if (error) return <div className="flex items-center justify-center py-20 text-red-500">{error}</div>;
+  if (loading)
+    return (
+      <div className="flex items-center justify-center py-20 text-foreground/50">
+        Loading...
+      </div>
+    );
+  if (error)
+    return (
+      <div className="flex items-center justify-center py-20 text-red-500">
+        {error}
+      </div>
+    );
 
   const STATS: Stat[] = [
     {
@@ -153,7 +166,10 @@ export default function CustomerDashboardPage() {
       </div>
 
       {/* Summary cards */}
-      <section aria-label="Booking summary" className="grid gap-4 sm:grid-cols-3">
+      <section
+        aria-label="Booking summary"
+        className="grid gap-4 sm:grid-cols-3"
+      >
         {STATS.map((stat) => (
           <article
             key={stat.label}
@@ -235,11 +251,17 @@ export default function CustomerDashboardPage() {
                   <div className="flex flex-wrap gap-1.5">
                     <StatusBadge
                       label={displayStatus}
-                      className={BOOKING_BADGE[displayStatus] ?? "bg-foreground/8 text-foreground/60"}
+                      className={
+                        BOOKING_BADGE[displayStatus] ??
+                        "bg-foreground/8 text-foreground/60"
+                      }
                     />
                     <StatusBadge
                       label={displayPayment}
-                      className={PAYMENT_BADGE[displayPayment] ?? "bg-foreground/8 text-foreground/60"}
+                      className={
+                        PAYMENT_BADGE[displayPayment] ??
+                        "bg-foreground/8 text-foreground/60"
+                      }
                     />
                   </div>
 

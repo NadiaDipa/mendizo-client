@@ -12,7 +12,7 @@ import {
   Store,
 } from "lucide-react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = "";
 
 const DEFAULT_IMAGE = "/images/showcase-2.png";
 
@@ -88,7 +88,8 @@ export default function FeaturedServices() {
               Featured Repair Services
             </h2>
             <p className="mt-2 text-xs sm:text-sm text-foreground/60 dark:text-on-dark/60">
-              Verified technicians, upfront pricing, and payment only after the job is completed.
+              Verified technicians, upfront pricing, and payment only after the
+              job is completed.
             </p>
           </div>
 
@@ -129,7 +130,8 @@ export default function FeaturedServices() {
             {services.map((service) => {
               const fallbackImage =
                 CATEGORY_FALLBACK_IMAGE[service.category] || DEFAULT_IMAGE;
-              const displayImage = service.image || service.imageUrl || fallbackImage;
+              const displayImage =
+                service.image || service.imageUrl || fallbackImage;
               const isHomeVisit = /home/i.test(service.serviceMode || "");
               const ModeIcon = isHomeVisit ? Home : Store;
               const technicianName = service.technicianName || "Technician";
@@ -192,7 +194,9 @@ export default function FeaturedServices() {
                       <div className="mt-4 flex flex-wrap gap-2">
                         <span className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-foreground/[0.05] px-3 py-1.5 text-xs font-medium text-foreground/75 dark:bg-white/[0.07] dark:text-on-dark/75">
                           <MapPin className="h-3.5 w-3.5 shrink-0 text-primary dark:text-sky" />
-                          <span className="truncate">{service.serviceArea}</span>
+                          <span className="truncate">
+                            {service.serviceArea}
+                          </span>
                         </span>
                         <span className="inline-flex items-center gap-1.5 rounded-full bg-foreground/[0.05] px-3 py-1.5 text-xs font-medium text-foreground/75 dark:bg-white/[0.07] dark:text-on-dark/75">
                           <Clock className="h-3.5 w-3.5 shrink-0 text-primary dark:text-sky" />

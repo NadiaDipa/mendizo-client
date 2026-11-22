@@ -19,7 +19,7 @@ import {
   X,
 } from "lucide-react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = "";
 
 // Exact categories matching PDF assignment requirement
 const CATEGORIES = [
@@ -118,7 +118,9 @@ export default function AddServicePage() {
       !serviceArea.trim() ||
       !image
     ) {
-      toast.error("Please complete all required fields including the service image.");
+      toast.error(
+        "Please complete all required fields including the service image.",
+      );
       return;
     }
 
@@ -162,11 +164,15 @@ export default function AddServicePage() {
         throw new Error(result.error || "Unable to create service.");
       }
 
-      toast.success("Service submitted! Waiting for admin review and approval.");
+      toast.success(
+        "Service submitted! Waiting for admin review and approval.",
+      );
       router.push("/dashboard/technician/my-services");
     } catch (error) {
       console.error("Create service error:", error);
-      toast.error(error instanceof Error ? error.message : "Something went wrong.");
+      toast.error(
+        error instanceof Error ? error.message : "Something went wrong.",
+      );
     } finally {
       setLoading(false);
     }
@@ -190,7 +196,8 @@ export default function AddServicePage() {
           Add New Service
         </h1>
         <p className="mt-1 text-xs sm:text-sm text-foreground/60 dark:text-on-dark/60">
-          Provide complete repair details and submit them for administrator approval.
+          Provide complete repair details and submit them for administrator
+          approval.
         </p>
       </div>
 
@@ -202,7 +209,9 @@ export default function AddServicePage() {
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 text-xs sm:text-sm">
             <div>
-              <label className="block text-foreground/50 mb-1">Technician Name</label>
+              <label className="block text-foreground/50 mb-1">
+                Technician Name
+              </label>
               <input
                 value={sessionLoading ? "Loading..." : technicianName}
                 readOnly
@@ -210,7 +219,9 @@ export default function AddServicePage() {
               />
             </div>
             <div>
-              <label className="block text-foreground/50 mb-1">Technician Email</label>
+              <label className="block text-foreground/50 mb-1">
+                Technician Email
+              </label>
               <input
                 value={sessionLoading ? "Loading..." : technicianEmail}
                 readOnly
@@ -332,7 +343,8 @@ export default function AddServicePage() {
             Service Image Upload (ImgBB)
           </h2>
           <p className="text-xs text-foreground/50 mb-3">
-            Select a clear banner photo representing the repair service. File upload automatically connects to ImgBB.
+            Select a clear banner photo representing the repair service. File
+            upload automatically connects to ImgBB.
           </p>
 
           <input

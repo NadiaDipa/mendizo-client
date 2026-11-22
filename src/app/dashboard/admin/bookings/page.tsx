@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import { Calendar, Filter, Loader2, DollarSign } from "lucide-react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = "";
 
 type BookingItem = {
   _id: string;
@@ -56,7 +56,9 @@ export default function AdminBookingsPage() {
       setBookings(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Admin bookings error:", err);
-      toast.error(err instanceof Error ? err.message : "Failed to load bookings.");
+      toast.error(
+        err instanceof Error ? err.message : "Failed to load bookings.",
+      );
     } finally {
       setLoading(false);
     }
@@ -75,7 +77,8 @@ export default function AdminBookingsPage() {
             All Repair Bookings
           </h1>
           <p className="mt-1 text-xs sm:text-sm text-foreground/60 dark:text-on-dark/60">
-            Read-only audit record of every service request placed across Mendizo.
+            Read-only audit record of every service request placed across
+            Mendizo.
           </p>
         </div>
 
@@ -159,13 +162,21 @@ export default function AdminBookingsPage() {
                     </td>
 
                     <td className="px-4 py-4">
-                      <p className="font-medium text-foreground dark:text-on-dark">{b.customerName}</p>
-                      <p className="text-[11px] text-foreground/50 dark:text-on-dark/50">{b.customerEmail}</p>
+                      <p className="font-medium text-foreground dark:text-on-dark">
+                        {b.customerName}
+                      </p>
+                      <p className="text-[11px] text-foreground/50 dark:text-on-dark/50">
+                        {b.customerEmail}
+                      </p>
                     </td>
 
                     <td className="px-4 py-4">
-                      <p className="font-medium text-foreground dark:text-on-dark">{b.technicianName}</p>
-                      <p className="text-[11px] text-foreground/50 dark:text-on-dark/50">{b.technicianEmail}</p>
+                      <p className="font-medium text-foreground dark:text-on-dark">
+                        {b.technicianName}
+                      </p>
+                      <p className="text-[11px] text-foreground/50 dark:text-on-dark/50">
+                        {b.technicianEmail}
+                      </p>
                     </td>
 
                     <td className="px-4 py-4">
@@ -174,12 +185,13 @@ export default function AdminBookingsPage() {
                           b.status === "completed"
                             ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300"
                             : b.status === "in-progress"
-                            ? "bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300"
-                            : b.status === "accepted"
-                            ? "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300"
-                            : b.status === "cancelled" || b.status === "rejected"
-                            ? "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300"
-                            : "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
+                              ? "bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300"
+                              : b.status === "accepted"
+                                ? "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300"
+                                : b.status === "cancelled" ||
+                                    b.status === "rejected"
+                                  ? "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300"
+                                  : "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
                         }`}
                       >
                         {b.status}
@@ -199,7 +211,10 @@ export default function AdminBookingsPage() {
                     </td>
 
                     <td className="px-5 py-4 text-right font-bold text-navy dark:text-on-dark">
-                      ${Number(b.finalAmount || b.amount || b.basePrice || 0).toLocaleString()}
+                      $
+                      {Number(
+                        b.finalAmount || b.amount || b.basePrice || 0,
+                      ).toLocaleString()}
                     </td>
                   </tr>
                 ))}

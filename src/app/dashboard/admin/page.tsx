@@ -14,7 +14,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = "";
 
 const CARD =
   "rounded-2xl border border-foreground/8 bg-white p-5 shadow-sm transition-all duration-300 dark:border-white/8 dark:bg-white/[0.04]";
@@ -71,7 +71,8 @@ export default function AdminOverviewPage() {
       value: stats.totalUsers,
       hint: "Customers, technicians & admins",
       icon: Users,
-      color: "bg-blue-500/10 text-blue-600 dark:bg-blue-400/15 dark:text-blue-400",
+      color:
+        "bg-blue-500/10 text-blue-600 dark:bg-blue-400/15 dark:text-blue-400",
       href: "/dashboard/admin/users",
     },
     {
@@ -95,7 +96,8 @@ export default function AdminOverviewPage() {
       value: `$${Number(stats.totalRevenue).toLocaleString()}`,
       hint: "Completed Stripe transactions",
       icon: DollarSign,
-      color: "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-400/15 dark:text-emerald-400",
+      color:
+        "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-400/15 dark:text-emerald-400",
       href: "/dashboard/admin/transactions",
     },
   ];
@@ -111,7 +113,8 @@ export default function AdminOverviewPage() {
           System Overview
         </h1>
         <p className="mt-1 text-xs sm:text-sm text-foreground/60 dark:text-on-dark/60">
-          Monitor platform metrics, user roles, service approvals, and Stripe financial records.
+          Monitor platform metrics, user roles, service approvals, and Stripe
+          financial records.
         </p>
       </div>
 
@@ -143,7 +146,9 @@ export default function AdminOverviewPage() {
                     {card.hint}
                   </p>
                 </div>
-                <div className={`grid h-12 w-12 place-items-center rounded-2xl ${card.color}`}>
+                <div
+                  className={`grid h-12 w-12 place-items-center rounded-2xl ${card.color}`}
+                >
                   <Icon className="h-6 w-6" />
                 </div>
               </div>
@@ -167,8 +172,12 @@ export default function AdminOverviewPage() {
                 <Users className="h-5 w-5" />
               </div>
               <div>
-                <p className="font-bold text-sm text-navy dark:text-on-dark">Manage Users</p>
-                <p className="text-xs text-foreground/50 dark:text-on-dark/50">Assign roles & access</p>
+                <p className="font-bold text-sm text-navy dark:text-on-dark">
+                  Manage Users
+                </p>
+                <p className="text-xs text-foreground/50 dark:text-on-dark/50">
+                  Assign roles & access
+                </p>
               </div>
             </div>
             <ArrowRight className="h-4 w-4 text-foreground/40" />
@@ -183,8 +192,12 @@ export default function AdminOverviewPage() {
                 <Clock className="h-5 w-5" />
               </div>
               <div>
-                <p className="font-bold text-sm text-navy dark:text-on-dark">Service Approvals</p>
-                <p className="text-xs text-foreground/50 dark:text-on-dark/50">Approve or reject</p>
+                <p className="font-bold text-sm text-navy dark:text-on-dark">
+                  Service Approvals
+                </p>
+                <p className="text-xs text-foreground/50 dark:text-on-dark/50">
+                  Approve or reject
+                </p>
               </div>
             </div>
             <ArrowRight className="h-4 w-4 text-foreground/40" />
@@ -199,8 +212,12 @@ export default function AdminOverviewPage() {
                 <Calendar className="h-5 w-5" />
               </div>
               <div>
-                <p className="font-bold text-sm text-navy dark:text-on-dark">All Bookings</p>
-                <p className="text-xs text-foreground/50 dark:text-on-dark/50">Monitor platform jobs</p>
+                <p className="font-bold text-sm text-navy dark:text-on-dark">
+                  All Bookings
+                </p>
+                <p className="text-xs text-foreground/50 dark:text-on-dark/50">
+                  Monitor platform jobs
+                </p>
               </div>
             </div>
             <ArrowRight className="h-4 w-4 text-foreground/40" />
@@ -215,8 +232,12 @@ export default function AdminOverviewPage() {
                 <DollarSign className="h-5 w-5" />
               </div>
               <div>
-                <p className="font-bold text-sm text-navy dark:text-on-dark">Transactions</p>
-                <p className="text-xs text-foreground/50 dark:text-on-dark/50">Stripe revenues</p>
+                <p className="font-bold text-sm text-navy dark:text-on-dark">
+                  Transactions
+                </p>
+                <p className="text-xs text-foreground/50 dark:text-on-dark/50">
+                  Stripe revenues
+                </p>
               </div>
             </div>
             <ArrowRight className="h-4 w-4 text-foreground/40" />

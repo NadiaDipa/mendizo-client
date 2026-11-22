@@ -2,9 +2,17 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { CheckCircle2, Clock, XCircle, Play, DollarSign, Loader2, AlertCircle } from "lucide-react";
+import {
+  CheckCircle2,
+  Clock,
+  XCircle,
+  Play,
+  DollarSign,
+  Loader2,
+  AlertCircle,
+} from "lucide-react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = "";
 
 type BookingStatus =
   | "requested"
@@ -41,10 +49,14 @@ const filters = [
 
 function getStatusStyle(status: string) {
   const styles: Record<string, string> = {
-    requested: "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300",
-    accepted: "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300",
-    "in-progress": "bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300",
-    completed: "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300",
+    requested:
+      "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300",
+    accepted:
+      "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300",
+    "in-progress":
+      "bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300",
+    completed:
+      "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300",
     rejected: "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300",
     cancelled: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
   };
@@ -84,13 +96,17 @@ export default function TechnicianRequestsPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || data.error || "Failed to load requests.");
+        throw new Error(
+          data.message || data.error || "Failed to load requests.",
+        );
       }
 
       setBookings(Array.isArray(data) ? data : data.requests || []);
     } catch (error) {
       console.error("Fetch requests error:", error);
-      toast.error(error instanceof Error ? error.message : "Unable to load requests.");
+      toast.error(
+        error instanceof Error ? error.message : "Unable to load requests.",
+      );
     } finally {
       setLoading(false);
     }
@@ -103,7 +119,7 @@ export default function TechnicianRequestsPage() {
   const updateStatus = async (
     booking: Booking,
     status: BookingStatus,
-    amount?: number
+    amount?: number,
   ) => {
     try {
       setUpdatingId(booking._id);
@@ -126,7 +142,7 @@ export default function TechnicianRequestsPage() {
           },
           credentials: "include",
           body: JSON.stringify(payload),
-        }
+        },
       );
 
       const data = await response.json();
@@ -142,7 +158,9 @@ export default function TechnicianRequestsPage() {
       await fetchRequests();
     } catch (error) {
       console.error("Update request error:", error);
-      toast.error(error instanceof Error ? error.message : "Unable to update request.");
+      toast.error(
+        error instanceof Error ? error.message : "Unable to update request.",
+      );
     } finally {
       setUpdatingId(null);
     }
@@ -179,7 +197,8 @@ export default function TechnicianRequestsPage() {
           Service Requests & Job Pipeline
         </h1>
         <p className="mt-1 text-xs sm:text-sm text-foreground/60 dark:text-on-dark/60">
-          Move your jobs through the pipeline: Requested → Accepted → In Progress → Completed (set final amount).
+          Move your jobs through the pipeline: Requested → Accepted → In
+          Progress → Completed (set final amount).
         </p>
       </div>
 
@@ -262,7 +281,7 @@ export default function TechnicianRequestsPage() {
 
                     <span
                       className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${getStatusStyle(
-                        booking.status
+                        booking.status,
                       )}`}
                     >
                       {formatStatus(booking.status)}
@@ -286,7 +305,9 @@ export default function TechnicianRequestsPage() {
                     </p>
 
                     <p>
-                      <span className="text-foreground/50">Preferred Date: </span>
+                      <span className="text-foreground/50">
+                        Preferred Date:{" "}
+                      </span>
                       <strong>
                         {booking.preferredDate
                           ? new Date(booking.preferredDate).toLocaleDateString()
@@ -300,7 +321,9 @@ export default function TechnicianRequestsPage() {
                     </p>
 
                     <p className="sm:col-span-2 bg-foreground/[0.03] p-2.5 rounded-xl border border-foreground/5">
-                      <span className="text-foreground/50 block font-semibold mb-0.5">Problem Description:</span>
+                      <span className="text-foreground/50 block font-semibold mb-0.5">
+                        Problem Description:
+                      </span>
                       {booking.problemDescription || "No description provided."}
                     </p>
                   </div>
@@ -315,7 +338,9 @@ export default function TechnicianRequestsPage() {
 
                     {booking.finalAmount !== undefined && (
                       <p>
-                        <span className="text-foreground/50">Final Charged Amount: </span>
+                        <span className="text-foreground/50">
+                          Final Charged Amount:{" "}
+                        </span>
                         <strong className="text-emerald-600 dark:text-emerald-400 font-bold">
                           ${Number(booking.finalAmount).toLocaleString()} USD
                         </strong>
@@ -330,7 +355,9 @@ export default function TechnicianRequestsPage() {
                             : "bg-amber-100 text-amber-700"
                         }`}
                       >
-                        {booking.paymentStatus === "paid" ? "Paid by Customer" : "Payment Pending"}
+                        {booking.paymentStatus === "paid"
+                          ? "Paid by Customer"
+                          : "Payment Pending"}
                       </span>
                     )}
                   </div>
@@ -402,7 +429,8 @@ export default function TechnicianRequestsPage() {
             </h2>
 
             <p className="mt-2 text-xs sm:text-sm text-foreground/60 dark:text-on-dark/60 leading-relaxed">
-              Enter the final amount ($) for this completed service. This amount will be charged when the customer pays via Stripe.
+              Enter the final amount ($) for this completed service. This amount
+              will be charged when the customer pays via Stripe.
             </p>
 
             <label
@@ -413,7 +441,9 @@ export default function TechnicianRequestsPage() {
             </label>
 
             <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-foreground/40 font-bold">$</span>
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-foreground/40 font-bold">
+                $
+              </span>
               <input
                 id="finalAmount"
                 type="number"
@@ -444,7 +474,9 @@ export default function TechnicianRequestsPage() {
                 disabled={updatingId === selectedBooking._id}
                 className="rounded-xl bg-emerald-600 px-5 py-2 text-xs font-bold text-white hover:bg-emerald-700 disabled:opacity-50 transition"
               >
-                {updatingId === selectedBooking._id ? "Saving..." : "Confirm & Send to Customer"}
+                {updatingId === selectedBooking._id
+                  ? "Saving..."
+                  : "Confirm & Send to Customer"}
               </button>
             </div>
           </div>
@@ -459,7 +491,9 @@ export default function TechnicianRequestsPage() {
               Reject Service Request?
             </h3>
             <p className="mt-2 text-xs sm:text-sm text-foreground/60 dark:text-on-dark/60 leading-relaxed">
-              Are you sure you want to reject the booking request from <strong>{rejectTarget.customerName}</strong> for <strong>{rejectTarget.serviceTitle}</strong>?
+              Are you sure you want to reject the booking request from{" "}
+              <strong>{rejectTarget.customerName}</strong> for{" "}
+              <strong>{rejectTarget.serviceTitle}</strong>?
             </p>
             <div className="mt-6 flex justify-end gap-3">
               <button

@@ -17,7 +17,7 @@ import {
   Loader2,
 } from "lucide-react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = "";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -67,7 +67,9 @@ export default function ContactPage() {
         throw new Error(data.error || "Failed to submit message.");
       }
 
-      toast.success(data.message || "Thank you! We have received your message.");
+      toast.success(
+        data.message || "Thank you! We have received your message.",
+      );
       setFormData({
         name: "",
         email: "",
@@ -78,7 +80,9 @@ export default function ContactPage() {
     } catch (err) {
       console.error("Contact form error:", err);
       toast.error(
-        err instanceof Error ? err.message : "Unable to send message right now."
+        err instanceof Error
+          ? err.message
+          : "Unable to send message right now.",
       );
     } finally {
       setSubmitting(false);
@@ -102,8 +106,9 @@ export default function ContactPage() {
                 Get in Touch with Mendizo
               </h1>
               <p className="mt-4 text-base text-on-dark/75 sm:text-lg">
-                Have questions about our repair services, booking procedures, or becoming a verified technician?
-                Our support team is ready to assist you.
+                Have questions about our repair services, booking procedures, or
+                becoming a verified technician? Our support team is ready to
+                assist you.
               </p>
             </div>
           </div>
@@ -122,8 +127,8 @@ export default function ContactPage() {
                   Talk with Our Team
                 </h2>
                 <p className="mt-2 text-sm text-foreground/60 dark:text-on-dark/60 leading-relaxed">
-                  Reach out directly via phone or email, or visit our office. We respond to all inquiries
-                  promptly.
+                  Reach out directly via phone or email, or visit our office. We
+                  respond to all inquiries promptly.
                 </p>
               </div>
 
@@ -214,12 +219,17 @@ export default function ContactPage() {
                       Send Us a Message
                     </h3>
                     <p className="text-xs text-foreground/60 dark:text-on-dark/60">
-                      Fill out the form below and we will respond as soon as possible.
+                      Fill out the form below and we will respond as soon as
+                      possible.
                     </p>
                   </div>
                 </div>
 
-                <form noValidate onSubmit={handleSubmit} className="mt-8 space-y-5">
+                <form
+                  noValidate
+                  onSubmit={handleSubmit}
+                  className="mt-8 space-y-5"
+                >
                   <div className="grid gap-5 sm:grid-cols-2">
                     {/* Name */}
                     <div>
@@ -244,7 +254,9 @@ export default function ContactPage() {
                         }`}
                       />
                       {errors.name && (
-                        <p className="mt-1 text-xs text-red-500">{errors.name}</p>
+                        <p className="mt-1 text-xs text-red-500">
+                          {errors.name}
+                        </p>
                       )}
                     </div>
 
@@ -271,7 +283,9 @@ export default function ContactPage() {
                         }`}
                       />
                       {errors.email && (
-                        <p className="mt-1 text-xs text-red-500">{errors.email}</p>
+                        <p className="mt-1 text-xs text-red-500">
+                          {errors.email}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -299,7 +313,9 @@ export default function ContactPage() {
                       }`}
                     />
                     {errors.subject && (
-                      <p className="mt-1 text-xs text-red-500">{errors.subject}</p>
+                      <p className="mt-1 text-xs text-red-500">
+                        {errors.subject}
+                      </p>
                     )}
                   </div>
 
@@ -326,7 +342,9 @@ export default function ContactPage() {
                       }`}
                     />
                     {errors.message && (
-                      <p className="mt-1 text-xs text-red-500">{errors.message}</p>
+                      <p className="mt-1 text-xs text-red-500">
+                        {errors.message}
+                      </p>
                     )}
                   </div>
 

@@ -7,7 +7,7 @@ import { toast } from "sonner";
 const CARD =
   "rounded-2xl border border-foreground/8 bg-white shadow-[0_6px_28px_-14px_rgba(18,35,46,0.12)] dark:border-white/8 dark:bg-white/[0.04] dark:shadow-[0_6px_28px_-14px_rgba(0,0,0,0.5)]";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = "";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -34,10 +34,8 @@ const BOOKING_BADGE: Record<string, string> = {
   "In Progress": "bg-primary/10 text-primary dark:bg-sky/15 dark:text-sky",
   Completed:
     "bg-emerald-500/10 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-300",
-  Cancelled:
-    "bg-red-500/10 text-red-600 dark:bg-red-400/15 dark:text-red-300",
-  Rejected:
-    "bg-red-500/10 text-red-600 dark:bg-red-400/15 dark:text-red-300",
+  Cancelled: "bg-red-500/10 text-red-600 dark:bg-red-400/15 dark:text-red-300",
+  Rejected: "bg-red-500/10 text-red-600 dark:bg-red-400/15 dark:text-red-300",
 };
 
 const PAYMENT_BADGE: Record<string, string> = {
@@ -46,7 +44,14 @@ const PAYMENT_BADGE: Record<string, string> = {
     "bg-amber-500/10 text-amber-700 dark:bg-amber-400/15 dark:text-amber-300",
 };
 
-const FILTER_TABS = ["All", "Requested", "Accepted", "In Progress", "Completed", "Cancelled"];
+const FILTER_TABS = [
+  "All",
+  "Requested",
+  "Accepted",
+  "In Progress",
+  "Completed",
+  "Cancelled",
+];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -86,7 +91,10 @@ function BookingsPageInner() {
   const [cancelTarget, setCancelTarget] = useState<ApiBooking | null>(null);
   const [cancelLoading, setCancelLoading] = useState(false);
   const [payingId, setPayingId] = useState<string | null>(null);
-  const [banner, setBanner] = useState<{ type: "success" | "info"; message: string } | null>(null);
+  const [banner, setBanner] = useState<{
+    type: "success" | "info";
+    message: string;
+  } | null>(null);
 
   const searchParams = useSearchParams();
 
@@ -113,10 +121,17 @@ function BookingsPageInner() {
   useEffect(() => {
     const paymentResult = searchParams.get("payment");
     if (paymentResult === "success") {
-      setBanner({ type: "success", message: "Payment verified successfully! Your booking is now marked as Paid." });
+      setBanner({
+        type: "success",
+        message:
+          "Payment verified successfully! Your booking is now marked as Paid.",
+      });
       fetchBookings();
     } else if (paymentResult === "cancelled") {
-      setBanner({ type: "info", message: "Payment was cancelled. You can try again anytime." });
+      setBanner({
+        type: "info",
+        message: "Payment was cancelled. You can try again anytime.",
+      });
     }
   }, [searchParams]);
 
@@ -126,7 +141,7 @@ function BookingsPageInner() {
     try {
       const res = await fetch(
         `${API_URL}/api/bookings/${cancelTarget._id}/cancel`,
-        { method: "PATCH", credentials: "include" }
+        { method: "PATCH", credentials: "include" },
       );
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -135,12 +150,14 @@ function BookingsPageInner() {
       toast.success("Booking cancelled successfully.");
       setBookings((prev) =>
         prev.map((b) =>
-          b._id === cancelTarget._id ? { ...b, status: "cancelled" } : b
-        )
+          b._id === cancelTarget._id ? { ...b, status: "cancelled" } : b,
+        ),
       );
       setCancelTarget(null);
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Failed to cancel booking.");
+      toast.error(
+        err instanceof Error ? err.message : "Failed to cancel booking.",
+      );
     } finally {
       setCancelLoading(false);
     }
@@ -149,12 +166,15 @@ function BookingsPageInner() {
   async function handlePay(booking: ApiBooking) {
     try {
       setPayingId(booking._id);
-      const res = await fetch(`${API_URL}/api/payments/create-checkout-session`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ bookingId: booking._id }),
-      });
+      const res = await fetch(
+        `${API_URL}/api/payments/create-checkout-session`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ bookingId: booking._id }),
+        },
+      );
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error ?? "Failed to initiate payment.");
@@ -162,14 +182,26 @@ function BookingsPageInner() {
       const { url } = await res.json();
       window.location.href = url;
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Failed to initiate payment.");
+      toast.error(
+        err instanceof Error ? err.message : "Failed to initiate payment.",
+      );
     } finally {
       setPayingId(null);
     }
   }
 
-  if (loading) return <div className="flex items-center justify-center py-20 text-foreground/50">Loading your bookings...</div>;
-  if (error) return <div className="flex items-center justify-center py-20 text-red-500">{error}</div>;
+  if (loading)
+    return (
+      <div className="flex items-center justify-center py-20 text-foreground/50">
+        Loading your bookings...
+      </div>
+    );
+  if (error)
+    return (
+      <div className="flex items-center justify-center py-20 text-red-500">
+        {error}
+      </div>
+    );
 
   const filteredBookings =
     filter === "All"
@@ -270,10 +302,11 @@ function BookingsPageInner() {
           const displayPayment = mapPayment(booking.paymentStatus);
           const canCancel = booking.status === "requested";
           const canPay =
-            booking.status === "completed" &&
-            booking.paymentStatus !== "paid";
+            booking.status === "completed" && booking.paymentStatus !== "paid";
           const isPaid = booking.paymentStatus === "paid";
-          const displayAmount = Number(booking.finalAmount ?? booking.amount ?? booking.basePrice ?? 0);
+          const displayAmount = Number(
+            booking.finalAmount ?? booking.amount ?? booking.basePrice ?? 0,
+          );
 
           return (
             <article key={booking._id} className={`${CARD} p-4 sm:p-5`}>
@@ -307,7 +340,10 @@ function BookingsPageInner() {
 
                     <p className="mt-1.5 flex items-center gap-1.5 text-[12.5px] text-foreground/55">
                       <WrenchIcon className="h-3.5 w-3.5 shrink-0 text-foreground/35" />
-                      Technician: <strong className="text-foreground/80 dark:text-on-dark/80">{booking.technicianName}</strong>
+                      Technician:{" "}
+                      <strong className="text-foreground/80 dark:text-on-dark/80">
+                        {booking.technicianName}
+                      </strong>
                     </p>
 
                     <p className="mt-1 flex items-center gap-1.5 text-[12.5px] text-foreground/55">
@@ -318,11 +354,17 @@ function BookingsPageInner() {
                     <div className="mt-2.5 flex flex-wrap gap-1.5">
                       <StatusBadge
                         label={displayStatus}
-                        className={BOOKING_BADGE[displayStatus] ?? "bg-foreground/8 text-foreground/60"}
+                        className={
+                          BOOKING_BADGE[displayStatus] ??
+                          "bg-foreground/8 text-foreground/60"
+                        }
                       />
                       <StatusBadge
                         label={displayPayment}
-                        className={PAYMENT_BADGE[displayPayment] ?? "bg-foreground/8 text-foreground/60"}
+                        className={
+                          PAYMENT_BADGE[displayPayment] ??
+                          "bg-foreground/8 text-foreground/60"
+                        }
                       />
                     </div>
                   </div>
@@ -331,7 +373,9 @@ function BookingsPageInner() {
                 <div className="flex flex-wrap items-end justify-between gap-4 border-t border-foreground/8 pt-3 dark:border-white/8 lg:min-w-[190px] lg:flex-col lg:items-end lg:border-0 lg:pt-0">
                   <div className="text-left lg:text-right">
                     <span className="text-[11px] text-foreground/45 block">
-                      {booking.status === "completed" ? "Final Amount" : "Estimated Price"}
+                      {booking.status === "completed"
+                        ? "Final Amount"
+                        : "Estimated Price"}
                     </span>
                     <p className="mt-0.5 font-display text-[20px] font-bold text-navy dark:text-on-dark">
                       ${displayAmount.toLocaleString()} USD
@@ -360,7 +404,9 @@ function BookingsPageInner() {
                         onClick={() => handlePay(booking)}
                         className="rounded-xl bg-primary px-5 py-2 text-[12px] font-bold text-white shadow-md transition-all hover:bg-sky hover:text-navy disabled:opacity-50"
                       >
-                        {payingId === booking._id ? "Redirecting..." : "Pay Now (Stripe)"}
+                        {payingId === booking._id
+                          ? "Redirecting..."
+                          : "Pay Now (Stripe)"}
                       </button>
                     )}
 
@@ -387,8 +433,10 @@ function BookingsPageInner() {
             </h3>
             <p className="mt-2 text-[13px] text-foreground/60 leading-relaxed">
               Are you sure you want to cancel your repair request for{" "}
-              <strong className="text-foreground/90">{cancelTarget.serviceTitle}</strong>?
-              This action cannot be undone.
+              <strong className="text-foreground/90">
+                {cancelTarget.serviceTitle}
+              </strong>
+              ? This action cannot be undone.
             </p>
             <div className="mt-6 flex justify-end gap-3">
               <button
@@ -419,7 +467,13 @@ function BookingsPageInner() {
 
 export default function BookingsPage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center py-20 text-foreground/50">Loading bookings...</div>}>
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center py-20 text-foreground/50">
+          Loading bookings...
+        </div>
+      }
+    >
       <BookingsPageInner />
     </Suspense>
   );
@@ -446,7 +500,16 @@ function StatusBadge({
 
 function CalendarIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className={className}>
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className={className}
+    >
       <rect x="3" y="4" width="18" height="17" rx="2.5" />
       <path d="M8 2v3M16 2v3M3 10h18" />
     </svg>
@@ -455,7 +518,16 @@ function CalendarIcon({ className = "h-4 w-4" }: { className?: string }) {
 
 function WrenchIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className={className}>
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className={className}
+    >
       <path d="M14.7 6.3a4.5 4.5 0 0 0 5.9 5.9l-9.3 9.3a2.5 2.5 0 0 1-3.5-3.5l9.3-9.3a4.5 4.5 0 0 0-5.9-5.9l3 3-2.5 2.5-3-3a4.5 4.5 0 0 0 6 1Z" />
     </svg>
   );

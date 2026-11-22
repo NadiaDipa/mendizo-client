@@ -4,9 +4,15 @@ import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
-import { DollarSign, Loader2, ArrowRight, Receipt, CheckCircle2 } from "lucide-react";
+import {
+  DollarSign,
+  Loader2,
+  ArrowRight,
+  Receipt,
+  CheckCircle2,
+} from "lucide-react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = "";
 
 const CARD =
   "rounded-2xl border border-foreground/8 bg-white shadow-sm dark:border-white/8 dark:bg-white/[0.04]";
@@ -44,7 +50,9 @@ export default function CustomerPaymentsPage() {
       setTotalPaid(data.totalPaid || 0);
     } catch (err) {
       console.error("Customer payments error:", err);
-      toast.error(err instanceof Error ? err.message : "Failed to load payment history.");
+      toast.error(
+        err instanceof Error ? err.message : "Failed to load payment history.",
+      );
     } finally {
       setLoading(false);
     }
@@ -66,7 +74,8 @@ export default function CustomerPaymentsPage() {
             Payment History
           </h1>
           <p className="mt-1 text-xs sm:text-sm text-foreground/55">
-            Official ledger of your completed Stripe payments for completed repair jobs.
+            Official ledger of your completed Stripe payments for completed
+            repair jobs.
           </p>
         </div>
 
@@ -96,7 +105,8 @@ export default function CustomerPaymentsPage() {
               No payments yet
             </h3>
             <p className="mt-1 text-xs text-foreground/55">
-              When a technician completes your repair request, you can pay via Stripe and view the receipt here.
+              When a technician completes your repair request, you can pay via
+              Stripe and view the receipt here.
             </p>
             <Link
               href="/dashboard/customer/bookings"

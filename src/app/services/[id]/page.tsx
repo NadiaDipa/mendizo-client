@@ -26,7 +26,7 @@ import {
   X,
 } from "lucide-react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = "";
 
 type Service = {
   _id: string;
@@ -105,7 +105,9 @@ export default function ServiceDetailsPage({
   // Handle clicking "Request Repair"
   const handleOpenRequestModal = () => {
     if (service && !service.isAvailable) {
-      toast.error("This service is currently unavailable. Please check back later.");
+      toast.error(
+        "This service is currently unavailable. Please check back later.",
+      );
       return;
     }
 
@@ -210,7 +212,8 @@ export default function ServiceDetailsPage({
             Service Not Available
           </h2>
           <p className="mt-2 text-sm text-foreground/60 dark:text-on-dark/60">
-            This service does not exist or has not been approved by an administrator yet.
+            This service does not exist or has not been approved by an
+            administrator yet.
           </p>
           <Link
             href="/services"
@@ -225,8 +228,10 @@ export default function ServiceDetailsPage({
     );
   }
 
-  const displayImage = service.image || service.imageUrl || "/images/showcase-2.png";
-  const isTechnicianOrAdmin = currentUser?.role === "technician" || currentUser?.role === "admin";
+  const displayImage =
+    service.image || service.imageUrl || "/images/showcase-2.png";
+  const isTechnicianOrAdmin =
+    currentUser?.role === "technician" || currentUser?.role === "admin";
 
   return (
     <div className="min-h-screen bg-background">
@@ -341,15 +346,21 @@ export default function ServiceDetailsPage({
               <div className="mt-6 space-y-3 text-xs sm:text-sm text-foreground/70 dark:text-on-dark/70">
                 <div className="flex justify-between">
                   <span>Service Delivery:</span>
-                  <span className="font-semibold text-foreground dark:text-on-dark">{service.serviceMode}</span>
+                  <span className="font-semibold text-foreground dark:text-on-dark">
+                    {service.serviceMode}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Coverage Area:</span>
-                  <span className="font-semibold text-foreground dark:text-on-dark">{service.serviceArea}</span>
+                  <span className="font-semibold text-foreground dark:text-on-dark">
+                    {service.serviceArea}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Estimated Time:</span>
-                  <span className="font-semibold text-foreground dark:text-on-dark">{service.estimatedDuration}</span>
+                  <span className="font-semibold text-foreground dark:text-on-dark">
+                    {service.estimatedDuration}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span>Availability:</span>
@@ -361,11 +372,14 @@ export default function ServiceDetailsPage({
               <div className="mt-8">
                 {!service.isAvailable ? (
                   <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-center text-xs font-semibold leading-relaxed text-red-700 dark:border-red-500/30 dark:bg-red-950/30 dark:text-red-300">
-                    This service is currently unavailable. The technician has turned off new requests — please check back later or browse other services.
+                    This service is currently unavailable. The technician has
+                    turned off new requests — please check back later or browse
+                    other services.
                   </div>
                 ) : isTechnicianOrAdmin ? (
                   <div className="rounded-2xl bg-amber-50 p-4 text-center text-xs font-semibold text-amber-800 dark:bg-amber-950/30 dark:text-amber-300">
-                    Only customer accounts can request a repair service. Log in with a customer account to place a request.
+                    Only customer accounts can request a repair service. Log in
+                    with a customer account to place a request.
                   </div>
                 ) : (
                   <button
@@ -409,7 +423,8 @@ export default function ServiceDetailsPage({
                         {technician.area || service.serviceArea}
                       </p>
                       <p className="mt-2 text-xs leading-relaxed text-foreground/70 dark:text-on-dark/70 line-clamp-3">
-                        {technician.bio || "Experienced repair technician dedicated to providing transparent and high quality repairs."}
+                        {technician.bio ||
+                          "Experienced repair technician dedicated to providing transparent and high quality repairs."}
                       </p>
                     </div>
                   </div>
@@ -491,7 +506,8 @@ export default function ServiceDetailsPage({
               {/* Address */}
               <div>
                 <label className="block text-xs font-semibold text-foreground/70 dark:text-on-dark/70 mb-1">
-                  Service / Pickup Address <span className="text-red-500">*</span>
+                  Service / Pickup Address{" "}
+                  <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -506,7 +522,8 @@ export default function ServiceDetailsPage({
               {/* Preferred Date */}
               <div>
                 <label className="block text-xs font-semibold text-foreground/70 dark:text-on-dark/70 mb-1">
-                  Preferred Date (Today or Future) <span className="text-red-500">*</span>
+                  Preferred Date (Today or Future){" "}
+                  <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="date"
@@ -522,11 +539,14 @@ export default function ServiceDetailsPage({
               <div>
                 <div className="flex justify-between items-center mb-1">
                   <label className="block text-xs font-semibold text-foreground/70 dark:text-on-dark/70">
-                    Problem Description (Min 20 characters) <span className="text-red-500">*</span>
+                    Problem Description (Min 20 characters){" "}
+                    <span className="text-red-500">*</span>
                   </label>
                   <span
                     className={`text-[11px] font-bold ${
-                      problemDescription.length >= 20 ? "text-emerald-500" : "text-amber-500"
+                      problemDescription.length >= 20
+                        ? "text-emerald-500"
+                        : "text-amber-500"
                     }`}
                   >
                     {problemDescription.length}/20 min

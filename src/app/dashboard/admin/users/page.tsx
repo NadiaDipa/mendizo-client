@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { useSession } from "@/lib/auth-client";
 import { Users, Shield, UserCheck, Search, Loader2 } from "lucide-react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = "";
 
 type UserItem = {
   _id: string;
@@ -63,12 +63,15 @@ export default function AdminUsersPage() {
     try {
       setUpdatingId(targetUser._id);
 
-      const res = await fetch(`${API_URL}/api/admin/users/${targetUser._id}/role`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ role: newRole }),
-      });
+      const res = await fetch(
+        `${API_URL}/api/admin/users/${targetUser._id}/role`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ role: newRole }),
+        },
+      );
 
       const data = await res.json();
 
@@ -79,8 +82,10 @@ export default function AdminUsersPage() {
       toast.success(`Role for ${targetUser.name} updated to ${newRole}.`);
       setUsers((prev) =>
         prev.map((u) =>
-          u._id === targetUser._id ? { ...u, role: newRole as UserItem["role"] } : u
-        )
+          u._id === targetUser._id
+            ? { ...u, role: newRole as UserItem["role"] }
+            : u,
+        ),
       );
     } catch (err) {
       console.error("Role update error:", err);
@@ -206,8 +211,8 @@ export default function AdminUsersPage() {
                             u.role === "admin"
                               ? "bg-purple-500/10 text-purple-600 dark:bg-purple-400/15 dark:text-purple-300"
                               : u.role === "technician"
-                              ? "bg-sky-500/10 text-sky-600 dark:bg-sky-400/15 dark:text-sky-300"
-                              : "bg-blue-500/10 text-blue-600 dark:bg-blue-400/15 dark:text-blue-300"
+                                ? "bg-sky-500/10 text-sky-600 dark:bg-sky-400/15 dark:text-sky-300"
+                                : "bg-blue-500/10 text-blue-600 dark:bg-blue-400/15 dark:text-blue-300"
                           }`}
                         >
                           <span className="h-1.5 w-1.5 rounded-full bg-current" />
@@ -225,7 +230,9 @@ export default function AdminUsersPage() {
                           <select
                             disabled={updatingId === u._id}
                             value={u.role}
-                            onChange={(e) => handleRoleChange(u, e.target.value)}
+                            onChange={(e) =>
+                              handleRoleChange(u, e.target.value)
+                            }
                             className="rounded-lg border border-foreground/15 bg-background px-3 py-1.5 text-xs font-semibold text-foreground outline-none focus:border-primary dark:border-white/15 dark:text-on-dark cursor-pointer disabled:opacity-50"
                           >
                             <option value="customer">customer</option>

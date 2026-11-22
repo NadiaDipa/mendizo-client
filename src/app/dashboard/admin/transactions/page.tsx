@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import { DollarSign, Loader2, ArrowUpRight, CheckCircle2 } from "lucide-react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = "";
 
 type Payment = {
   _id: string;
@@ -43,7 +43,9 @@ export default function AdminTransactionsPage() {
       setTotalRevenue(data.totalRevenue || 0);
     } catch (err) {
       console.error("Admin transactions error:", err);
-      toast.error(err instanceof Error ? err.message : "Failed to load transactions.");
+      toast.error(
+        err instanceof Error ? err.message : "Failed to load transactions.",
+      );
     } finally {
       setLoading(false);
     }
@@ -61,7 +63,8 @@ export default function AdminTransactionsPage() {
           Stripe Transactions & Platform Revenue
         </h1>
         <p className="mt-1 text-xs sm:text-sm text-foreground/60 dark:text-on-dark/60">
-          Complete ledger of paid repair orders processed securely through Stripe Checkout.
+          Complete ledger of paid repair orders processed securely through
+          Stripe Checkout.
         </p>
       </div>
 
@@ -138,13 +141,21 @@ export default function AdminTransactionsPage() {
                     </td>
 
                     <td className="px-4 py-4">
-                      <p className="font-medium text-foreground dark:text-on-dark">{p.customerName}</p>
-                      <p className="text-[11px] text-foreground/50 dark:text-on-dark/50">{p.customerEmail}</p>
+                      <p className="font-medium text-foreground dark:text-on-dark">
+                        {p.customerName}
+                      </p>
+                      <p className="text-[11px] text-foreground/50 dark:text-on-dark/50">
+                        {p.customerEmail}
+                      </p>
                     </td>
 
                     <td className="px-4 py-4">
-                      <p className="font-medium text-foreground dark:text-on-dark">{p.technicianName}</p>
-                      <p className="text-[11px] text-foreground/50 dark:text-on-dark/50">{p.technicianEmail}</p>
+                      <p className="font-medium text-foreground dark:text-on-dark">
+                        {p.technicianName}
+                      </p>
+                      <p className="text-[11px] text-foreground/50 dark:text-on-dark/50">
+                        {p.technicianEmail}
+                      </p>
                     </td>
 
                     <td className="px-4 py-4">

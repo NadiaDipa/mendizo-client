@@ -22,7 +22,7 @@ import {
   X,
 } from "lucide-react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = "";
 const FALLBACK_IMAGE = "/images/showcase-2.png";
 
 const CATEGORIES = [
@@ -110,12 +110,16 @@ export default function MyServicesPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || data.error || "Failed to load services.");
+        throw new Error(
+          data.message || data.error || "Failed to load services.",
+        );
       }
 
       setServices(Array.isArray(data) ? data : data.services || []);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Unable to load services.");
+      toast.error(
+        err instanceof Error ? err.message : "Unable to load services.",
+      );
     } finally {
       setLoading(false);
     }
@@ -143,7 +147,7 @@ export default function MyServicesPage() {
       pending: services.filter((s) => s.approvalStatus === "pending").length,
       rejected: services.filter((s) => s.approvalStatus === "rejected").length,
     }),
-    [services]
+    [services],
   );
 
   const visibleServices = useMemo(
@@ -151,7 +155,7 @@ export default function MyServicesPage() {
       filter === "all"
         ? services
         : services.filter((s) => s.approvalStatus === filter),
-    [services, filter]
+    [services, filter],
   );
 
   const toggleAvailability = async (service: Service) => {
@@ -165,13 +169,15 @@ export default function MyServicesPage() {
           credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ isAvailable: !service.isAvailable }),
-        }
+        },
       );
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || data.error || "Could not update availability.");
+        throw new Error(
+          data.message || data.error || "Could not update availability.",
+        );
       }
 
       const nextAvailability =
@@ -183,17 +189,19 @@ export default function MyServicesPage() {
         current.map((item) =>
           item._id === service._id
             ? { ...item, isAvailable: nextAvailability }
-            : item
-        )
+            : item,
+        ),
       );
 
       toast.success(
         nextAvailability
           ? "Service is now available and visible to customers."
-          : "Service is now unavailable and hidden from customer requests."
+          : "Service is now unavailable and hidden from customer requests.",
       );
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Availability update failed.");
+      toast.error(
+        err instanceof Error ? err.message : "Availability update failed.",
+      );
     } finally {
       setActionId("");
     }
@@ -210,23 +218,27 @@ export default function MyServicesPage() {
         {
           method: "DELETE",
           credentials: "include",
-        }
+        },
       );
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || data.error || "Could not delete service.");
+        throw new Error(
+          data.message || data.error || "Could not delete service.",
+        );
       }
 
       setServices((current) =>
-        current.filter((service) => service._id !== deleteTarget._id)
+        current.filter((service) => service._id !== deleteTarget._id),
       );
 
       toast.success("Service deleted successfully.");
       setDeleteTarget(null);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Service deletion failed.");
+      toast.error(
+        err instanceof Error ? err.message : "Service deletion failed.",
+      );
     } finally {
       setActionId("");
     }
@@ -258,22 +270,25 @@ export default function MyServicesPage() {
     try {
       setSavingEdit(true);
 
-      const response = await fetch(`${API_URL}/api/services/${editTarget._id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          title: editTitle.trim(),
-          category: editCategory.trim(),
-          description: editDescription.trim(),
-          basePrice: price,
-          estimatedDuration: editDuration.trim(),
-          serviceMode: editMode,
-          serviceArea: editArea.trim(),
-          image: editImage.trim(),
-          imageUrl: editImage.trim(),
-        }),
-      });
+      const response = await fetch(
+        `${API_URL}/api/services/${editTarget._id}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            title: editTitle.trim(),
+            category: editCategory.trim(),
+            description: editDescription.trim(),
+            basePrice: price,
+            estimatedDuration: editDuration.trim(),
+            serviceMode: editMode,
+            serviceArea: editArea.trim(),
+            image: editImage.trim(),
+            imageUrl: editImage.trim(),
+          }),
+        },
+      );
 
       const data = await response.json();
 
@@ -285,7 +300,9 @@ export default function MyServicesPage() {
       setEditTarget(null);
       await fetchServices();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to update service.");
+      toast.error(
+        err instanceof Error ? err.message : "Failed to update service.",
+      );
     } finally {
       setSavingEdit(false);
     }
@@ -300,7 +317,8 @@ export default function MyServicesPage() {
             My Services
           </h1>
           <p className="mt-1.5 max-w-xl text-sm text-foreground/60 dark:text-on-dark/60">
-            Manage your repair listings. Editing a service sends it back for admin approval.
+            Manage your repair listings. Editing a service sends it back for
+            admin approval.
           </p>
         </div>
 
@@ -401,7 +419,8 @@ export default function MyServicesPage() {
             No services listed yet
           </h3>
           <p className="mx-auto mt-1.5 max-w-sm text-sm text-foreground/60 dark:text-on-dark/60">
-            Submit your first repair service to start receiving customer requests.
+            Submit your first repair service to start receiving customer
+            requests.
           </p>
           <Link
             href="/dashboard/technician/add-service"
@@ -423,7 +442,8 @@ export default function MyServicesPage() {
             const status =
               STATUS_META[service.approvalStatus] ?? STATUS_META.pending;
             const busy = actionId === service._id;
-            const ModeIcon = service.serviceMode === "Home Visit" ? Home : Store;
+            const ModeIcon =
+              service.serviceMode === "Home Visit" ? Home : Store;
 
             return (
               <article
@@ -457,7 +477,9 @@ export default function MyServicesPage() {
                   <span
                     className={`absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold shadow-sm ring-1 ring-inset backdrop-blur ${status.badge}`}
                   >
-                    <span className={`h-1.5 w-1.5 rounded-full ${status.dot}`} />
+                    <span
+                      className={`h-1.5 w-1.5 rounded-full ${status.dot}`}
+                    />
                     {status.label}
                   </span>
 
@@ -499,7 +521,8 @@ export default function MyServicesPage() {
                   {service.approvalStatus === "rejected" && (
                     <p className="flex items-start gap-2 rounded-xl bg-red-50 px-3 py-2.5 text-xs text-red-700 dark:bg-red-500/10 dark:text-red-300">
                       <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                      This service was rejected. Edit it and resubmit for review.
+                      This service was rejected. Edit it and resubmit for
+                      review.
                     </p>
                   )}
 
@@ -545,7 +568,9 @@ export default function MyServicesPage() {
                     >
                       <span
                         className={`inline-block h-5 w-5 rounded-full bg-white shadow transition-transform duration-200 ${
-                          service.isAvailable ? "translate-x-6" : "translate-x-1"
+                          service.isAvailable
+                            ? "translate-x-6"
+                            : "translate-x-1"
                         }`}
                       />
                     </button>
@@ -584,7 +609,8 @@ export default function MyServicesPage() {
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
           onMouseDown={(e) => {
-            if (e.target === e.currentTarget && !savingEdit) setEditTarget(null);
+            if (e.target === e.currentTarget && !savingEdit)
+              setEditTarget(null);
           }}
         >
           <div
@@ -602,7 +628,8 @@ export default function MyServicesPage() {
                   Edit Service
                 </h3>
                 <p className="mt-1 text-xs text-foreground/55 dark:text-on-dark/55">
-                  Saving changes sends this service back to pending admin approval.
+                  Saving changes sends this service back to pending admin
+                  approval.
                 </p>
               </div>
 
@@ -805,7 +832,8 @@ const STAT_TONES = {
   primary: "bg-primary/10 text-primary dark:bg-sky/15 dark:text-sky",
   emerald:
     "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-400/15 dark:text-emerald-400",
-  amber: "bg-amber-500/10 text-amber-600 dark:bg-amber-400/15 dark:text-amber-400",
+  amber:
+    "bg-amber-500/10 text-amber-600 dark:bg-amber-400/15 dark:text-amber-400",
 } as const;
 
 function StatCard({

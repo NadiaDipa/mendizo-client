@@ -5,10 +5,16 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { CheckCircle2, ArrowRight, Loader2, AlertCircle, Receipt } from "lucide-react";
+import {
+  CheckCircle2,
+  ArrowRight,
+  Loader2,
+  AlertCircle,
+  Receipt,
+} from "lucide-react";
 import { toast } from "sonner";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = "";
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
@@ -52,11 +58,14 @@ function PaymentSuccessContent() {
         setPaymentDetails({
           amount: data.payment?.amount,
           transactionId: data.payment?.transactionId,
-          serviceTitle: data.payment?.serviceTitle || data.booking?.serviceTitle,
+          serviceTitle:
+            data.payment?.serviceTitle || data.booking?.serviceTitle,
         });
       } catch (err) {
         console.error("Payment verification error:", err);
-        setError(err instanceof Error ? err.message : "Unable to verify payment.");
+        setError(
+          err instanceof Error ? err.message : "Unable to verify payment.",
+        );
       } finally {
         setVerifying(false);
       }
@@ -110,14 +119,17 @@ function PaymentSuccessContent() {
               Payment Successful!
             </h1>
             <p className="mt-2 text-sm text-foreground/60 dark:text-on-dark/60">
-              Thank you! Your payment has been received and verified. The booking is now marked as Paid.
+              Thank you! Your payment has been received and verified. The
+              booking is now marked as Paid.
             </p>
 
             {/* Receipt Summary Card */}
             <div className="mt-6 rounded-2xl border border-foreground/10 bg-background/50 p-5 text-left text-xs sm:text-sm dark:border-white/10 space-y-2.5">
               {paymentDetails?.serviceTitle && (
                 <div className="flex justify-between">
-                  <span className="text-foreground/55 dark:text-on-dark/55">Service:</span>
+                  <span className="text-foreground/55 dark:text-on-dark/55">
+                    Service:
+                  </span>
                   <span className="font-semibold text-foreground dark:text-on-dark truncate max-w-[200px]">
                     {paymentDetails.serviceTitle}
                   </span>
@@ -125,7 +137,9 @@ function PaymentSuccessContent() {
               )}
               {paymentDetails?.amount !== undefined && (
                 <div className="flex justify-between">
-                  <span className="text-foreground/55 dark:text-on-dark/55">Amount Paid:</span>
+                  <span className="text-foreground/55 dark:text-on-dark/55">
+                    Amount Paid:
+                  </span>
                   <span className="font-bold text-navy dark:text-on-dark">
                     ${Number(paymentDetails.amount).toLocaleString()} USD
                   </span>
@@ -133,14 +147,18 @@ function PaymentSuccessContent() {
               )}
               {paymentDetails?.transactionId && (
                 <div className="flex justify-between items-center">
-                  <span className="text-foreground/55 dark:text-on-dark/55">Transaction ID:</span>
+                  <span className="text-foreground/55 dark:text-on-dark/55">
+                    Transaction ID:
+                  </span>
                   <span className="font-mono text-xs font-semibold text-primary dark:text-sky bg-primary/10 px-2 py-0.5 rounded">
                     {paymentDetails.transactionId}
                   </span>
                 </div>
               )}
               <div className="flex justify-between">
-                <span className="text-foreground/55 dark:text-on-dark/55">Status:</span>
+                <span className="text-foreground/55 dark:text-on-dark/55">
+                  Status:
+                </span>
                 <span className="font-semibold text-emerald-600 dark:text-emerald-400">
                   Completed & Recorded
                 </span>
@@ -174,7 +192,13 @@ function PaymentSuccessContent() {
 
 export default function PaymentSuccessPage() {
   return (
-    <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Verifying transaction...</div>}>
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          Verifying transaction...
+        </div>
+      }
+    >
       <PaymentSuccessContent />
     </Suspense>
   );

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -11,7 +10,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = "";
 
 type Service = {
   _id: string;
@@ -46,14 +45,17 @@ export default function TechnicianDashboardPage() {
 
         if (requestsResponse.ok) {
           const requestsData = await requestsResponse.json();
-          setPendingRequests(Array.isArray(requestsData) ? requestsData.filter(
-            (request: { status: string }) => request.status === "requested"
-          ).length : 0);
+          setPendingRequests(
+            Array.isArray(requestsData)
+              ? requestsData.filter(
+                  (request: { status: string }) =>
+                    request.status === "requested",
+                ).length
+              : 0,
+          );
         }
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Something went wrong."
-        );
+        setError(err instanceof Error ? err.message : "Something went wrong.");
       } finally {
         setLoading(false);
       }
@@ -63,7 +65,7 @@ export default function TechnicianDashboardPage() {
   }, []);
 
   const approvedServices = services.filter(
-    (service) => service.approvalStatus === "approved"
+    (service) => service.approvalStatus === "approved",
   ).length;
 
   const stats = [
@@ -186,8 +188,8 @@ export default function TechnicianDashboardPage() {
                         service.approvalStatus === "approved"
                           ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300"
                           : service.approvalStatus === "rejected"
-                          ? "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300"
-                          : "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
+                            ? "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300"
+                            : "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
                       }`}
                     >
                       {service.approvalStatus}
