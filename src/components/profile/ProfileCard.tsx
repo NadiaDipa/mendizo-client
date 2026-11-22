@@ -119,7 +119,7 @@ export default function ProfileCard({
 
       <div className="px-6 pb-6">
         {/* ── Avatar ─────────────────────────────────────────────── */}
-        <div className="-mt-14 flex justify-center">
+        <div className="relative z-10 -mt-14 flex justify-center">
           <div className="h-28 w-28 overflow-hidden rounded-full bg-white shadow-[0_14px_30px_-12px_rgba(0,124,199,0.6)] ring-4 ring-white dark:bg-[#1b2c36] dark:ring-[#1b2c36]">
             {user.image ? (
               // eslint-disable-next-line @next/next/no-img-element
