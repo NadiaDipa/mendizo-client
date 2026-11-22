@@ -1,6 +1,5 @@
 import type { NextConfig } from "next";
 
-
 const API_URL = (
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
 ).replace(/\/$/, "");
@@ -31,7 +30,7 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: "/api/:path*",
+        source: "/api/:path((?!upload-image).*)",
         destination: `${API_URL}/api/:path*`,
       },
     ];
