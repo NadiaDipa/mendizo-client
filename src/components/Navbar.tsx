@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -37,7 +36,8 @@ type UserMenuProps = {
     role?: UserRole;
   };
   router: ReturnType<typeof useRouter>;
-  scrolled: boolean;
+  /** True when the header background is white (non-home pages, or home after scrolling). */
+  isLightSolid: boolean;
   isOpen: boolean;
   onOpenChange: (next: boolean) => void;
 };
@@ -178,7 +178,7 @@ export default function Navbar() {
                 }
               }
               router={router}
-              scrolled={scrolled}
+              isLightSolid={isLightSolid}
               isOpen={isUserMenuOpen}
               onOpenChange={(next) => {
                 setIsUserMenuOpen(next);
@@ -274,7 +274,7 @@ export default function Navbar() {
 function UserMenu({
   user,
   router,
-  scrolled,
+  isLightSolid,
   isOpen,
   onOpenChange,
 }: UserMenuProps) {
@@ -357,6 +357,11 @@ function UserMenu({
   return (
     <div ref={containerRef} className="relative">
       {/* User name + avatar trigger */}
+      {/*
+        FIX: the name used to be `text-on-dark` (white) even when the header
+        turned white (non-home pages / after scrolling), so it vanished.
+        Now the colors follow `isLightSolid`, the same flag the rest of the navbar uses.
+      */}
       <button
         ref={triggerRef}
         type="button"
@@ -364,10 +369,11 @@ function UserMenu({
         aria-label="Open user menu"
         aria-expanded={isOpen}
         aria-haspopup="true"
-        className={`flex h-11 max-w-[150px] items-center gap-2 rounded-full border py-1 pl-1.5 pr-1.5 transition-all duration-200 hover:border-sky hover:bg-on-dark/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky sm:max-w-[190px] sm:pl-3 ${scrolled
-          ? "border-on-dark/40 text-on-dark"
-          : "border-on-dark/40 text-on-dark lg:[html:not(.dark)_&]:border-navy/30 lg:[html:not(.dark)_&]:text-navy lg:[html:not(.dark)_&]:hover:border-primary"
-          }`}
+        className={`flex h-11 max-w-[150px] items-center gap-2 rounded-full border py-1 pl-1.5 pr-1.5 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky sm:max-w-[190px] sm:pl-3 ${
+          isLightSolid
+            ? "border-foreground/25 text-foreground hover:border-primary hover:bg-foreground/5 dark:border-on-dark/40 dark:text-on-dark dark:hover:border-sky dark:hover:bg-on-dark/5"
+            : "border-on-dark/40 text-on-dark hover:border-sky hover:bg-on-dark/5 lg:[html:not(.dark)_&]:border-navy/30 lg:[html:not(.dark)_&]:text-navy lg:[html:not(.dark)_&]:hover:border-primary"
+        }`}
       >
         <span className="hidden max-w-[105px] truncate text-sm font-semibold sm:inline-block">
           {user.name}
@@ -465,9 +471,6 @@ function UserMenu({
                 type="button"
                 role="menuitem"
                 onClick={() => {
-                  console.log("User role:", user.role);
-                  console.log("Dashboard path:", dashboardPath);
-
                   onOpenChange(false);
                   router.push(dashboardPath);
                 }}

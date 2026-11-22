@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
@@ -51,12 +52,9 @@ const ROLE_OPTIONS: {
   },
 ];
 
-
 const FIELD_SCALE =
   "[&_label]:text-[15px] [&_label]:font-semibold [&_label]:text-foreground [&_input]:h-[54px] [&_input]:text-[16px] [&_input]:font-medium [&_input]:text-foreground [&_input]:placeholder:text-foreground/55 [&_p]:text-[14px]";
 
-
-  
 const USE_WIDER_CARD = true;
 const CARD_MAX_WIDTH = "34rem";
 
@@ -77,6 +75,7 @@ function useWiderCard(ref: RefObject<HTMLElement | null>) {
         const target = node;
         const previous = target.style.maxWidth;
         target.style.maxWidth = CARD_MAX_WIDTH;
+
         return () => {
           target.style.maxWidth = previous;
         };
@@ -102,6 +101,7 @@ export default function SignUpForm() {
 
   const [errors, setErrors] = useState<FormErrors<Field>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   function clearError(field: Field) {
     setErrors((previous) => {
@@ -111,6 +111,25 @@ export default function SignUpForm() {
       delete next[field];
       return next;
     });
+  }
+
+  async function handleGoogleSignIn() {
+    setIsGoogleLoading(true);
+
+    try {
+      const { error } = await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/auth/callback",
+      });
+
+      if (error) {
+        toast.error(error.message || "Google sign-in failed.");
+        setIsGoogleLoading(false);
+      }
+    } catch {
+      toast.error("Unable to sign in with Google. Please try again.");
+      setIsGoogleLoading(false);
+    }
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -174,24 +193,22 @@ export default function SignUpForm() {
 
       if (error) {
         toast.error(
-          error.message || "Account creation failed. Please try again.",
+          error.message || "Account creation failed. Please try again."
         );
         return;
       }
 
-
       toast.success(
-        "Account created successfully! Please sign in with your email and password.",
+        "Account created successfully! Please sign in with your email and password."
       );
-      router.push("/sign-in");
 
+      router.push("/sign-in");
     } catch {
       toast.error("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   }
-
 
   return (
     <div ref={rootRef}>
@@ -382,6 +399,49 @@ export default function SignUpForm() {
           </SubmitButton>
         </div>
       </form>
+
+      <div className="relative my-5 flex items-center">
+        <div className="flex-grow border-t border-foreground/10" />
+        <span className="mx-3 text-xs text-foreground/45">
+          OR CONTINUE WITH
+        </span>
+        <div className="flex-grow border-t border-foreground/10" />
+      </div>
+
+      <button
+        type="button"
+        onClick={handleGoogleSignIn}
+        disabled={isGoogleLoading || isSubmitting}
+        className="flex w-full items-center justify-center gap-3 rounded-xl border border-foreground/15 bg-background px-4 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-foreground/5 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {isGoogleLoading ? (
+          <span className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+        ) : (
+          <svg viewBox="0 0 48 48" className="h-5 w-5" aria-hidden="true">
+            <path
+              fill="#EA4335"
+              d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 3.12 13.22l7.98 6.19C13 13.72 18.1 9.5 24 9.5Z"
+              transform="translate(0 5)"
+            />
+            <path
+              fill="#4285F4"
+              d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.77 7.18l7.73 6C44.41 38.08 46.98 31.84 46.98 24.55Z"
+            />
+            <path
+              fill="#FBBC05"
+              d="M10.64 28.59A14.4 14.4 0 0 1 9.88 24c0-1.59.27-3.13.76-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.87.93 7.53 2.66 10.78l7.98-6.19Z"
+              transform="translate(0 5)"
+            />
+            <path
+              fill="#34A853"
+              d="M24 48c6.48 0 11.93-2.13 15.9-5.8l-7.73-6c-2.14 1.44-4.87 2.3-8.17 2.3-5.9 0-11-3.98-12.8-9.34l-7.98 6.19C6.51 43.62 14.62 48 24 48Z"
+              transform="translate(0 -5)"
+            />
+          </svg>
+        )}
+
+        {isGoogleLoading ? "Connecting to Google…" : "Continue with Google"}
+      </button>
 
       <p className="mt-4 border-t border-foreground/10 pt-4 text-center text-[15px] text-foreground/65">
         Already have an account?{" "}

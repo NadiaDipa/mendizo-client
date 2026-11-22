@@ -12,14 +12,24 @@ import {
   MapPin,
   Clock,
   ArrowUpDown,
+  ArrowRight,
   RotateCcw,
   Wrench,
-  CheckCircle2,
+  Home,
+  Store,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
+const DEFAULT_IMAGE = "/images/showcase-2.png";
+
+// Used only when a service has no image of its own (or the image fails to load).
+const CATEGORY_FALLBACK_IMAGE: Record<string, string> = {
+  "Laptop & PC": "/images/technician-3.png",
+  Smartphone: "/images/technician-3.png",
+};
 
 const CATEGORIES = [
   "All",
@@ -60,6 +70,12 @@ type Service = {
   isAvailable: boolean;
 };
 
+// "home-visit" -> "Home Visit", "shop_drop-off" -> "Shop Drop Off"
+function formatMode(mode: string) {
+  if (!mode) return "";
+  return mode.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 function ServicesContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -80,6 +96,8 @@ function ServicesContent() {
   const [services, setServices] = useState<Service[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
+  // Real page size used by the server (so the "Showing X to Y" text is always correct)
+  const [pageSize, setPageSize] = useState(25);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -188,6 +206,10 @@ function ServicesContent() {
       setServices(data.services || []);
       setTotalCount(data.total || 0);
       setTotalPages(data.totalPages || 1);
+      setPageSize((prev) =>
+        data.limit ||
+        ((data.totalPages || 1) > currentPage ? (data.services || []).length || prev : prev)
+      );
     } catch (err) {
       console.error("Browse services error:", err);
       setError(err instanceof Error ? err.message : "Failed to load services.");
@@ -418,15 +440,18 @@ function ServicesContent() {
             {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
               <div
                 key={i}
-                className="flex flex-col overflow-hidden rounded-2xl border border-foreground/10 bg-white p-4 shadow-sm animate-pulse dark:border-white/10 dark:bg-surface/30"
+                className="flex flex-col overflow-hidden rounded-2xl border border-foreground/10 bg-white shadow-sm animate-pulse dark:border-white/10 dark:bg-surface/30"
               >
-                <div className="h-48 w-full rounded-xl bg-foreground/10 dark:bg-white/10" />
-                <div className="mt-4 h-4 w-1/3 rounded bg-foreground/10 dark:bg-white/10" />
-                <div className="mt-2 h-6 w-3/4 rounded bg-foreground/10 dark:bg-white/10" />
-                <div className="mt-4 h-12 w-full rounded bg-foreground/10 dark:bg-white/10" />
-                <div className="mt-auto pt-4 flex justify-between">
-                  <div className="h-6 w-20 rounded bg-foreground/10 dark:bg-white/10" />
-                  <div className="h-8 w-24 rounded-full bg-foreground/10 dark:bg-white/10" />
+                <div className="h-52 w-full bg-foreground/10 dark:bg-white/10" />
+                <div className="space-y-3 p-5">
+                  <div className="h-5 w-3/4 rounded bg-foreground/10 dark:bg-white/10" />
+                  <div className="h-3 w-full rounded bg-foreground/10 dark:bg-white/10" />
+                  <div className="h-3 w-2/3 rounded bg-foreground/10 dark:bg-white/10" />
+                  <div className="h-3 w-1/2 rounded bg-foreground/10 dark:bg-white/10" />
+                  <div className="flex items-center justify-between pt-4">
+                    <div className="h-8 w-20 rounded bg-foreground/10 dark:bg-white/10" />
+                    <div className="h-9 w-28 rounded-full bg-foreground/10 dark:bg-white/10" />
+                  </div>
                 </div>
               </div>
             ))}
@@ -453,74 +478,111 @@ function ServicesContent() {
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {services.map((service) => {
-              const displayImage = service.image || service.imageUrl || "/images/showcase-2.png";
+              const fallbackImage =
+                CATEGORY_FALLBACK_IMAGE[service.category] || DEFAULT_IMAGE;
+              const displayImage = service.image || service.imageUrl || fallbackImage;
+              const isHomeVisit = /home/i.test(service.serviceMode || "");
+              const ModeIcon = isHomeVisit ? Home : Store;
+              const technicianName = service.technicianName || "Technician";
+
               return (
                 <article
                   key={service._id}
-                  className="group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-foreground/8 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-[0_16px_36px_-12px_rgba(0,124,199,0.22)] dark:border-white/10 dark:bg-surface/40"
+                  className="group flex min-w-0 flex-col rounded-3xl border border-foreground/10 bg-white p-2.5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_22px_44px_-16px_rgba(0,124,199,0.35)] dark:border-white/10 dark:bg-surface/40"
                 >
-                  {/* Card Image */}
-                  <div className="relative h-48 w-full overflow-hidden bg-foreground/5 dark:bg-navy">
+                  {/* Inset image with rounded corners */}
+                  <div className="relative h-44 w-full overflow-hidden rounded-2xl bg-foreground/5 dark:bg-navy">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={displayImage}
                       alt={service.title}
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                       loading="lazy"
+                      onError={(e) => {
+                        const img = e.currentTarget;
+                        if (!img.dataset.fallback) {
+                          img.dataset.fallback = "1";
+                          img.src = fallbackImage;
+                        }
+                      }}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
-                    <span className="absolute left-3 top-3 rounded-full bg-primary/90 px-3 py-1 text-[11px] font-bold text-white shadow-sm backdrop-blur-sm">
-                      {service.category}
-                    </span>
-                    <span className="absolute right-3 top-3 rounded-full bg-navy/80 px-2.5 py-1 text-[11px] font-medium text-sky shadow-sm backdrop-blur-sm">
-                      {service.serviceMode}
-                    </span>
+                    <div
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/10"
+                    />
+
                     <AvailabilityBadge
                       isAvailable={service.isAvailable}
-                      className="absolute bottom-3 left-3"
+                      className="absolute left-3 top-3"
                     />
+
+                    {/* Price lives on the image now (single line) */}
+                    <div className="absolute bottom-3 right-3 flex items-baseline gap-1.5 whitespace-nowrap rounded-full bg-white/95 px-3.5 py-1.5 shadow-lg backdrop-blur">
+                      <span className="text-[11px] font-medium text-foreground/55">
+                        From
+                      </span>
+                      <span className="text-base font-bold leading-none text-navy">
+                        ${Number(service.basePrice).toLocaleString()}
+                      </span>
+                    </div>
                   </div>
 
-                  {/* Card Body */}
-                  <div className="flex flex-1 flex-col p-5">
-                    <h2 className="break-words font-semibold text-base leading-snug text-foreground transition-colors group-hover:text-primary dark:text-on-dark dark:group-hover:text-sky">
+                  {/* Body */}
+                  <div className="flex flex-1 flex-col px-3 pb-2 pt-4">
+                    <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-primary dark:text-sky">
+                      {service.category}
+                    </span>
+
+                    <h2 className="mt-1 line-clamp-1 break-words text-[17px] font-semibold leading-snug tracking-tight text-navy transition-colors group-hover:text-primary dark:text-on-dark dark:group-hover:text-sky">
                       {service.title}
                     </h2>
 
-                    <p className="mt-2 line-clamp-2 break-words text-xs leading-relaxed text-foreground/60 dark:text-on-dark/60">
+                    <p className="mt-1.5 line-clamp-2 min-h-[2.6rem] break-words text-[13px] leading-relaxed text-foreground/60 dark:text-on-dark/60">
                       {service.description}
                     </p>
 
-                    <div className="mt-4 space-y-1.5 border-t border-foreground/8 pt-3 text-xs text-foreground/55 dark:border-white/8 dark:text-on-dark/60">
-                      <div className="flex items-center gap-1.5">
-                        <MapPin className="h-3.5 w-3.5 text-primary shrink-0 dark:text-sky" />
+                    {/* Info chips */}
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      <span className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-foreground/[0.05] px-3 py-1.5 text-xs font-medium text-foreground/75 dark:bg-white/[0.07] dark:text-on-dark/75">
+                        <MapPin className="h-3.5 w-3.5 shrink-0 text-primary dark:text-sky" />
                         <span className="truncate">{service.serviceArea}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Clock className="h-3.5 w-3.5 text-primary shrink-0 dark:text-sky" />
-                        <span>{service.estimatedDuration || "Standard service"}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 text-foreground/80 dark:text-on-dark/80 font-medium">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-                        <span className="truncate">By {service.technicianName}</span>
-                      </div>
+                      </span>
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-foreground/[0.05] px-3 py-1.5 text-xs font-medium text-foreground/75 dark:bg-white/[0.07] dark:text-on-dark/75">
+                        <Clock className="h-3.5 w-3.5 shrink-0 text-primary dark:text-sky" />
+                        {service.estimatedDuration || "Standard"}
+                      </span>
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-foreground/[0.05] px-3 py-1.5 text-xs font-medium text-foreground/75 dark:bg-white/[0.07] dark:text-on-dark/75">
+                        <ModeIcon className="h-3.5 w-3.5 shrink-0 text-primary dark:text-sky" />
+                        {formatMode(service.serviceMode)}
+                      </span>
                     </div>
 
-                    {/* Price and Action */}
-                    <div className="mt-auto flex items-center justify-between border-t border-foreground/8 pt-4 dark:border-white/8">
-                      <div>
-                        <span className="text-[11px] font-medium text-foreground/50 dark:text-on-dark/50">
-                          Starting at
+                    {/* Footer: technician + action */}
+                    <div className="mt-auto flex items-center justify-between gap-3 pt-5">
+                      <div className="flex min-w-0 items-center gap-2.5">
+                        <span
+                          aria-hidden="true"
+                          className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary/10 text-sm font-bold uppercase text-primary dark:bg-sky/20 dark:text-sky"
+                        >
+                          {technicianName.charAt(0)}
                         </span>
-                        <p className="text-lg font-bold text-navy dark:text-on-dark">
-                          ${Number(service.basePrice).toLocaleString()}
-                        </p>
+                        <div className="min-w-0 leading-tight">
+                          <span className="block text-[10px] text-foreground/45 dark:text-on-dark/45">
+                            Technician
+                          </span>
+                          <span className="block truncate text-[13px] font-semibold text-navy dark:text-on-dark">
+                            {technicianName}
+                          </span>
+                        </div>
                       </div>
 
                       <Link
                         href={`/services/${service._id}`}
-                        className="rounded-full bg-primary px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-sky hover:text-navy"
+                        aria-label={`View details for ${service.title}`}
+                        className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-navy px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-primary dark:bg-primary dark:hover:bg-sky dark:hover:text-navy"
                       >
-                        View Details
+                        Details
+                        <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                       </Link>
                     </div>
                   </div>
@@ -536,11 +598,11 @@ function ServicesContent() {
             <p className="text-xs sm:text-sm text-foreground/60 dark:text-on-dark/60">
               Showing{" "}
               <span className="font-bold text-navy dark:text-on-dark">
-                {Math.min((currentPage - 1) * 25 + 1, totalCount)}
+                {Math.min((currentPage - 1) * pageSize + 1, totalCount)}
               </span>{" "}
               to{" "}
               <span className="font-bold text-navy dark:text-on-dark">
-                {Math.min(currentPage * 25, totalCount)}
+                {Math.min((currentPage - 1) * pageSize + services.length, totalCount)}
               </span>{" "}
               of{" "}
               <span className="font-bold text-navy dark:text-on-dark">

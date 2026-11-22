@@ -24,6 +24,12 @@ type Field = "email" | "password";
 const LINK =
   "font-semibold text-primary underline-offset-4 transition-colors hover:text-[color-mix(in_oklab,var(--color-primary),black_14%)] hover:underline dark:text-sky dark:hover:text-on-dark";
 
+function getDashboardPath(role?: string) {
+  if (role === "technician") return "/dashboard/technician";
+  if (role === "admin") return "/dashboard/admin";
+  return "/dashboard/customer";
+}
+
 export default function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -33,6 +39,7 @@ export default function SignInForm() {
   const [rememberMe, setRememberMe] = useState(true);
   const [errors, setErrors] = useState<FormErrors<Field>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   function clearError(field: Field) {
     setErrors((previous) => {
@@ -44,10 +51,45 @@ export default function SignInForm() {
     });
   }
 
+  function getReturnTo() {
+    const returnTo =
+      searchParams.get("returnTo") ||
+      searchParams.get("redirect") ||
+      searchParams.get("callbackUrl");
+
+    return returnTo?.startsWith("/") && !returnTo.startsWith("//")
+      ? returnTo
+      : null;
+  }
+
+  async function handleGoogleSignIn() {
+    setIsGoogleLoading(true);
+
+    try {
+      const returnTo = getReturnTo();
+
+      const callbackURL = returnTo
+        ? `/auth/callback?returnTo=${encodeURIComponent(returnTo)}`
+        : "/auth/callback";
+
+      const { error } = await authClient.signIn.social({
+        provider: "google",
+        callbackURL,
+      });
+
+      if (error) {
+        toast.error(error.message || "Google sign-in failed.");
+        setIsGoogleLoading(false);
+      }
+    } catch {
+      toast.error("Unable to sign in with Google. Please try again.");
+      setIsGoogleLoading(false);
+    }
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    // Collect form data and convert it into an object
     const formData = new FormData(event.currentTarget);
     const formDataObj = Object.fromEntries(formData.entries());
 
@@ -55,7 +97,6 @@ export default function SignInForm() {
     const password = String(formDataObj.password || "");
     const rememberMe = formDataObj.remember === "on";
 
-    // Validate form data
     const nextErrors: FormErrors<Field> = {};
 
     if (!email) {
@@ -80,7 +121,6 @@ export default function SignInForm() {
       return;
     }
 
-    // Sign in using Better Auth
     setIsSubmitting(true);
 
     try {
@@ -99,32 +139,18 @@ export default function SignInForm() {
 
       toast.success("Welcome back to Mendizo!");
 
-      // 1. Check for returnTo / redirect param
-      const returnTo =
-        searchParams.get("returnTo") ||
-        searchParams.get("redirect") ||
-        searchParams.get("callbackUrl");
+      const returnTo = getReturnTo();
 
-      if (returnTo && returnTo.startsWith("/")) {
+      if (returnTo) {
         router.push(returnTo);
         router.refresh();
         return;
       }
 
-      // 2. Route to role-specific dashboard based on active session
-      try {
-        const sessionRes = await authClient.getSession();
-        const userRole = (sessionRes?.data?.user as { role?: string })?.role;
-        if (userRole === "technician") {
-          router.push("/dashboard/technician");
-        } else if (userRole === "admin") {
-          router.push("/dashboard/admin");
-        } else {
-          router.push("/dashboard/customer");
-        }
-      } catch {
-        router.push("/dashboard");
-      }
+      const sessionRes = await authClient.getSession();
+      const userRole = (sessionRes?.data?.user as { role?: string })?.role;
+
+      router.push(getDashboardPath(userRole));
       router.refresh();
     } catch {
       toast.error("Something went wrong. Please try again.");
@@ -222,6 +248,47 @@ export default function SignInForm() {
           </SubmitButton>
         </div>
       </form>
+
+      <div className="relative my-5 flex items-center">
+        <div className="flex-grow border-t border-foreground/10" />
+        <span className="mx-3 text-xs text-foreground/45">OR CONTINUE WITH</span>
+        <div className="flex-grow border-t border-foreground/10" />
+      </div>
+
+      <button
+        type="button"
+        onClick={handleGoogleSignIn}
+        disabled={isGoogleLoading || isSubmitting}
+        className="flex w-full items-center justify-center gap-3 rounded-xl border border-foreground/15 bg-background px-4 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-foreground/5 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {isGoogleLoading ? (
+          <span className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+        ) : (
+          <svg viewBox="0 0 48 48" className="h-5 w-5" aria-hidden="true">
+            <path
+              fill="#EA4335"
+              d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 3.12 13.22l7.98 6.19C13 13.72 18.1 9.5 24 9.5Z"
+              transform="translate(0 5)"
+            />
+            <path
+              fill="#4285F4"
+              d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.77 7.18l7.73 6C44.41 38.08 46.98 31.84 46.98 24.55Z"
+            />
+            <path
+              fill="#FBBC05"
+              d="M10.64 28.59A14.4 14.4 0 0 1 9.88 24c0-1.59.27-3.13.76-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.87.93 7.53 2.66 10.78l7.98-6.19Z"
+              transform="translate(0 5)"
+            />
+            <path
+              fill="#34A853"
+              d="M24 48c6.48 0 11.93-2.13 15.9-5.8l-7.73-6c-2.14 1.44-4.87 2.3-8.17 2.3-5.9 0-11-3.98-12.8-9.34l-7.98 6.19C6.51 43.62 14.62 48 24 48Z"
+              transform="translate(0 -5)"
+            />
+          </svg>
+        )}
+
+        {isGoogleLoading ? "Connecting to Google…" : "Continue with Google"}
+      </button>
 
       <p className="mt-5 border-t border-foreground/10 pt-4 text-center text-[13.5px] text-foreground/60">
         New to Mendizo?{" "}

@@ -18,7 +18,10 @@ type ProfileCardProps = {
   verifiedTechnician?: boolean;
 };
 
-// ─── Role badge config ────────────────────────────────────────────────────────
+// ─── Role badge config (glass style, sits on the dark banner) ─────────────────
+
+const GLASS_BADGE =
+  "bg-white/15 text-white ring-1 ring-inset ring-white/30 backdrop-blur-md";
 
 const ROLE_BADGE: Record<
   string,
@@ -26,20 +29,17 @@ const ROLE_BADGE: Record<
 > = {
   customer: {
     label: "Customer",
-    className:
-      "border border-primary/20 bg-primary/8 text-primary dark:border-sky/25 dark:bg-sky/12 dark:text-sky",
+    className: GLASS_BADGE,
     icon: <UserCheckIcon />,
   },
   technician: {
     label: "Technician",
-    className:
-      "border border-transparent bg-navy text-mist shadow-[0_6px_16px_-8px_rgba(18,35,46,0.55)] dark:border-sky/25 dark:bg-sky/15 dark:text-sky dark:shadow-none",
+    className: GLASS_BADGE,
     icon: <WrenchIcon />,
   },
   admin: {
     label: "Admin",
-    className:
-      "border border-surface/20 bg-surface/8 text-surface dark:border-white/15 dark:bg-white/10 dark:text-on-dark",
+    className: GLASS_BADGE,
     icon: <ShieldIcon />,
   },
 };
@@ -47,7 +47,7 @@ const ROLE_BADGE: Record<
 const VERIFIED_TECHNICIAN_BADGE = {
   label: "Verified Technician",
   className:
-    "border border-emerald-500/25 bg-emerald-500/10 text-emerald-700 dark:border-emerald-400/30 dark:bg-emerald-400/12 dark:text-emerald-300",
+    "bg-emerald-400/20 text-emerald-50 ring-1 ring-inset ring-emerald-300/50 backdrop-blur-md",
   icon: <BadgeCheckIcon />,
 };
 
@@ -93,80 +93,63 @@ export default function ProfileCard({
   const initials = getInitials(user.name);
 
   return (
-    <article
-      className={[
-        "group relative overflow-hidden rounded-[24px] border",
-        "border-foreground/10 bg-white shadow-[0_10px_34px_-14px_rgba(18,35,46,0.16)]",
-        "transition-shadow duration-300 hover:shadow-[0_16px_44px_-18px_rgba(0,124,199,0.28)]",
-        "dark:border-white/8 dark:bg-white/[0.04] dark:shadow-[0_10px_34px_-14px_rgba(0,0,0,0.55)]",
-        "dark:hover:shadow-[0_16px_44px_-18px_rgba(77,168,218,0.22)]",
-      ].join(" ")}
-    >
-      {/* ── Decorative banner ────────────────────────────────────── */}
+    <article className="group relative overflow-hidden rounded-3xl border border-foreground/10 bg-white shadow-[0_10px_34px_-14px_rgba(18,35,46,0.16)] transition-shadow duration-300 hover:shadow-[0_18px_44px_-18px_rgba(0,124,199,0.32)] dark:border-white/10 dark:bg-white/[0.04] dark:shadow-[0_10px_34px_-14px_rgba(0,0,0,0.55)]">
+      {/* ── Banner ───────────────────────────────────────────────── */}
       <div
         aria-hidden="true"
-        className="relative h-24 overflow-hidden bg-gradient-to-br from-primary/12 via-sky/10 to-transparent dark:from-primary/22 dark:via-sky/12 dark:to-transparent"
+        className="relative h-32 overflow-hidden bg-gradient-to-br from-navy via-[#0f4a78] to-primary"
       >
-        <div className="absolute -right-8 -top-10 h-32 w-32 rounded-full bg-sky/20 blur-2xl dark:bg-sky/15" />
-        <div className="absolute -left-10 top-4 h-24 w-24 rounded-full bg-primary/10 blur-2xl dark:bg-primary/20" />
-        <div className="absolute inset-x-0 bottom-0 h-px bg-foreground/5 dark:bg-white/8" />
+        <div className="absolute -right-10 -top-12 h-40 w-40 rounded-full bg-sky/35 blur-3xl" />
+        <div className="absolute -bottom-16 -left-10 h-36 w-36 rounded-full bg-primary/50 blur-3xl" />
+        <div className="absolute inset-0 opacity-[0.12] [background-image:radial-gradient(circle,white_1px,transparent_1px)] [background-size:18px_18px]" />
       </div>
+
+      {badge && (
+        <span
+          className={[
+            "absolute right-4 top-4 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5",
+            "text-[10px] font-bold uppercase tracking-[0.14em]",
+            badge.className,
+          ].join(" ")}
+        >
+          {badge.icon}
+          {badge.label}
+        </span>
+      )}
 
       <div className="px-6 pb-6">
         {/* ── Avatar ─────────────────────────────────────────────── */}
-        <div className="-mt-12 flex justify-center">
-          <div className="rounded-full bg-gradient-to-br from-primary via-sky to-primary/50 p-[3px] shadow-[0_14px_30px_-14px_rgba(0,124,199,0.65)]">
-            <div className="h-24 w-24 overflow-hidden rounded-full border-[3px] border-white bg-white dark:border-[#1b2c36] dark:bg-[#1b2c36]">
-              {user.image ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={user.image}
-                  alt={`${user.name}'s profile`}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary to-sky text-2xl font-bold tracking-wide text-white select-none">
-                  {initials}
-                </span>
-              )}
-            </div>
+        <div className="-mt-14 flex justify-center">
+          <div className="h-28 w-28 overflow-hidden rounded-full bg-white shadow-[0_14px_30px_-12px_rgba(0,124,199,0.6)] ring-4 ring-white dark:bg-[#1b2c36] dark:ring-[#1b2c36]">
+            {user.image ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={user.image}
+                alt={`${user.name}'s profile`}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <span className="flex h-full w-full select-none items-center justify-center bg-gradient-to-br from-primary to-sky text-3xl font-bold tracking-wide text-white">
+                {initials}
+              </span>
+            )}
           </div>
         </div>
 
-        {/* ── Name, email & role ─────────────────────────────────── */}
+        {/* ── Name & email ───────────────────────────────────────── */}
         <div className="mt-4 flex flex-col items-center text-center">
-          <h2 className="max-w-full break-words font-display text-[22px] leading-tight tracking-tight text-navy dark:text-on-dark">
+          <h2 className="max-w-full break-words text-[22px] font-semibold leading-tight tracking-tight text-navy dark:text-on-dark">
             {user.name}
           </h2>
 
-          <p className="mt-1.5 max-w-full break-words text-[12.5px] leading-relaxed text-foreground/55">
+          <p className="mt-1 max-w-full break-all text-[13px] leading-relaxed text-foreground/55">
             {user.email}
           </p>
-
-          {badge && (
-            <span
-              className={[
-                "mt-4 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5",
-                "text-[10px] font-bold uppercase tracking-[0.14em]",
-                badge.className,
-              ].join(" ")}
-            >
-              {badge.icon}
-              {badge.label}
-            </span>
-          )}
         </div>
 
-        {/* ── Role-specific stats ─────────────────────────────────── */}
+        {/* ── Role-specific stats (separate tiles) ───────────────── */}
         {stats.length > 0 && (
-          <div
-            className={[
-              "mt-6 grid divide-x divide-foreground/8 overflow-hidden rounded-2xl",
-              "border border-foreground/8 bg-foreground/[0.02]",
-              "dark:divide-white/8 dark:border-white/8 dark:bg-white/[0.02]",
-              statGridClass(stats.length),
-            ].join(" ")}
-          >
+          <div className={`mt-6 grid gap-2.5 ${statGridClass(stats.length)}`}>
             {stats.map((stat) => (
               <Stat key={stat.label} value={stat.value} label={stat.label} />
             ))}
@@ -175,28 +158,30 @@ export default function ProfileCard({
 
         {/* ── Account details ─────────────────────────────────────── */}
         {meta.length > 0 && (
-          <div className="mt-3 flex flex-col gap-2">
+          <dl className="mt-4 divide-y divide-foreground/8 overflow-hidden rounded-2xl border border-foreground/8 dark:divide-white/8 dark:border-white/8">
             {meta.map((row) => (
               <div
                 key={row.label}
-                className="flex items-center justify-between gap-3 rounded-2xl border border-foreground/8 bg-foreground/[0.02] px-4 py-3 dark:border-white/8 dark:bg-white/[0.02]"
+                className="flex items-center justify-between gap-3 px-4 py-3"
               >
-                <span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-foreground/45">
-                  {row.label === "Account Status" ? <StatusIcon /> : <CalendarIcon />}
+                <dt className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-foreground/45">
+                  <span className="text-primary dark:text-sky">
+                    {row.label === "Account Status" ? <StatusIcon /> : <CalendarIcon />}
+                  </span>
                   {row.label}
-                </span>
+                </dt>
 
-                <span
+                <dd
                   className={[
                     "text-right text-[13px] font-semibold",
                     META_TONE[row.tone ?? "neutral"],
                   ].join(" ")}
                 >
                   {row.value}
-                </span>
+                </dd>
               </div>
             ))}
-          </div>
+          </dl>
         )}
       </div>
     </article>
@@ -207,11 +192,11 @@ export default function ProfileCard({
 
 function Stat({ value, label }: { value: string; label: string }) {
   return (
-    <div className="flex min-w-0 flex-col items-center gap-1 px-2.5 py-4 text-center">
-      <span className="text-[18px] font-bold leading-none text-navy dark:text-on-dark">
+    <div className="flex min-w-0 flex-col items-center gap-1.5 rounded-2xl border border-foreground/8 bg-foreground/[0.03] px-2 py-4 text-center dark:border-white/8 dark:bg-white/[0.04]">
+      <span className="text-xl font-bold leading-none tracking-tight text-navy dark:text-on-dark">
         {value}
       </span>
-      <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-foreground/45">
+      <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-foreground/45">
         {label}
       </span>
     </div>

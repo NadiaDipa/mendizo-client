@@ -6,9 +6,7 @@ import { createAuthMiddleware } from "better-auth/api";
 
 const client = new MongoClient(process.env.MONGODB_URI!);
 
-// Shared database handle. Exported so server components (for example the
-// profile page) can read role-specific statistics without duplicating the
-// BetterAuth connection configuration.
+// Shared database handle.
 export const db = client.db("mendizo");
 
 export const auth = betterAuth({
@@ -21,6 +19,14 @@ export const auth = betterAuth({
     autoSignIn: false,
   },
 
+  // Google Sign-In / Sign-Up
+  socialProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    },
+  },
+
   user: {
     additionalFields: {
       role: {
@@ -29,19 +35,16 @@ export const auth = betterAuth({
         defaultValue: "customer",
         input: true,
       },
-
       phone: {
         type: "string",
         required: false,
         input: true,
       },
-
       area: {
         type: "string",
         required: false,
         input: true,
       },
-
       bio: {
         type: "string",
         required: false,
