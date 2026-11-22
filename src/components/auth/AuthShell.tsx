@@ -104,19 +104,23 @@ export default function AuthShell({ variant, children }: AuthShellProps) {
 
           {/* Desktop: photographic visual + floating badge */}
           <div className="relative z-10 mt-10 hidden lg:block">
-            <div className="relative h-[clamp(9.5rem,24vh,15rem)] w-full overflow-hidden rounded-[26px] border border-white/12 bg-[linear-gradient(140deg,rgba(77,168,218,0.22),rgba(0,124,199,0.08))]">
-              <Image
-                src="/images/technician-3.png"
-                alt="Mendizo technician repairing a home appliance"
-                fill
-                sizes="(min-width: 1024px) 42vw, 0px"
-                className="object-contain object-bottom p-3 drop-shadow-[0_14px_18px_rgba(0,0,0,0.35)]"
-              />
+            {/* Outer frame: equal gap (p-3) on all four sides */}
+            <div className="w-full rounded-[28px] border border-white/20 bg-white/[0.07] p-3 shadow-[0_24px_50px_-30px_rgba(0,0,0,0.7)]">
+              <div className="relative aspect-[3/1] w-full overflow-hidden rounded-[18px]">
+                <Image
+                  src="/images/sign-in.png"
+                  alt="Mendizo technicians repairing a smartphone, an AC and a washing machine"
+                  fill
+                  priority
+                  sizes="(min-width: 1024px) 42vw, 0px"
+                  className="scale-[1.02] object-cover object-[center_55%]"
+                />
 
-              <span className="absolute bottom-3 left-3 inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/95 px-3 py-1.5 text-[11.5px] font-semibold text-navy shadow-[0_12px_28px_-14px_rgba(11,34,64,0.6)]">
-                <CheckIcon className="h-3.5 w-3.5 text-primary" />
-                Verified professionals
-              </span>
+                <span className="absolute bottom-3 left-3 inline-flex items-center gap-2 rounded-full border border-white/70 bg-white px-3 py-1.5 text-[11.5px] font-semibold text-primary shadow-[0_12px_28px_-14px_rgba(11,34,64,0.6)]">
+                  <CheckIcon className="h-3.5 w-3.5 text-primary" />
+                  Verified professionals
+                </span>
+              </div>
             </div>
           </div>
 
