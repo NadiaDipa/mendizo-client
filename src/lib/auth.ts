@@ -1,4 +1,3 @@
-
 import { betterAuth } from "better-auth";
 import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
@@ -10,6 +9,12 @@ const client = new MongoClient(process.env.MONGODB_URI!);
 export const db = client.db("mendizo");
 
 export const auth = betterAuth({
+  baseURL: process.env.BETTER_AUTH_URL || "https://mendizo-client.vercel.app",
+  trustedOrigins: [
+    "https://mendizo-client.vercel.app",
+    "http://localhost:3000",
+  ],
+
   database: mongodbAdapter(db, {
     client,
   }),
