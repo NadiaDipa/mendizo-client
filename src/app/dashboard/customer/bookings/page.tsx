@@ -64,7 +64,7 @@ function mapStatus(status: string): string {
     cancelled: "Cancelled",
     rejected: "Rejected",
   };
-  return map[status] ?? status;
+  return map[status] ?? String(status ?? "");
 }
 
 function mapPayment(paymentStatus?: string): string {
@@ -74,7 +74,9 @@ function mapPayment(paymentStatus?: string): string {
 
 function formatDate(dateStr?: string): string {
   if (!dateStr) return "N/A";
-  return new Date(dateStr).toLocaleDateString("en-US", {
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return "N/A";
+  return d.toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -101,10 +103,13 @@ function BookingsPageInner() {
   async function fetchBookings() {
     try {
       setLoading(true);
-      const res = await fetch(`${API_URL}/api/bookings/my`, {
+      setError(null);
+      const res = await fetch(`${API_URL}/api/customer/bookings`, {
         credentials: "include",
       });
-      if (!res.ok) throw new Error("Failed to fetch bookings.");
+      if (!res.ok) {
+        throw new Error(`Failed to fetch bookings (status ${res.status}).`);
+      }
       const data = await res.json();
       setBookings(Array.isArray(data) ? data : []);
     } catch (err: unknown) {
@@ -307,18 +312,20 @@ function BookingsPageInner() {
           const displayAmount = Number(
             booking.finalAmount ?? booking.amount ?? booking.basePrice ?? 0,
           );
+          const bookingId = String(booking._id);
 
           return (
-            <article key={booking._id} className={`${CARD} p-4 sm:p-5`}>
+            <article key={bookingId} className={`${CARD} p-4 sm:p-5`}>
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div className="flex min-w-0 items-start gap-3.5 sm:gap-4">
                   {/* Service Image */}
                   <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border border-foreground/8 bg-foreground/5 dark:border-white/8 sm:h-24 sm:w-24">
-                    {booking.serviceImage ? (
+                    {typeof booking.serviceImage === "string" &&
+                    booking.serviceImage ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={booking.serviceImage}
-                        alt={booking.serviceTitle}
+                        alt={String(booking.serviceTitle ?? "Service")}
                         className="h-full w-full object-cover"
                       />
                     ) : (
@@ -331,10 +338,10 @@ function BookingsPageInner() {
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                       <h3 className="text-[14.5px] font-bold leading-snug text-navy dark:text-on-dark">
-                        {booking.serviceTitle}
+                        {String(booking.serviceTitle ?? "")}
                       </h3>
                       <span className="rounded-md bg-foreground/[0.04] px-1.5 py-0.5 font-mono text-[10px] text-foreground/40 dark:bg-white/[0.06]">
-                        {booking._id.slice(-8).toUpperCase()}
+                        {bookingId.slice(-8).toUpperCase()}
                       </span>
                     </div>
 
@@ -342,7 +349,7 @@ function BookingsPageInner() {
                       <WrenchIcon className="h-3.5 w-3.5 shrink-0 text-foreground/35" />
                       Technician:{" "}
                       <strong className="text-foreground/80 dark:text-on-dark/80">
-                        {booking.technicianName}
+                        {String(booking.technicianName ?? "")}
                       </strong>
                     </p>
 
@@ -383,11 +390,10 @@ function BookingsPageInner() {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    {/* Cancel button: only when status === 'requested' with confirmation modal */}
                     {canCancel && (
                       <button
                         type="button"
-                        aria-label={`Cancel booking ${booking._id}`}
+                        aria-label={`Cancel booking ${bookingId}`}
                         onClick={() => setCancelTarget(booking)}
                         className="rounded-xl border border-foreground/15 px-4 py-2 text-[12px] font-semibold text-foreground/65 transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-600 dark:border-white/12 dark:hover:border-red-400/30 dark:hover:bg-red-400/10 dark:hover:text-red-300"
                       >
@@ -395,22 +401,20 @@ function BookingsPageInner() {
                       </button>
                     )}
 
-                    {/* Pay Now button: appears only when status === 'completed' and paymentStatus === 'unpaid' */}
                     {canPay && (
                       <button
                         type="button"
-                        disabled={payingId === booking._id}
-                        aria-label={`Pay for booking ${booking._id}`}
+                        disabled={payingId === bookingId}
+                        aria-label={`Pay for booking ${bookingId}`}
                         onClick={() => handlePay(booking)}
                         className="rounded-xl bg-primary px-5 py-2 text-[12px] font-bold text-white shadow-md transition-all hover:bg-sky hover:text-navy disabled:opacity-50"
                       >
-                        {payingId === booking._id
+                        {payingId === bookingId
                           ? "Redirecting..."
                           : "Pay Now (Stripe)"}
                       </button>
                     )}
 
-                    {/* Paid badge: when paid, show Paid badge instead of button */}
                     {isPaid && (
                       <span className="inline-flex items-center gap-1 rounded-xl bg-emerald-500/15 px-3 py-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
                         ✓ Paid
@@ -434,7 +438,7 @@ function BookingsPageInner() {
             <p className="mt-2 text-[13px] text-foreground/60 leading-relaxed">
               Are you sure you want to cancel your repair request for{" "}
               <strong className="text-foreground/90">
-                {cancelTarget.serviceTitle}
+                {String(cancelTarget.serviceTitle ?? "")}
               </strong>
               ? This action cannot be undone.
             </p>

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState, useCallback, useRef, Suspense } from "react";
@@ -22,7 +21,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = "";
 
 const DEFAULT_IMAGE = "/images/showcase-2.png";
 
@@ -85,7 +84,7 @@ function ServicesContent() {
   const initialSort = searchParams.get("sort") || "newest";
   const initialPage = Math.max(
     1,
-    parseInt(searchParams.get("page") || "1", 10)
+    parseInt(searchParams.get("page") || "1", 10),
   );
 
   const [search, setSearch] = useState(initialSearch);
@@ -188,9 +187,7 @@ function ServicesContent() {
     setSelectedSort(urlSort || "newest");
 
     const urlPage = searchParams.get("page");
-    setCurrentPage(
-      urlPage ? Math.max(1, parseInt(urlPage, 10) || 1) : 1
-    );
+    setCurrentPage(urlPage ? Math.max(1, parseInt(urlPage, 10) || 1) : 1);
   }, [searchParams]);
 
   // Fetch services after the user pauses typing.
@@ -240,19 +237,11 @@ function ServicesContent() {
     } catch (err) {
       console.error("Browse services error:", err);
 
-      setError(
-        err instanceof Error ? err.message : "Failed to load services."
-      );
+      setError(err instanceof Error ? err.message : "Failed to load services.");
     } finally {
       setLoading(false);
     }
-  }, [
-    search,
-    selectedCategory,
-    selectedMode,
-    selectedSort,
-    currentPage,
-  ]);
+  }, [search, selectedCategory, selectedMode, selectedSort, currentPage]);
 
   // Update the URL separately, without changing the input value.
   useEffect(() => {
@@ -329,7 +318,8 @@ function ServicesContent() {
 
             <p className="mt-4 text-base text-on-dark/75 sm:text-lg">
               Search by appliance, device type, or problem. Transparent pricing,
-              step-by-step tracking, and payment only after the work is completed.
+              step-by-step tracking, and payment only after the work is
+              completed.
             </p>
 
             {/* Main Search Bar */}
@@ -517,7 +507,8 @@ function ServicesContent() {
             </span>{" "}
             approved service{services.length === 1 ? "" : "s"}
             <span className="hidden sm:inline">
-              {" "}— availability is shown on every listing
+              {" "}
+              — availability is shown on every listing
             </span>
           </p>
         </div>
@@ -715,7 +706,7 @@ function ServicesContent() {
               <span className="font-bold text-navy dark:text-on-dark">
                 {Math.min(
                   (currentPage - 1) * pageSize + services.length,
-                  totalCount
+                  totalCount,
                 )}
               </span>{" "}
               of{" "}
