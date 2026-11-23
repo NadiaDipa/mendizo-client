@@ -3,7 +3,18 @@ import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { createAuthMiddleware } from "better-auth/api";
 
-const client = new MongoClient(process.env.MONGODB_URI!);
+const globalForMongo = globalThis as unknown as {
+  mendizoMongoClient?: MongoClient;
+};
+
+const client =
+  globalForMongo.mendizoMongoClient ??
+  new MongoClient(process.env.MONGODB_URI!, {
+    maxPoolSize: 5,
+    serverSelectionTimeoutMS: 10000,
+  });
+
+globalForMongo.mendizoMongoClient = client;
 
 // Shared database handle.
 export const db = client.db("mendizo");
