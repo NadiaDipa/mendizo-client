@@ -55,17 +55,20 @@ type Filter = "all" | "approved" | "pending" | "rejected";
 const STATUS_META = {
   approved: {
     label: "Live",
-    badge: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
+    badge:
+      "bg-emerald-50 text-emerald-700 ring-emerald-600/25 dark:bg-emerald-400/15 dark:text-emerald-300 dark:ring-emerald-400/30",
     dot: "bg-emerald-500",
   },
   pending: {
     label: "Pending review",
-    badge: "bg-amber-50 text-amber-700 ring-amber-600/20",
+    badge:
+      "bg-amber-50 text-amber-700 ring-amber-600/25 dark:bg-amber-400/15 dark:text-amber-300 dark:ring-amber-400/30",
     dot: "bg-amber-500",
   },
   rejected: {
     label: "Rejected",
-    badge: "bg-red-50 text-red-700 ring-red-600/20",
+    badge:
+      "bg-red-50 text-red-700 ring-red-600/25 dark:bg-red-400/15 dark:text-red-300 dark:ring-red-400/30",
     dot: "bg-red-500",
   },
 } as const;
@@ -78,7 +81,7 @@ const FILTERS: { key: Filter; label: string }[] = [
 ];
 
 const FIELD_CLASS =
-  "w-full rounded-xl border border-foreground/15 bg-white px-3.5 py-2.5 text-sm text-navy outline-none transition placeholder:text-foreground/40 focus:border-primary focus:ring-4 focus:ring-primary/15 dark:border-white/15 dark:bg-white/5 dark:text-on-dark dark:placeholder:text-on-dark/40";
+  "w-full rounded-xl border border-foreground/20 bg-white px-4 py-3 text-[15px] text-navy outline-none transition placeholder:text-foreground/45 focus:border-primary focus:ring-4 focus:ring-primary/15 dark:border-white/20 dark:bg-white/5 dark:text-on-dark dark:placeholder:text-on-dark/45";
 
 export default function MyServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
@@ -316,7 +319,7 @@ export default function MyServicesPage() {
           <h1 className="font-display text-2xl font-bold text-navy dark:text-on-dark sm:text-3xl">
             My Services
           </h1>
-          <p className="mt-1.5 max-w-xl text-sm text-foreground/60 dark:text-on-dark/60">
+          <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-foreground/75 dark:text-on-dark/80">
             Manage your repair listings. Editing a service sends it back for
             admin approval.
           </p>
@@ -324,15 +327,15 @@ export default function MyServicesPage() {
 
         <Link
           href="/dashboard/technician/add-service"
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_-12px_rgba(0,124,199,0.9)] transition hover:-translate-y-0.5 hover:bg-sky hover:text-navy"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-[15px] font-semibold text-white shadow-[0_10px_24px_-12px_rgba(0,124,199,0.9)] transition hover:-translate-y-0.5 hover:bg-sky hover:text-navy"
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="h-[18px] w-[18px]" />
           Add New Service
         </Link>
       </header>
 
       {/* Stats */}
-      <section className="grid gap-4 sm:grid-cols-3">
+      <section className="grid gap-5 sm:grid-cols-3">
         <StatCard
           label="Total Services"
           value={counts.all}
@@ -369,18 +372,18 @@ export default function MyServicesPage() {
                 role="tab"
                 aria-selected={active}
                 onClick={() => setFilter(item.key)}
-                className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold transition ${
+                className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition ${
                   active
                     ? "border-primary bg-primary text-white shadow-sm"
-                    : "border-foreground/10 bg-white text-foreground/70 hover:border-primary/40 hover:text-primary dark:border-white/10 dark:bg-white/5 dark:text-on-dark/70 dark:hover:text-sky"
+                    : "border-foreground/20 bg-white text-foreground/80 hover:border-primary/40 hover:text-primary dark:border-white/15 dark:bg-white/5 dark:text-on-dark/80 dark:hover:text-sky"
                 }`}
               >
                 {item.label}
                 <span
-                  className={`rounded-full px-1.5 py-0.5 text-[10px] leading-none ${
+                  className={`rounded-full px-2 py-0.5 text-[13px] leading-none ${
                     active
-                      ? "bg-white/20 text-white"
-                      : "bg-foreground/10 text-foreground/60 dark:bg-white/10 dark:text-on-dark/60"
+                      ? "bg-white/25 text-white"
+                      : "bg-foreground/10 text-foreground/70 dark:bg-white/10 dark:text-on-dark/75"
                   }`}
                 >
                   {counts[item.key]}
@@ -418,20 +421,20 @@ export default function MyServicesPage() {
           <h3 className="mt-5 text-lg font-semibold text-navy dark:text-on-dark">
             No services listed yet
           </h3>
-          <p className="mx-auto mt-1.5 max-w-sm text-sm text-foreground/60 dark:text-on-dark/60">
+          <p className="mx-auto mt-2 max-w-sm text-[15px] leading-relaxed text-foreground/75 dark:text-on-dark/80">
             Submit your first repair service to start receiving customer
             requests.
           </p>
           <Link
             href="/dashboard/technician/add-service"
-            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-sky hover:text-navy"
+            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-[15px] font-semibold text-white transition hover:bg-sky hover:text-navy"
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="h-[18px] w-[18px]" />
             Create a Service
           </Link>
         </div>
       ) : visibleServices.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-foreground/20 bg-white px-6 py-12 text-center text-sm text-foreground/60 dark:border-white/15 dark:bg-surface/30 dark:text-on-dark/60">
+        <div className="rounded-2xl border border-dashed border-foreground/20 bg-white px-6 py-12 text-center text-[15px] text-foreground/75 dark:border-white/15 dark:bg-surface/30 dark:text-on-dark/80">
           No services in this category.
         </div>
       ) : (
@@ -470,41 +473,41 @@ export default function MyServicesPage() {
                     className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/5 to-transparent"
                   />
 
-                  <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-navy shadow-sm backdrop-blur">
+                  <span className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1.5 text-[13px] font-bold text-navy shadow-sm backdrop-blur">
                     {service.category}
                   </span>
 
                   <span
-                    className={`absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold shadow-sm ring-1 ring-inset backdrop-blur ${status.badge}`}
+                    className={`absolute right-3 top-3 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[13px] font-bold shadow-sm ring-1 ring-inset backdrop-blur ${status.badge}`}
                   >
                     <span
-                      className={`h-1.5 w-1.5 rounded-full ${status.dot}`}
+                      className={`h-2 w-2 rounded-full ${status.dot}`}
                     />
                     {status.label}
                   </span>
 
-                  <div className="absolute bottom-3 left-4 text-white">
-                    <p className="text-[10px] font-medium uppercase tracking-wider text-white/75">
+                  <div className="absolute bottom-4 left-5 text-white">
+                    <p className="text-[13px] font-semibold uppercase tracking-wider text-white/85">
                       Starting from
                     </p>
-                    <p className="text-2xl font-bold leading-none">
+                    <p className="mt-0.5 text-3xl font-bold leading-none sm:text-[34px]">
                       ${Number(service.basePrice)}
                     </p>
                   </div>
                 </div>
 
                 {/* Body */}
-                <div className="flex flex-1 flex-col gap-4 p-5">
+                <div className="flex flex-1 flex-col gap-5 p-6 sm:p-7">
                   <div>
-                    <h3 className="line-clamp-1 text-[17px] font-semibold leading-snug tracking-tight text-navy dark:text-on-dark">
+                    <h3 className="line-clamp-1 text-xl font-bold leading-snug tracking-tight text-navy dark:text-on-dark sm:text-[22px]">
                       {service.title}
                     </h3>
-                    <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-foreground/60 dark:text-on-dark/60">
+                    <p className="mt-2 line-clamp-2 text-[15px] leading-relaxed text-foreground/75 dark:text-on-dark/80">
                       {service.description}
                     </p>
                   </div>
 
-                  <dl className="grid grid-cols-2 gap-x-4 gap-y-3 border-y border-foreground/10 py-4 text-xs dark:border-white/10">
+                  <dl className="grid grid-cols-1 gap-x-6 gap-y-5 border-y border-foreground/15 py-5 text-sm dark:border-white/15 sm:grid-cols-2">
                     <MetaItem icon={Timer} label="Duration">
                       {service.estimatedDuration}
                     </MetaItem>
@@ -519,30 +522,30 @@ export default function MyServicesPage() {
                   </dl>
 
                   {service.approvalStatus === "rejected" && (
-                    <p className="flex items-start gap-2 rounded-xl bg-red-50 px-3 py-2.5 text-xs text-red-700 dark:bg-red-500/10 dark:text-red-300">
-                      <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                    <p className="flex items-start gap-2.5 rounded-xl bg-red-50 px-4 py-3 text-[15px] leading-relaxed text-red-700 dark:bg-red-500/10 dark:text-red-300">
+                      <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
                       This service was rejected. Edit it and resubmit for
                       review.
                     </p>
                   )}
 
                   {/* Availability */}
-                  <div className="flex items-center justify-between gap-3 rounded-xl bg-foreground/[0.04] px-3.5 py-3 dark:bg-white/[0.05]">
+                  <div className="flex items-center justify-between gap-4 rounded-xl bg-foreground/[0.04] px-4 py-4 dark:bg-white/[0.06]">
                     <div className="min-w-0">
-                      <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-foreground/50 dark:text-on-dark/50">
-                        <Power className="h-3 w-3" />
+                      <p className="flex items-center gap-1.5 text-[13px] font-semibold uppercase tracking-wide text-foreground/70 dark:text-on-dark/75">
+                        <Power className="h-3.5 w-3.5" />
                         Visibility
                       </p>
                       <p
-                        className={`mt-0.5 text-xs font-semibold ${
+                        className={`mt-1 text-[15px] font-bold ${
                           service.isAvailable
-                            ? "text-emerald-600 dark:text-emerald-400"
-                            : "text-red-600 dark:text-red-400"
+                            ? "text-emerald-700 dark:text-emerald-300"
+                            : "text-red-700 dark:text-red-300"
                         }`}
                       >
                         {busy ? (
-                          <span className="inline-flex items-center gap-1.5 text-foreground/50 dark:text-on-dark/50">
-                            <Loader2 className="h-3 w-3 animate-spin" />
+                          <span className="inline-flex items-center gap-2 text-foreground/70 dark:text-on-dark/75">
+                            <Loader2 className="h-4 w-4 animate-spin" />
                             Saving...
                           </span>
                         ) : service.isAvailable ? (
@@ -560,16 +563,16 @@ export default function MyServicesPage() {
                       aria-label={`Toggle availability for ${service.title}`}
                       disabled={busy}
                       onClick={() => toggleAvailability(service)}
-                      className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-60 ${
+                      className={`relative inline-flex h-8 w-14 shrink-0 items-center rounded-full transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-60 ${
                         service.isAvailable
                           ? "bg-emerald-500"
-                          : "bg-foreground/25 dark:bg-white/25"
+                          : "bg-foreground/30 dark:bg-white/30"
                       }`}
                     >
                       <span
-                        className={`inline-block h-5 w-5 rounded-full bg-white shadow transition-transform duration-200 ${
+                        className={`inline-block h-6 w-6 rounded-full bg-white shadow transition-transform duration-200 ${
                           service.isAvailable
-                            ? "translate-x-6"
+                            ? "translate-x-7"
                             : "translate-x-1"
                         }`}
                       />
@@ -577,13 +580,13 @@ export default function MyServicesPage() {
                   </div>
 
                   {/* Actions */}
-                  <div className="mt-auto flex gap-2.5">
+                  <div className="mt-auto flex gap-3">
                     <button
                       type="button"
                       onClick={() => openEditModal(service)}
-                      className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-primary/30 px-3 py-2.5 text-xs font-semibold text-primary transition hover:bg-primary hover:text-white dark:border-sky/30 dark:text-sky dark:hover:bg-sky dark:hover:text-navy"
+                      className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-primary/30 px-4 py-3 text-sm font-bold text-primary transition hover:bg-primary hover:text-white dark:border-sky/30 dark:text-sky dark:hover:bg-sky dark:hover:text-navy"
                     >
-                      <Edit3 className="h-3.5 w-3.5" />
+                      <Edit3 className="h-4 w-4" />
                       Edit
                     </button>
 
@@ -591,9 +594,9 @@ export default function MyServicesPage() {
                       type="button"
                       onClick={() => setDeleteTarget(service)}
                       disabled={busy}
-                      className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-red-200 px-3 py-2.5 text-xs font-semibold text-red-600 transition hover:bg-red-600 hover:text-white disabled:opacity-50 dark:border-red-500/30 dark:text-red-400 dark:hover:bg-red-600 dark:hover:text-white"
+                      className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-red-200 px-4 py-3 text-sm font-bold text-red-700 transition hover:bg-red-600 hover:text-white disabled:opacity-50 dark:border-red-500/30 dark:text-red-300 dark:hover:bg-red-600 dark:hover:text-white"
                     >
-                      <Trash2 className="h-3.5 w-3.5" />
+                      <Trash2 className="h-4 w-4" />
                       Delete
                     </button>
                   </div>
@@ -627,7 +630,7 @@ export default function MyServicesPage() {
                 >
                   Edit Service
                 </h3>
-                <p className="mt-1 text-xs text-foreground/55 dark:text-on-dark/55">
+                <p className="mt-2 text-sm leading-relaxed text-foreground/75 dark:text-on-dark/80">
                   Saving changes sends this service back to pending admin
                   approval.
                 </p>
@@ -643,7 +646,7 @@ export default function MyServicesPage() {
               </button>
             </div>
 
-            <form onSubmit={handleSaveEdit} className="mt-5 space-y-4">
+            <form onSubmit={handleSaveEdit} className="mt-6 space-y-5">
               <Field label="Title">
                 <input
                   type="text"
@@ -741,7 +744,7 @@ export default function MyServicesPage() {
                   type="button"
                   onClick={() => setEditTarget(null)}
                   disabled={savingEdit}
-                  className="rounded-xl border border-foreground/15 px-4 py-2.5 text-sm font-semibold text-foreground/70 transition hover:bg-foreground/5 dark:border-white/15 dark:text-on-dark/70 dark:hover:bg-white/10"
+                  className="rounded-xl border border-foreground/20 px-4 py-2.5 text-sm font-bold text-foreground/80 transition hover:bg-foreground/5 dark:border-white/20 dark:text-on-dark/85 dark:hover:bg-white/10"
                 >
                   Cancel
                 </button>
@@ -749,7 +752,7 @@ export default function MyServicesPage() {
                 <button
                   type="submit"
                   disabled={savingEdit}
-                  className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-sky hover:text-navy disabled:opacity-50"
+                  className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-[15px] font-bold text-white transition hover:bg-sky hover:text-navy disabled:opacity-50"
                 >
                   {savingEdit ? (
                     <>
@@ -791,8 +794,8 @@ export default function MyServicesPage() {
               Delete this service?
             </h3>
 
-            <p className="mt-2 text-sm leading-relaxed text-foreground/60 dark:text-on-dark/60">
-              <strong className="text-foreground/80 dark:text-on-dark/80">
+            <p className="mt-2 text-[15px] leading-relaxed text-foreground/75 dark:text-on-dark/80">
+              <strong className="font-bold text-navy dark:text-on-dark">
                 {deleteTarget.title}
               </strong>{" "}
               will be permanently removed. This action cannot be undone.
@@ -803,7 +806,7 @@ export default function MyServicesPage() {
                 type="button"
                 onClick={() => setDeleteTarget(null)}
                 disabled={actionId === deleteTarget._id}
-                className="rounded-xl border border-foreground/15 px-4 py-2.5 text-sm font-semibold text-foreground/70 transition hover:bg-foreground/5 dark:border-white/15 dark:text-on-dark/70 dark:hover:bg-white/10"
+                className="rounded-xl border border-foreground/20 px-4 py-2.5 text-sm font-bold text-foreground/80 transition hover:bg-foreground/5 dark:border-white/20 dark:text-on-dark/85 dark:hover:bg-white/10"
               >
                 Cancel
               </button>
@@ -855,7 +858,7 @@ function StatCard({
         <Icon className="h-5 w-5" />
       </span>
       <div>
-        <p className="text-xs font-medium text-foreground/55 dark:text-on-dark/55">
+        <p className="text-sm font-semibold text-foreground/75 dark:text-on-dark/80">
           {label}
         </p>
         <p className="mt-0.5 text-3xl font-bold leading-none tracking-tight text-navy dark:text-on-dark">
@@ -876,15 +879,15 @@ function MetaItem({
   children: ReactNode;
 }) {
   return (
-    <div className="flex items-center gap-2.5">
-      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary dark:bg-sky/15 dark:text-sky">
-        <Icon className="h-4 w-4" />
+    <div className="flex items-center gap-3">
+      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary dark:bg-sky/15 dark:text-sky">
+        <Icon className="h-[18px] w-[18px]" />
       </span>
       <div className="min-w-0">
-        <dt className="text-[10px] font-medium uppercase tracking-wider text-foreground/45 dark:text-on-dark/45">
+        <dt className="text-[13px] font-semibold uppercase tracking-wide text-foreground/70 dark:text-on-dark/75">
           {label}
         </dt>
-        <dd className="truncate text-xs font-semibold text-navy dark:text-on-dark">
+        <dd className="mt-0.5 truncate text-[15px] font-bold text-navy dark:text-on-dark">
           {children}
         </dd>
       </div>
@@ -895,7 +898,7 @@ function MetaItem({
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-xs font-semibold text-foreground/70 dark:text-on-dark/70">
+      <span className="mb-2 block text-sm font-bold text-foreground/80 dark:text-on-dark/85">
         {label}
       </span>
       {children}
