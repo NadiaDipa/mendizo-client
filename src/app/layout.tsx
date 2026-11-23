@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   description:
     "Book trusted professionals for appliance and device repairs with Mendizo.",
   icons: {
-    icon: "/public/mendizo-logo.svg",
+    icon: "/mendizo-logo.svg",
   },
 };
 
