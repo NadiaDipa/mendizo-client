@@ -75,6 +75,18 @@ function normalizeRole(role?: string | null): ProfileUserData["role"] {
   return "customer";
 }
 
+// Convert Date objects to plain strings so they can safely cross from
+// server components to client components.
+function toIsoString(value?: Date | string | null): string | null {
+  if (!value) return null;
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) return null;
+
+  return date.toISOString();
+}
+
 function formatMemberSince(value?: Date | string | null) {
   if (!value) return null;
 
@@ -224,7 +236,7 @@ export async function getProfileData(sessionUser: SessionUser): Promise<ProfileD
       (typeof userDoc?.bio === "string" && userDoc.bio) ||
       sessionUser.bio ||
       "",
-    createdAt: userDoc?.createdAt || sessionUser.createdAt || null,
+    createdAt: toIsoString(userDoc?.createdAt || sessionUser.createdAt || null),
   };
 
   const stats: ProfileStat[] = [];
