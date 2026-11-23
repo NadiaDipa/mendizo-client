@@ -1,4 +1,4 @@
-import { db } from "@/lib/auth";
+import { getDb, withMongoRetry } from "@/lib/auth";
 
 // ─── Shared profile types ────────────────────────────────────────────────────
 
@@ -166,7 +166,7 @@ async function getTechnicianAverageRating(
 
     if (!("$or" in match)) return null;
 
-    const result = await db
+    const result = await getDb()
       .collection("reviews")
       .aggregate([
         {
@@ -206,8 +206,14 @@ export async function getProfileData(sessionUser: SessionUser): Promise<ProfileD
   const email = sessionUser.email?.trim().toLowerCase() || "";
   const userId = sessionUser.id?.trim() || "";
 
+  const userDoc = email
+    ? await withMongoRetry((db) =>
+        db.collection<MongoUser>("user").findOne({ email })
+      )
+    : null;
+
+  const db = getDb();
   const usersCol = db.collection<MongoUser>("user");
-  const userDoc = email ? await usersCol.findOne({ email }) : null;
 
   const role = normalizeRole(
     (typeof userDoc?.role === "string" && userDoc.role) || sessionUser.role
