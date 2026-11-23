@@ -20,6 +20,9 @@ export const metadata: Metadata = {
   title: "Mendizo — Expert Repairs at Your Doorstep",
   description:
     "Book trusted professionals for appliance and device repairs with Mendizo.",
+  icons: {
+    icon: "/public/mendizo-logo.svg",
+  },
 };
 
 // Runs before paint so a saved dark theme is applied without a flash.
