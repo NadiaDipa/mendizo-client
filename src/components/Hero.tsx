@@ -42,9 +42,6 @@ const HERO_IMAGES = [
   },
 ];
 
-// Background photo for the light blue side (public/images/hero-bg.jpg)
-const HERO_BG = "/images/hero-bg.jpg";
-
 // All cards share the same right edge (aligned with the Navbar's Sign Up button).
 // Only the left margin is staggered, so the cards differ in width but the right edge never moves.
 const LIGHT_CARDS = [
@@ -472,10 +469,7 @@ function HeroBackground() {
           className={`absolute inset-0 ${tier.show}`}
           style={{ clipPath: `url(#hero-right-clip-${tier.id})` }}
         >
-          <div
-            className="absolute inset-0 bg-cover bg-center opacity-30 blur-[2px] dark:opacity-20"
-            style={{ backgroundImage: `url(${HERO_BG})` }}
-          />
+          <div className="absolute inset-0 bg-cover bg-center opacity-30 blur-[2px] dark:opacity-20" />
           <div className="absolute inset-0 bg-[linear-gradient(90deg,var(--hero-right-from),transparent_55%)] opacity-70" />
         </div>
       ))}
