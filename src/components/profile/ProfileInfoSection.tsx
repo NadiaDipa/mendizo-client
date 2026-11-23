@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
@@ -56,8 +56,17 @@ export default function ProfileInfoSection({
   const [isSaving, setIsSaving] = useState(false);
 
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    return () => {
+      if (avatarPreview?.startsWith("blob:")) {
+        URL.revokeObjectURL(avatarPreview);
+      }
+    };
+  }, [avatarPreview]);
 
   const [form, setForm] = useState(() => ({
     fullName: user.name,
@@ -85,15 +94,27 @@ export default function ProfileInfoSection({
       bio: user.bio ?? "",
     });
 
+    setAvatarPreview(null);
+    setPendingAvatarFile(null);
+
+    if (avatarInputRef.current) {
+      avatarInputRef.current.value = "";
+    }
+
     setEditing(false);
   }
 
   // ─── Change Profile Photo ──────────────────────────────────────────────────
 
-  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
 
     if (!file) return;
+
+    if (!editing) {
+      e.target.value = "";
+      return;
+    }
 
     if (!file.type.startsWith("image/")) {
       toast.error("Please choose a valid image file.");
@@ -107,11 +128,21 @@ export default function ProfileInfoSection({
       return;
     }
 
+    setPendingAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
+    e.target.value = "";
+  }
+
+  // ─── Upload Pending Profile Photo ─────────────────────────────────────────
+
+  async function uploadPendingAvatar(): Promise<string | null> {
+    if (!pendingAvatarFile) return null;
+
     setIsUploadingAvatar(true);
 
     try {
       const formData = new FormData();
-      formData.append("image", file);
+      formData.append("image", pendingAvatarFile);
 
       const response = await fetch("/api/upload-image", {
         method: "POST",
@@ -124,17 +155,7 @@ export default function ProfileInfoSection({
         throw new Error(data.error || "Unable to upload your photo.");
       }
 
-      const { error } = await authClient.updateUser({
-        image: data.imageUrl,
-      });
-
-      if (error) {
-        throw new Error(error.message || "Unable to update your photo.");
-      }
-
-      setAvatarPreview(data.imageUrl);
-      toast.success("Profile photo updated successfully!");
-      router.refresh();
+      return data.imageUrl as string;
     } catch (error) {
       console.error("Profile photo update error:", error);
       toast.error(
@@ -142,12 +163,9 @@ export default function ProfileInfoSection({
           ? error.message
           : "Something went wrong. Please try again."
       );
+      return null;
     } finally {
       setIsUploadingAvatar(false);
-
-      if (avatarInputRef.current) {
-        avatarInputRef.current.value = "";
-      }
     }
   }
 
@@ -166,11 +184,19 @@ export default function ProfileInfoSection({
     setIsSaving(true);
 
     try {
+      let uploadedImageUrl: string | null = null;
+
+      if (pendingAvatarFile) {
+        uploadedImageUrl = await uploadPendingAvatar();
+        if (!uploadedImageUrl) return;
+      }
+
       const { error } = await authClient.updateUser({
         name: fullName,
         phone: form.phone.trim(),
         area: form.area.trim(),
         bio: form.bio.trim(),
+        ...(uploadedImageUrl ? { image: uploadedImageUrl } : {}),
       });
 
       if (error) {
@@ -180,6 +206,11 @@ export default function ProfileInfoSection({
 
       toast.success("Profile updated successfully!");
 
+      if (uploadedImageUrl) {
+        setAvatarPreview(uploadedImageUrl);
+      }
+
+      setPendingAvatarFile(null);
       setEditing(false);
 
       // Refresh server component data
@@ -206,7 +237,10 @@ export default function ProfileInfoSection({
     {
       label: "Add a profile photo",
       done: Boolean(avatarSrc),
-      onClick: () => avatarInputRef.current?.click(),
+      onClick: () => {
+        setEditing(true);
+        window.setTimeout(() => avatarInputRef.current?.click(), 60);
+      },
     },
     {
       label: "Add your phone number",
@@ -299,7 +333,7 @@ export default function ProfileInfoSection({
           <button
             type="button"
             onClick={() => avatarInputRef.current?.click()}
-            disabled={isUploadingAvatar}
+            disabled={!editing || isSaving || isUploadingAvatar}
             className={[
               "inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border bg-white",
               "border-foreground/15 px-4 py-2.5 text-[13px] font-semibold",

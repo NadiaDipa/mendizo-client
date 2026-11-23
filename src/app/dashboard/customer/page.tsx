@@ -16,12 +16,13 @@ type Stat = {
   value: string;
   hint: string;
   tone: string;
-  Icon: () => JSX.Element;
+  Icon: (props?: { className?: string }) => JSX.Element;
 };
 
 type ApiBooking = {
   _id: string;
   serviceTitle: string;
+  serviceImage?: string;
   technicianName: string;
   preferredDate: string;
   amount: number;
@@ -33,7 +34,7 @@ type ApiBooking = {
 // ─── Badge maps ──────────────────────────────────────────────────────────────
 
 const BOOKING_BADGE: Record<string, string> = {
-  Pending:
+  Requested:
     "bg-amber-500/10 text-amber-700 dark:bg-amber-400/15 dark:text-amber-300",
   Confirmed: "bg-sky/18 text-[#0b6a9e] dark:bg-sky/15 dark:text-sky",
   "In Progress": "bg-primary/10 text-primary dark:bg-sky/15 dark:text-sky",
@@ -52,7 +53,7 @@ const PAYMENT_BADGE: Record<string, string> = {
 
 function mapStatus(status: string): string {
   const map: Record<string, string> = {
-    requested: "Pending",
+    requested: "Requested",
     confirmed: "Confirmed",
     "in-progress": "In Progress",
     completed: "Completed",
@@ -154,13 +155,13 @@ export default function CustomerDashboardPage() {
     <div className="flex flex-col gap-6">
       {/* Intro */}
       <div>
-        <p className="text-[10.5px] font-bold uppercase tracking-[0.18em] text-primary dark:text-sky">
+        <p className="text-[13px] font-bold uppercase tracking-[0.14em] text-primary dark:text-sky">
           Overview
         </p>
         <h2 className="mt-1 font-display text-[clamp(1.5rem,3vw,2rem)] leading-tight tracking-tight text-navy dark:text-on-dark">
           Welcome back
         </h2>
-        <p className="mt-1 text-[13px] text-foreground/55">
+        <p className="mt-1.5 text-[13px] leading-relaxed text-foreground/75 dark:text-on-dark/80">
           Your repair activity at a glance.
         </p>
       </div>
@@ -177,13 +178,13 @@ export default function CustomerDashboardPage() {
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-[10.5px] font-bold uppercase tracking-[0.12em] text-foreground/45">
+                <p className="text-[13px] font-bold uppercase tracking-[0.08em] text-foreground/70 dark:text-on-dark/75">
                   {stat.label}
                 </p>
                 <p className="mt-2.5 font-display text-[34px] leading-none text-navy dark:text-on-dark">
                   {stat.value}
                 </p>
-                <p className="mt-2 text-[11.5px] text-foreground/45">
+                <p className="mt-2 text-[13px] leading-relaxed text-foreground/70 dark:text-on-dark/75">
                   {stat.hint}
                 </p>
               </div>
@@ -205,14 +206,14 @@ export default function CustomerDashboardPage() {
             <h2 className="text-[15px] font-bold text-navy dark:text-on-dark">
               Recent Bookings
             </h2>
-            <p className="mt-0.5 text-[12px] text-foreground/50">
+            <p className="mt-1 text-[13px] text-foreground/70 dark:text-on-dark/75">
               Your latest service requests.
             </p>
           </div>
 
           <Link
             href="/dashboard/customer/bookings"
-            className="group inline-flex shrink-0 items-center gap-1.5 rounded-full border border-primary/20 bg-primary/8 px-3.5 py-1.5 text-[11.5px] font-semibold text-primary transition-colors hover:border-primary/40 hover:bg-primary/14 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky dark:border-sky/25 dark:bg-sky/10 dark:text-sky dark:hover:border-sky/40 dark:hover:bg-sky/15"
+            className="group inline-flex shrink-0 items-center gap-1.5 rounded-full border border-primary/20 bg-primary/8 px-3.5 py-1.5 text-[13px] font-semibold text-primary transition-colors hover:border-primary/40 hover:bg-primary/14 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky dark:border-sky/25 dark:bg-sky/10 dark:text-sky dark:hover:border-sky/40 dark:hover:bg-sky/15"
           >
             View All
             <ArrowRightIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
@@ -230,18 +231,20 @@ export default function CustomerDashboardPage() {
                 className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6"
               >
                 <div className="flex min-w-0 items-center gap-3.5">
-                  {/* Placeholder gradient div instead of Image */}
-                  <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-foreground/8 bg-gradient-to-br from-primary/20 to-sky/30 dark:border-white/8 dark:from-sky/20 dark:to-primary/30" />
+                  <ServiceThumb
+                    src={booking.serviceImage}
+                    alt={booking.serviceTitle}
+                  />
 
                   <div className="min-w-0">
-                    <p className="truncate text-[13.5px] font-semibold text-navy dark:text-on-dark">
+                    <p className="truncate text-[15px] font-bold text-navy dark:text-on-dark">
                       {booking.serviceTitle}
                     </p>
-                    <p className="mt-0.5 text-[12px] text-foreground/50">
+                    <p className="mt-0.5 text-[13px] text-foreground/75 dark:text-on-dark/80">
                       {booking.technicianName}
                     </p>
-                    <p className="mt-0.5 flex items-center gap-1 text-[11.5px] text-foreground/40">
-                      <CalendarIcon className="h-3 w-3" />
+                    <p className="mt-0.5 flex items-center gap-1 text-[13px] text-foreground/70 dark:text-on-dark/75">
+                      <CalendarIcon className="h-3.5 w-3.5" />
                       {formatDate(booking.preferredDate)}
                     </p>
                   </div>
@@ -253,20 +256,20 @@ export default function CustomerDashboardPage() {
                       label={displayStatus}
                       className={
                         BOOKING_BADGE[displayStatus] ??
-                        "bg-foreground/8 text-foreground/60"
+                        "bg-foreground/8 text-foreground/70 dark:text-on-dark/75"
                       }
                     />
                     <StatusBadge
                       label={displayPayment}
                       className={
                         PAYMENT_BADGE[displayPayment] ??
-                        "bg-foreground/8 text-foreground/60"
+                        "bg-foreground/8 text-foreground/70 dark:text-on-dark/75"
                       }
                     />
                   </div>
 
-                  <p className="shrink-0 text-[14px] font-bold text-navy dark:text-on-dark">
-                    ৳{booking.amount.toLocaleString()}
+                  <p className="shrink-0 text-[15px] font-bold text-navy dark:text-on-dark">
+                    {`$${booking.amount.toLocaleString()} USD`}
                   </p>
                 </div>
               </li>
@@ -289,11 +292,39 @@ function StatusBadge({
 }) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.08em] ${className}`}
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[13px] font-bold uppercase tracking-[0.06em] ${className}`}
     >
       <span className="h-1.5 w-1.5 rounded-full bg-current" />
       {label}
     </span>
+  );
+}
+
+function ServiceThumb({ src, alt }: { src?: string; alt: string }) {
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    setFailed(false);
+  }, [src]);
+
+  const hasImage = typeof src === "string" && src.trim().length > 0 && !failed;
+
+  return (
+    <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-foreground/10 bg-foreground/5 dark:border-white/10 dark:bg-white/5">
+      {hasImage ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={src}
+          alt={alt}
+          onError={() => setFailed(true)}
+          className="h-full w-full object-cover"
+        />
+      ) : (
+        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/10 to-sky/20 text-primary dark:from-sky/15 dark:to-primary/20 dark:text-sky">
+          <WrenchIcon className="h-5 w-5" />
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -321,9 +352,9 @@ function ClipboardIcon() {
   );
 }
 
-function WrenchIcon() {
+function WrenchIcon({ className }: { className?: string } = {}) {
   return (
-    <svg {...svgProps()}>
+    <svg {...svgProps(className)}>
       <path d="M14.7 6.3a4.5 4.5 0 0 0 5.9 5.9l-9.3 9.3a2.5 2.5 0 0 1-3.5-3.5l9.3-9.3a4.5 4.5 0 0 0-5.9-5.9l3 3-2.5 2.5-3-3a4.5 4.5 0 0 0 6 1Z" />
     </svg>
   );

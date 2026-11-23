@@ -238,18 +238,18 @@ function BookingsPageInner() {
       {/* Intro */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-[10.5px] font-bold uppercase tracking-[0.18em] text-primary dark:text-sky">
+          <p className="text-[13px] font-bold uppercase tracking-[0.14em] text-primary dark:text-sky">
             Bookings
           </p>
           <h1 className="mt-1 font-display text-2xl sm:text-3xl font-bold tracking-tight text-navy dark:text-on-dark">
             My Service Bookings
           </h1>
-          <p className="mt-1 text-[13px] text-foreground/55">
+          <p className="mt-1.5 text-[13px] leading-relaxed text-foreground/75 dark:text-on-dark/80">
             Track schedules, job progress, and pay online only after completion.
           </p>
         </div>
 
-        <span className="inline-flex w-fit items-center gap-2 rounded-full border border-primary/20 bg-primary/8 px-3.5 py-1.5 text-[11.5px] font-semibold text-primary dark:border-sky/25 dark:bg-sky/10 dark:text-sky">
+        <span className="inline-flex w-fit items-center gap-2 rounded-full border border-primary/20 bg-primary/8 px-3.5 py-1.5 text-[13px] font-semibold text-primary dark:border-sky/25 dark:bg-sky/10 dark:text-sky">
           <CalendarIcon className="h-3.5 w-3.5" />
           {bookings.length} bookings total
         </span>
@@ -262,10 +262,10 @@ function BookingsPageInner() {
             key={tab}
             type="button"
             onClick={() => setFilter(tab)}
-            className={`rounded-full px-3.5 py-1.5 text-[11.5px] font-semibold transition-colors ${
+            className={`rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-colors ${
               filter === tab
                 ? "bg-primary text-white dark:bg-sky dark:text-navy"
-                : "border border-foreground/15 text-foreground/55 hover:border-primary/30 hover:text-primary dark:border-white/12 dark:hover:border-sky/30 dark:hover:text-sky"
+                : "border border-foreground/20 text-foreground/75 hover:border-primary/30 hover:text-primary dark:border-white/15 dark:text-on-dark/80 dark:hover:border-sky/30 dark:hover:text-sky"
             }`}
           >
             {tab}
@@ -290,7 +290,7 @@ function BookingsPageInner() {
                 </p>
                 <a
                   href="/services"
-                  className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-primary px-5 py-2 text-xs font-bold text-white hover:bg-sky hover:text-navy transition"
+                  className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-primary px-5 py-2 text-[13px] font-bold text-white transition hover:bg-sky hover:text-navy"
                 >
                   Browse Services
                 </a>
@@ -319,42 +319,31 @@ function BookingsPageInner() {
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div className="flex min-w-0 items-start gap-3.5 sm:gap-4">
                   {/* Service Image */}
-                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border border-foreground/8 bg-foreground/5 dark:border-white/8 sm:h-24 sm:w-24">
-                    {typeof booking.serviceImage === "string" &&
-                    booking.serviceImage ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={booking.serviceImage}
-                        alt={String(booking.serviceTitle ?? "Service")}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/10 to-sky/20 text-primary">
-                        <WrenchIcon className="h-6 w-6" />
-                      </div>
-                    )}
-                  </div>
+                  <ServiceImage
+                    src={booking.serviceImage}
+                    alt={String(booking.serviceTitle ?? "Service")}
+                  />
 
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                       <h3 className="text-[14.5px] font-bold leading-snug text-navy dark:text-on-dark">
                         {String(booking.serviceTitle ?? "")}
                       </h3>
-                      <span className="rounded-md bg-foreground/[0.04] px-1.5 py-0.5 font-mono text-[10px] text-foreground/40 dark:bg-white/[0.06]">
+                      <span className="rounded-md bg-foreground/[0.04] px-1.5 py-0.5 font-mono text-[13px] text-foreground/60 dark:bg-white/[0.06] dark:text-on-dark/70">
                         {bookingId.slice(-8).toUpperCase()}
                       </span>
                     </div>
 
-                    <p className="mt-1.5 flex items-center gap-1.5 text-[12.5px] text-foreground/55">
-                      <WrenchIcon className="h-3.5 w-3.5 shrink-0 text-foreground/35" />
+                    <p className="mt-1.5 flex items-center gap-1.5 text-[13px] text-foreground/75 dark:text-on-dark/80">
+                      <WrenchIcon className="h-3.5 w-3.5 shrink-0 text-foreground/55 dark:text-on-dark/60" />
                       Technician:{" "}
-                      <strong className="text-foreground/80 dark:text-on-dark/80">
+                      <strong className="font-bold text-foreground/90 dark:text-on-dark">
                         {String(booking.technicianName ?? "")}
                       </strong>
                     </p>
 
-                    <p className="mt-1 flex items-center gap-1.5 text-[12.5px] text-foreground/55">
-                      <CalendarIcon className="h-3.5 w-3.5 shrink-0 text-foreground/35" />
+                    <p className="mt-1 flex items-center gap-1.5 text-[13px] text-foreground/75 dark:text-on-dark/80">
+                      <CalendarIcon className="h-3.5 w-3.5 shrink-0 text-foreground/55 dark:text-on-dark/60" />
                       Preferred Date: {formatDate(booking.preferredDate)}
                     </p>
 
@@ -379,7 +368,7 @@ function BookingsPageInner() {
 
                 <div className="flex flex-wrap items-end justify-between gap-4 border-t border-foreground/8 pt-3 dark:border-white/8 lg:min-w-[190px] lg:flex-col lg:items-end lg:border-0 lg:pt-0">
                   <div className="text-left lg:text-right">
-                    <span className="text-[11px] text-foreground/45 block">
+                    <span className="block text-[13px] font-semibold text-foreground/70 dark:text-on-dark/75">
                       {booking.status === "completed"
                         ? "Final Amount"
                         : "Estimated Price"}
@@ -395,7 +384,7 @@ function BookingsPageInner() {
                         type="button"
                         aria-label={`Cancel booking ${bookingId}`}
                         onClick={() => setCancelTarget(booking)}
-                        className="rounded-xl border border-foreground/15 px-4 py-2 text-[12px] font-semibold text-foreground/65 transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-600 dark:border-white/12 dark:hover:border-red-400/30 dark:hover:bg-red-400/10 dark:hover:text-red-300"
+                        className="rounded-xl border border-foreground/20 px-4 py-2 text-[13px] font-semibold text-foreground/75 transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-600 dark:border-white/15 dark:text-on-dark/80 dark:hover:border-red-400/30 dark:hover:bg-red-400/10 dark:hover:text-red-300"
                       >
                         Cancel
                       </button>
@@ -407,7 +396,7 @@ function BookingsPageInner() {
                         disabled={payingId === bookingId}
                         aria-label={`Pay for booking ${bookingId}`}
                         onClick={() => handlePay(booking)}
-                        className="rounded-xl bg-primary px-5 py-2 text-[12px] font-bold text-white shadow-md transition-all hover:bg-sky hover:text-navy disabled:opacity-50"
+                        className="rounded-xl bg-primary px-5 py-2 text-[13px] font-bold text-white shadow-md transition-all hover:bg-sky hover:text-navy disabled:opacity-50"
                       >
                         {payingId === bookingId
                           ? "Redirecting..."
@@ -416,7 +405,7 @@ function BookingsPageInner() {
                     )}
 
                     {isPaid && (
-                      <span className="inline-flex items-center gap-1 rounded-xl bg-emerald-500/15 px-3 py-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                      <span className="inline-flex items-center gap-1 rounded-xl bg-emerald-500/15 px-3 py-1.5 text-[13px] font-bold text-emerald-700 dark:text-emerald-300">
                         ✓ Paid
                       </span>
                     )}
@@ -435,7 +424,7 @@ function BookingsPageInner() {
             <h3 className="font-display text-[16px] font-bold text-navy dark:text-on-dark">
               Cancel Repair Booking?
             </h3>
-            <p className="mt-2 text-[13px] text-foreground/60 leading-relaxed">
+            <p className="mt-2 text-[13px] leading-relaxed text-foreground/75 dark:text-on-dark/80">
               Are you sure you want to cancel your repair request for{" "}
               <strong className="text-foreground/90">
                 {String(cancelTarget.serviceTitle ?? "")}
@@ -447,7 +436,7 @@ function BookingsPageInner() {
                 type="button"
                 onClick={() => setCancelTarget(null)}
                 disabled={cancelLoading}
-                className="rounded-xl border border-foreground/15 px-4 py-2 text-[12px] font-semibold text-foreground/65 hover:bg-foreground/5 disabled:opacity-50"
+                className="rounded-xl border border-foreground/20 px-4 py-2 text-[13px] font-semibold text-foreground/75 hover:bg-foreground/5 disabled:opacity-50 dark:border-white/15 dark:text-on-dark/80"
               >
                 Keep Booking
               </button>
@@ -455,7 +444,7 @@ function BookingsPageInner() {
                 type="button"
                 onClick={handleCancel}
                 disabled={cancelLoading}
-                className="rounded-xl bg-red-600 px-4 py-2 text-[12px] font-bold text-white hover:bg-red-700 disabled:opacity-50 transition"
+                className="rounded-xl bg-red-600 px-4 py-2 text-[13px] font-bold text-white transition hover:bg-red-700 disabled:opacity-50"
               >
                 {cancelLoading ? "Cancelling…" : "Yes, Cancel"}
               </button>
@@ -485,6 +474,34 @@ export default function BookingsPage() {
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
+function ServiceImage({ src, alt }: { src?: string; alt: string }) {
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    setFailed(false);
+  }, [src]);
+
+  const hasImage = typeof src === "string" && src.trim().length > 0 && !failed;
+
+  return (
+    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border border-foreground/10 bg-foreground/5 dark:border-white/10 sm:h-24 sm:w-24">
+      {hasImage ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={src}
+          alt={alt}
+          onError={() => setFailed(true)}
+          className="h-full w-full object-cover"
+        />
+      ) : (
+        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/10 to-sky/20 text-primary dark:from-sky/15 dark:to-primary/20 dark:text-sky">
+          <WrenchIcon className="h-6 w-6" />
+        </div>
+      )}
+    </div>
+  );
+}
+
 function StatusBadge({
   label,
   className,
@@ -494,7 +511,7 @@ function StatusBadge({
 }) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.08em] ${className}`}
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[13px] font-bold uppercase tracking-[0.06em] ${className}`}
     >
       <span className="h-1.5 w-1.5 rounded-full bg-current" />
       {label}
